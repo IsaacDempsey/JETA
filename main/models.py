@@ -50,3 +50,4 @@ class DublinBusStops(models.Model):
     lng = models.DecimalField(max_digits=10, decimal_places=8)
     lud = CharField(max_length=200)
     routes = ArrayField(CharField(max_length=200))
+    flag = CharField(max_length=200)
