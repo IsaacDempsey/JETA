@@ -77,11 +77,11 @@ WSGI_APPLICATION = 'jeta.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'jetadb',
-        'USER': 'team7',
-        'PASSWORD': 'password',
+        'NAME': 'jetaDb',
+        'USER': 'postgres',
+        'PASSWORD': '00001234',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5433',
     }
 }
 

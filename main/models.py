@@ -1,3 +1,42 @@
 from django.db import models
 
 # Create your models here.
+class Leavetimes(models.Model):
+    datasource = models.CharField(max_length=200)
+    dayofservice = models.CharField(max_length=200)
+    trip = models.CharField(max_length=200)
+    tripid = models.CharField(max_length=200)
+    progrnumber = models.CharField(max_length=200)
+    stoppointid = models.CharField(max_length=200)
+    plannedtime_arr = models.CharField(max_length=200)
+    plannedtime_dep = models.CharField(max_length=200)
+    actualtime_arr = models.CharField(max_length=200)
+    actualtime_dep = models.CharField(max_length=200)
+    vehicleid = models.CharField(max_length=200)
+    passengers = models.CharField(max_length=200)
+    passengersin = models.CharField(max_length=200)
+    passengersout = models.CharField(max_length=200)
+    distance = models.CharField(max_length=200)
+    suppressed = models.CharField(max_length=200)
+    justificationid = models.CharField(max_length=200)
+    lastupdate = models.CharField(max_length=200)
+    note = models.CharField(max_length=200)
+
+class Trips(models.Model):
+    datasource = models.CharField(max_length=200)
+    dayofservice = models.CharField(max_length=200)
+    tripid = models.CharField(max_length=200)
+    lineid = models.CharField(max_length=200)
+    routeid = models.CharField(max_length=200)
+    direction = models.CharField(max_length=200)
+    plannedtime_arr = models.CharField(max_length=200)
+    plannedtime_dep = models.CharField(max_length=200)
+    actualtime_arr = models.CharField(max_length=200)
+    actualtime_dep = models.CharField(max_length=200)
+    basin = models.CharField(max_length=200)
+    tenderlot = models.CharField(max_length=200)
+    suppressed = models.CharField(max_length=200)
+    justificationid = models.CharField(max_length=200)
+    lastupdate = models.CharField(max_length=200)
+    note = models.CharField(max_length=200)
+
