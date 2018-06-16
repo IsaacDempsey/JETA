@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<img src='{% static "img/test_dublinBusLogo.png" %}' alt="Dublin Bus Logo"/>
+<div id="test_id" class="container-fluid">
+    <h1>Welcome to Jeta!</h1>
+</div>
+<table id='stationsTable' class="table table-bordered">
+    <tr>
+        <th>ID</th>
+        <th>Station ID</th>
+        <th>Bus Stop Name</th>
+    </tr>
+</table>
+<script>showStations()</script>
+{% endblock %}
