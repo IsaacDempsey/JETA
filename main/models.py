@@ -24,6 +24,13 @@ class Leavetimes(models.Model):
     lastupdate = CharField(max_length=200)
     note = CharField(max_length=200)
 
+    def __str__(self):
+        return self.tripid
+
+    class Meta:
+        verbose_name_plural = "Leavetimes"
+
+
 class Trips(models.Model):
     id = models.AutoField(primary_key=True)
     datasource = CharField(max_length=200)
@@ -43,6 +50,13 @@ class Trips(models.Model):
     lastupdate = CharField(max_length=200)
     note = CharField(max_length=200)
 
+    def __str__(self):
+        return self.tripid
+
+    class Meta:
+        verbose_name_plural = "Trips"
+
+
 class DublinBusStops(models.Model):
     stopid = CharField(max_length=200)
     loadtime = CharField(max_length=200)
@@ -52,3 +66,9 @@ class DublinBusStops(models.Model):
     lud = CharField(max_length=200)
     routes = ArrayField(CharField(max_length=200))
     flag = CharField(max_length=200)
+
+    def __str__(self):
+        return self.stopid
+
+    class Meta:
+        verbose_name_plural = "Dublin Bus Stops"
