@@ -4,9 +4,9 @@ from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 class Leavetimes(models.Model):
+    id = models.AutoField(primary_key=True)
     datasource = CharField(max_length=200)
     dayofservice = CharField(max_length=200)
-    trip = CharField(max_length=200)
     tripid = CharField(max_length=200)
     progrnumber = CharField(max_length=200)
     stoppointid = CharField(max_length=200)
@@ -25,6 +25,7 @@ class Leavetimes(models.Model):
     note = CharField(max_length=200)
 
 class Trips(models.Model):
+    id = models.AutoField(primary_key=True)
     datasource = CharField(max_length=200)
     dayofservice = CharField(max_length=200)
     tripid = CharField(max_length=200)
