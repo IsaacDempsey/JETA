@@ -73,8 +73,8 @@ class DublinBusStops(models.Model):
     lat = models.DecimalField(max_digits=10, decimal_places=8)
     lng = models.DecimalField(max_digits=10, decimal_places=8)
     lud = models.DateTimeField(null=True)
-    routes = ArrayField(models.CharField(max_length=5))
-    operator = models.CharField(max_length=5)
+    routes = ArrayField(models.CharField(max_length=10))
+    operator = models.CharField(max_length=10)
 
     def __str__(self):
         return "STOP: "+self.stopid+" OP: "+self.operator
