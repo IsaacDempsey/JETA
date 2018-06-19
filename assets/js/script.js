@@ -11,7 +11,7 @@ function showStations() {
             tableRows += "<td>"+station.stopid+"</td>";
             tableRows += "<td>"+station.busstopname+"</td>";
             tableRows += "</tr>";
+            stationsTable.innerHTML += tableRows;
         }
-        stationsTable.innerHTML += tableRows;
 	});
 }
