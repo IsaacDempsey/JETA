@@ -94,17 +94,18 @@ class DublinRoutes(models.Model):
         verbose_name_plural = "Dublin TFI Routes"
 
 class DublinWeather(models.Model):
-    date = models.DateTimeField()
+    date = models.CharField(max_length=12)
+    time = models.CharField(max_length=5, null=True)
     irain = models.IntegerField(null=True)
-    rain = models.FloatField(null=True)
+    rain = models.CharField(max_length=10,null=True)
     itemp = models.IntegerField(null=True)
-    temp = models.FloatField(null=True)
+    temp = models.CharField(max_length=10,null=True)
     iwetb = models.IntegerField(null=True)
-    wetb = models.FloatField(null=True)
-    dewpt = models.FloatField(null=True)
-    vappr = models.FloatField(null=True)
-    rhum = models.FloatField(null=True)
-    msl = models.FloatField(null=True)
+    wetb = models.CharField(max_length=10,null=True)
+    dewpt = models.CharField(max_length=10,null=True)
+    vappr = models.CharField(max_length=10,null=True)
+    rhum = models.CharField(max_length=10,null=True)
+    msl = models.CharField(max_length=10,null=True)
 
     def __str__(self):
         return self.date
@@ -114,4 +115,17 @@ class DublinWeather(models.Model):
         indexes = [
             models.Index(fields=['rain'],),
             models.Index(fields=['date'],),
+            models.Index(fields=['time'],),
+            models.Index(fields=['date','time'],),
         ]
+
+class BankHolidays(models.Model):
+    day = models.CharField(max_length=10)
+    date = models.CharField(max_length=15)
+    holiday = models.TextField()
+
+    def __str__(self):
+        return "Date: "+self.date+" Day: "+self.day
+    
+    class Meta:
+        verbose_name_plural = "Bank Holidays"
