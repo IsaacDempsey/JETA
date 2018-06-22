@@ -11,6 +11,7 @@ def index(request):
 # Returns first 10 stations in DublinBusStops table as JSON.
 def stations(request):
     stations = DublinBusStops.objects.all()[:10].values()
+    print(stations)
 
     stationJson = []
     for i in stations:

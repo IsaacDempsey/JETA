@@ -33,7 +33,7 @@ def main():
             'user': 'postgres',
             'password': '00001234',
             'host': 'localhost',
-            'port': '5433' # ------------ PORT 5433 for server db
+            'port': '5432' # ------------ PORT 5433 for server db
         }  # ---------------------------- Connection String to connect to the PostgreSQL Database
         conn = psycopg2.connect(**connect_str) # --------------------------- Connecting to the PostgreSQL Database using psycopg2 package
 
@@ -50,7 +50,7 @@ def main():
                 LUD = busStop['lastupdated']
                 routes = busStop['operators'][0]['routes']
                 flag = busStop['operators'][0]['name']
-
+                print(loadTime)
                 cursor.execute('INSERT INTO main_dublinbusstops VALUES (%s, %s, %s, %s, %s, %s, %s, %s::text[], %s)',
                                (i,stopId,loadTime,busStopName,latitude,longitude,LUD,routes, flag)) # --- INSERT INTO TABLE
         else:
