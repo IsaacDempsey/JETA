@@ -69,7 +69,7 @@ class BankHolidays(models.Model):
         verbose_name_plural = "Bank Holidays"
 
 class BusStopAddress(models.Model):
-    stopid=models.IntegerField(null=True)
+    stopid=models.CharField(max_length=10,null=True)
     address=models.TextField(null=True)
 
     def __str__(self):

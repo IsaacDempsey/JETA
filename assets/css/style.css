@@ -1,4 +1,4 @@
-#test_id {
+/* #test_id {
     background-color: lightcoral;
     text-align: center;
 }
@@ -7,4 +7,13 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
+} */
+
+.ui-autocomplete {
+    max-height: 200px !important;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* add padding to account for vertical scrollbar */
+    padding-right: 20px;
+} 

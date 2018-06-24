@@ -1,18 +1,18 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<!-- <img src='{% static "img/test_dublinBusLogo.png" %}' alt="Dublin Bus Logo"/>
-<div id="test_id" class="container-fluid">
-    <h1>Welcome to Jeta!</h1>
-</div>
-<table id='stationsTable' class="table table-bordered">
-    <tr>
-        <th>ID</th>
-        <th>Station ID</th>
-        <th>Bus Stop Name</th>
-    </tr>
-</table>
-<script>showStations()</script> -->
+<style>
+    .ui-autocomplete{
+        max-height: 200px !important;
+        max-width: 350px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+        /* add padding to account for vertical scrollbar */
+        padding-right: 20px;
+    }
+</style>
+
 <!-- CONTAINER TO HOLD THE FORM AND THE MAP -->
 <div class="container-fluid p-3" >
     <div class="row">
@@ -29,7 +29,7 @@
                 </div>
                 <div class="row">
                     <div class="col-xl-6 p-3">
-                        <input type="text" class="form-control" placeholder="Source">
+                        <input type="text" class="form-control" placeholder="Source" id="source">
                     </div>
                     <div class="col-xl-6 p-3">
                         <input type="text" class="form-control" placeholder="Destination">
@@ -54,12 +54,23 @@
             </form>
 
         </div>
-        <div class="col-xl-12 w-75 p-3"></div>
+        <div class="col-xl-12 w-75 p-3">
+        </div>
     </div>
 </div>
+<!-- <script>showStations()</script> -->
 <script type="text/javascript">
-    $(function () {
-        $('#datetimepicker1').datetimepicker();
+    var stationsTable = document.getElementById("stationsTable");
+
+    var $j = jQuery.noConflict();
+    $j(function () {
+        $j('#datetimepicker1').datetimepicker();
+    });
+    $j(function () {
+        $j("#source").autocomplete({
+            source: "{% url 'main:get_address' %}",
+            minLength: 2,
+        });
     });
 </script>
 {% endblock %}
