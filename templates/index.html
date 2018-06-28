@@ -32,7 +32,7 @@
                         <input type="text" class="form-control" placeholder="Source" id="source">
                     </div>
                     <div class="col-xl-6 p-3">
-                        <input type="text" class="form-control" placeholder="Destination">
+                        <input type="text" class="form-control" placeholder="Destination" id="destination">
                     </div>
                 </div>
                 <div class="row">
@@ -55,6 +55,8 @@
 
         </div>
         <div class="col-xl-12 w-75 p-3">
+            <div id='map' style='width: 400px; height: 300px;'></div>
+            
         </div>
     </div>
 </div>
@@ -72,5 +74,11 @@
             minLength: 2,
         });
     });
+    $j(function () {
+        $j("#destination").autocomplete({
+            source: "{% url 'main:get_address' %}",
+            minLength: 2,
+        })        
+    })
 </script>
 {% endblock %}
