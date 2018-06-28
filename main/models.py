@@ -67,3 +67,18 @@ class BankHolidays(models.Model):
     
     class Meta:
         verbose_name_plural = "Bank Holidays"
+
+class BusStopAddress(models.Model):
+    stopid=models.CharField(max_length=10,null=True)
+    address=models.TextField(null=True)
+
+    def __str__(self):
+        return self.stopid+self.address
+    
+    class Meta:
+        verbose_name_plural = "Bus Stop Address"
+        indexes = [
+            models.Index(fields=['stopid'],),
+            models.Index(fields=['address'],),
+            models.Index(fields=['stopid','address'],),
+        ]
