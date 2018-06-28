@@ -2,15 +2,15 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 import json
 from django.urls import reverse
-from .models import DublinBusStops, BusStopAddress
+from .models import Stops
 
 
 def index(request):
     return render(request, 'index.html')
 
-# Returns first 10 stations in DublinBusStops table as JSON.
+# Returns first 10 stations in Stops table as JSON.
 def stations(request):
-    stations = DublinBusStops.objects.all()[:10].values()
+    stations = Stops.objects.all()[:10].values()
     print(stations)
 
     stationJson = []
@@ -23,7 +23,7 @@ def stations(request):
 def get_address(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
-        badds = BusStopAddress.objects.filter(address__icontains=q)[:20]
+        badds = Stops.objects.filter(address__icontains=q)[:20]
         results = []
         for badd in badds:
             badd_json = {}
