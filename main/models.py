@@ -4,13 +4,38 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-class DublinBusStops(models.Model):
-    stopid = models.CharField(max_length=10)
-    loadtime = models.DateTimeField(null=True)
-    busstopname = models.TextField()
+class Routes(models.Model):
+    routeid = models.CharField(max_length=10, primary_key=True)
+    direction = models.IntegerField(null=True)
+    stopid = ArrayField(models.IntegerField(null=True))
+
+    def __str__(self):
+        return "Route ID: "+self.routeid
+    
+    class Meta:
+        verbose_name_plural = "Routes"
+        indexes = [
+            models.Index(fields=['routeid'],)
+        ]
+
+class Lines(models.Model):
+    lineid = models.CharField(max_length=10, primary_key=True)
+    routes = ArrayField(models.CharField(max_length=10))
+
+    def __str__(self):
+        return "Line ID: "+self.lineid
+    
+    class Meta:
+        verbose_name_plural = "Lines"
+        indexes = [
+            models.Index(fields=['lineid'],)
+        ]
+
+class Stops(models.Model):
+    stopid = models.CharField(max_length=10, primary_key=True)
+    address = models.TextField()
     lat = models.DecimalField(max_digits=10, decimal_places=8)
     lng = models.DecimalField(max_digits=10, decimal_places=8)
-    lud = models.DateTimeField(null=True)
     routes = ArrayField(models.CharField(max_length=10))
     operator = models.CharField(max_length=10)
 
@@ -18,20 +43,18 @@ class DublinBusStops(models.Model):
         return "STOP: "+self.stopid+" OP: "+self.operator
 
     class Meta:
-        verbose_name_plural = "Dublin Bus Stops"
+        verbose_name_plural = "Stops" 
+        indexes = [
+            models.Index(fields=['stopid'],)
+        ]
 
-class DublinRoutes(models.Model):
-    id = models.AutoField(primary_key=True)
-    operator=models.CharField(max_length=5)
-    routeId=models.CharField(max_length=10)
+# class Timetables(models.Model):
+#     stopid = models.CharField(max_length=10)
+#     dayofweek = models.CharField(max_length=10)
+#     times = ArrayField(models.CharField(max_length=10))
 
-    def __str__(self):
-        return "OPERATOR: "+self.operator+" ROUTE: "+self.routeId
-    
-    class Meta:
-        verbose_name_plural = "Dublin TFI Routes"
 
-class DublinWeather(models.Model):
+class Weather(models.Model):
     date = models.CharField(max_length=12)
     time = models.CharField(max_length=5, null=True)
     irain = models.IntegerField(null=True)
