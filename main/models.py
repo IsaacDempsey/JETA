@@ -7,7 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 class Routes(models.Model):
     routeid = models.CharField(max_length=10, primary_key=True)
     direction = models.IntegerField(null=True)
-    stopid = ArrayField(models.IntegerField(null=True))
+    stopids = ArrayField(models.IntegerField(null=True))
 
     def __str__(self):
         return "Route ID: "+self.routeid
@@ -52,6 +52,20 @@ class Stops(models.Model):
 #     stopid = models.CharField(max_length=10)
 #     dayofweek = models.CharField(max_length=10)
 #     times = ArrayField(models.CharField(max_length=10))
+
+class JourneyLogs(models.Model):
+    routeid = models.CharField(max_length=10, primary_key=True)
+    segments = ArrayField(models.CharField(max_length=15))
+    seg_num = ArrayField(models.IntegerField(null=True))
+
+    def __str__(self):
+        return self.routeid
+
+    class Meta:
+        verbose_name_plural = "Journey Logs"
+        indexes = [
+            models.Index(fields=['routeid'],)
+        ]    
 
 
 class Weather(models.Model):
