@@ -53,19 +53,19 @@ class Stops(models.Model):
 #     dayofweek = models.CharField(max_length=10)
 #     times = ArrayField(models.CharField(max_length=10))
 
-class JourneyLogs(models.Model):
-    routeid = models.CharField(max_length=10, primary_key=True)
-    segments = ArrayField(models.CharField(max_length=15))
-    seg_num = ArrayField(models.IntegerField(null=True))
+# class JourneyLogs(models.Model):
+#     routeid = models.CharField(max_length=10, primary_key=True)
+#     segments = ArrayField(models.CharField(max_length=15))
+#     seg_num = ArrayField(models.IntegerField(null=True))
 
-    def __str__(self):
-        return self.routeid
+#     def __str__(self):
+#         return self.routeid
 
-    class Meta:
-        verbose_name_plural = "Journey Logs"
-        indexes = [
-            models.Index(fields=['routeid'],)
-        ]    
+#     class Meta:
+#         verbose_name_plural = "Journey Logs"
+#         indexes = [
+#             models.Index(fields=['routeid'],)
+#         ]    
 
 
 class Weather(models.Model):
@@ -104,3 +104,17 @@ class BankHolidays(models.Model):
     
     class Meta:
         verbose_name_plural = "Bank Holidays"
+
+class Linked(models.Model):
+    stop_name = models.TextField(null=True)
+    linked = ArrayField(models.TextField(null=True))
+
+    def __str__(self):
+        return self.stop_name
+    
+    class Meta:
+        verbose_name_plural = "Linked Stops"
+        indexes = [
+            models.Index(fields=['stop_name'],),
+            models.Index(fields=['linked'],),
+        ]
