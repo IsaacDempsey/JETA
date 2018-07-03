@@ -14,6 +14,7 @@ def main():
         conn = psycopg2.connect(**connect_str)
         cursor = conn.cursor()
         f = open(r'C:\UCD\RESEARCH\Code\Final\jeta\dataloaders\holidays.csv', 'r')
+        print(f)
         cursor.copy_from(f, 'main_bankholidays',columns=('day','date','holiday'), sep=",")
         f.close()
         conn.commit()
