@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('routeid', models.CharField(max_length=10, primary_key=True, serialize=False)),
                 ('direction', models.IntegerField(null=True)),
-                ('stopid', django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(null=True), size=None)),
+                ('stopids', django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(null=True), size=None)),
             ],
             options={
                 'verbose_name_plural': 'Routes',

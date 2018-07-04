@@ -1,6 +1,5 @@
 from django.forms.models import model_to_dict
-from .models import Linked
-from .models import Routes
+from models import Linked, Routes
 
 class Switch_start():
     def __init__(self, start_id, destination_id):
@@ -10,6 +9,7 @@ class Switch_start():
         self.linked_dict = model_to_dict(Linked.objects.all())
 
     def switch_check(self):
+        print('Inswitch')
         linked_start = False
         new_start = self.start_id
         linked = []
