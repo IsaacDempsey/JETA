@@ -104,3 +104,17 @@ class BankHolidays(models.Model):
     
     class Meta:
         verbose_name_plural = "Bank Holidays"
+
+class Linked(models.Model):
+    stop_name = models.TextField(null=True)
+    linked = ArrayField(models.TextField(null=True))
+
+    def __str__(self):
+        return self.stop_name
+    
+    class Meta:
+        verbose_name_plural = "Linked Stops"
+        indexes = [
+            models.Index(fields=['stop_name'],),
+            models.Index(fields=['linked'],),
+        ]
