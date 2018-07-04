@@ -8,4 +8,5 @@ urlpatterns = [
     path('stations', views.stations, name='stations'),
     path('get_address',
             views.get_address, name='get_address'),
+    path('linked', views.linked, name='linked'),
 ]

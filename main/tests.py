@@ -1,5 +1,5 @@
 from django.test import TestCase
-from switch import Switch_start
+from .switch import Switch_start
 import unittest
 # Create your tests here.
 class Testing(unittest.TestCase):
