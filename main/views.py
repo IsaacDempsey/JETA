@@ -13,12 +13,12 @@ def index(request):
 def stops(request):
     stops = Stops.objects.all()[:10].values()
 
-    stops_df = pd.DataFrame.from_records(stops)
+    stops_df = pd.DataFrame.from_records(stops, index='stopid')
 
     # Test that stop df contains data in server terminal.
     print(stops_df.head(5))
 
-    return HttpResponse(stops_df.to_json())
+    return HttpResponse(stops_df.to_json(orient='index'), content_type='application/json')
 
     # Alternative code - building json from list of dicts.
 
