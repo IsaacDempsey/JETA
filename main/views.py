@@ -2,9 +2,13 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 import json
 from django.urls import reverse
+<<<<<<< HEAD
 from .models import Stops
 import pandas as pd
 
+=======
+from .models import Stops, Linked, Routes
+>>>>>>> f42b75be682c098932543c95248ec6085ba72d53
 
 def index(request):
     return render(request, 'index.html')
@@ -40,3 +44,21 @@ def get_address(request):
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
+def routes(request):
+    routes = Routes.objects.all().values()
+
+    routesJson = []
+    for i in routes:
+        routesJson.append(dict(i))
+
+    return JsonResponse(routesJson, safe=False)
+
+def linked(request):
+    linked = Linked.objects.all().values()
+
+    linkedJson = []
+    for i in linked:
+        linkedJson.append(dict(i))
+
+    return JsonResponse(linkedJson, safe=False)
