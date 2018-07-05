@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponse
 import json
 from django.urls import reverse
 from .models import Stops
+import pandas as pd
 
 
 def index(request):
@@ -10,7 +11,7 @@ def index(request):
 
 # Returns first 10 stations in Stops table as JSON.
 def stations(request):
-    stations = Stops.objects.all()[:10].values()
+    stations = Stations.objects.all()[:10].values()
     print(stations)
 
     stationJson = []
@@ -18,6 +19,11 @@ def stations(request):
         stationJson.append(dict(i))
 
     return JsonResponse(stationJson, safe=False)
+
+def stops(request):
+    stops = pd.DataFrame(list(Stops.objects.all()[:10].values()))
+    
+    return stops.to_json(orient='split')
 
 
 def get_address(request):
