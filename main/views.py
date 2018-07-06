@@ -56,8 +56,5 @@ def routes(request):
 def linked(request):
     linked = Linked.objects.all().values()
 
-    linkedJson = []
-    for i in linked:
-        linkedJson.append(dict(i))
-
+    
     return JsonResponse(linkedJson, safe=False)
