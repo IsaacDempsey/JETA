@@ -1,22 +1,32 @@
-from django.shortcuts import render
+from django.db import connection
 from django.http import JsonResponse, HttpResponse
-import json
+from django.shortcuts import render
 from django.urls import reverse
 from .models import Stops, Linked, Routes
+
+import json
+import pandas as pd
 
 def index(request):
     return render(request, 'index.html')
 
-# Returns first 10 stations in Stops table as JSON.
-def stations(request):
-    stations = Stops.objects.all()[:10].values()
-    print(stations)
+def stops(request):
+    stops = Stops.objects.all()[:10].values()
 
-    stationJson = []
-    for i in stations:
-        stationJson.append(dict(i))
+    stops_df = pd.DataFrame.from_records(stops, index='stopid')
 
-    return JsonResponse(stationJson, safe=False)
+    # Test that stop df contains data in server terminal.
+    print(stops_df.head(5))
+
+    return HttpResponse(stops_df.to_json(orient='index'), content_type='application/json')
+
+    # Alternative code - building json from list of dicts.
+
+    # stopsJson = []
+    # for i in stops:
+    #     stopsJson.append(dict(i))
+
+    # return JsonResponse(stopsJson, safe=False)
 
 
 def get_address(request):
