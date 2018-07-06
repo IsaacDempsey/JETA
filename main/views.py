@@ -3,6 +3,8 @@ from django.http import JsonResponse, HttpResponse
 import json
 from django.urls import reverse
 from .models import Stops, Linked, Routes
+from .destinations import Destinations
+from .route_result import Route_result
 
 def index(request):
     return render(request, 'index.html')
@@ -51,3 +53,14 @@ def linked(request):
         linkedJson.append(dict(i))
 
     return JsonResponse(linkedJson, safe=False)
+
+def destinations(request):
+    start = 1165
+    dest1 = Destinations(start).destinations_json()
+    return JsonResponse(dest1, safe=False)
+
+def route_result(request):
+    start = 1165
+    destination = 7564
+    route1 = Route_result(start, destination).route_json()
+    return JsonResponse(route1, safe=False)

@@ -9,4 +9,9 @@ urlpatterns = [
     path('get_address',
             views.get_address, name='get_address'),
     path('linked', views.linked, name='linked'),
+    path('routes', views.routes, name='routes'),
+    path('destinations', views.destinations, name='destinations'),
+    path('route_result', views.route_result, name='route_result'),
+
+
 ]

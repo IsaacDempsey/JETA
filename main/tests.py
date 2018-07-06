@@ -6,7 +6,7 @@ class Testing(unittest.TestCase):
     
     """Test if bus stops linked"""    
     def test_switch(self):
-        self.start = 7249
+        self.start = 4348
         self.desitination = 7564
         switch1 = Switch_start(self.start,self.desitination).switch_check()
-        self.assertEqual(switch1,True)
+        self.assertEqual(switch1,False)

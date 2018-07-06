@@ -1,52 +1,15 @@
 {% extends "layout.html" %} {% block content %}
-<style>
-    #wrapper {
-        position: relative;
-    }
 
-    #over_map {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        z-index: 99;
-    }
-    .ui-autocomplete{
-        max-height: 200px !important;
-        max-width: 350px;
-        overflow-y: auto;
-        /* prevent horizontal scrollbar */
-        overflow-x: hidden;
-        /* add padding to account for vertical scrollbar */
-        padding-right: 20px;
-    }
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-</style>
 <body>
-    <div id="wrapper">
-        <div id="map"></div>
-        <div id="overmap">
-            <div class="container-fluid p-3">
-                <div class="row">
-                    <div class="col-xl-4 bg-dark" style="border-radius: 10px; margin-top: 2.5rem; margin-left: 2.5rem">
-                        <!-- FORM -->
-                        <form class="text-center">
-                            <div class="row">
-                                <div class="col-xl-12">
-                                    <div class="display-5 p-3" style="color: white;">
-                                        Estimated Journey Times for Dublin Bus
-                                    </div>
-                                </div>
-                            </div>
+    <div id="wrapper">    
+            <div class="row">
+              <div class="col-sm-8" style="background-color:white;">
+                    <div id="googleMap" style="width:100%;height:600px;">
+                        </div>
+              </div>
+              <div class="col-sm-4" style="background-color:white;">
+                    <!-- FORM -->
+                    <form class="text-center">
                             <div class="row">
                                 <div class="col-xl-6 p-3">
                                     <input type="text" class="form-control" placeholder="Source" id="source">
@@ -72,234 +35,113 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
-                </div>
             </div>
-        </div>       
-    </div>
+        
+         </div>
     
-    <script>
-        var map;
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 53.353584, lng: -6.251495 },
-                zoom: 12,
-                styles : [
-                    {
-                        "elementType": "geometry",
-                        "stylers": [
-                            {
-                                "color": "#212121"
-                            }
-                        ]
-                    },
-                    {
-                        "elementType": "labels.icon",
-                        "stylers": [
-                            {
-                                "visibility": "off"
-                            }
-                        ]
-                    },
-                    {
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#757575"
-                            }
-                        ]
-                    },
-                    {
-                        "elementType": "labels.text.stroke",
-                        "stylers": [
-                            {
-                                "color": "#212121"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "administrative",
-                        "elementType": "geometry",
-                        "stylers": [
-                            {
-                                "color": "#757575"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "administrative.country",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#9e9e9e"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "administrative.land_parcel",
-                        "stylers": [
-                            {
-                                "visibility": "off"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "administrative.locality",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#bdbdbd"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "poi",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#757575"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "poi.park",
-                        "elementType": "geometry",
-                        "stylers": [
-                            {
-                                "color": "#181818"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "poi.park",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#616161"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "poi.park",
-                        "elementType": "labels.text.stroke",
-                        "stylers": [
-                            {
-                                "color": "#1b1b1b"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road",
-                        "elementType": "geometry.fill",
-                        "stylers": [
-                            {
-                                "color": "#2c2c2c"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#8a8a8a"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road.arterial",
-                        "elementType": "geometry",
-                        "stylers": [
-                            {
-                                "color": "#373737"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road.arterial",
-                        "elementType": "labels",
-                        "stylers": [
-                            {
-                                "visibility": "off"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road.highway",
-                        "elementType": "geometry",
-                        "stylers": [
-                            {
-                                "color": "#3c3c3c"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road.highway",
-                        "elementType": "labels",
-                        "stylers": [
-                            {
-                                "visibility": "off"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road.highway.controlled_access",
-                        "elementType": "geometry",
-                        "stylers": [
-                            {
-                                "color": "#4e4e4e"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road.local",
-                        "stylers": [
-                            {
-                                "visibility": "off"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "road.local",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#616161"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "transit",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#757575"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "water",
-                        "elementType": "geometry",
-                        "stylers": [
-                            {
-                                "color": "#000000"
-                            }
-                        ]
-                    },
-                    {
-                        "featureType": "water",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                            {
-                                "color": "#3d3d3d"
-                            }
-                        ]
-                    }
-                ]
-            });
-        }
-    </script>
     <script type="text/javascript">
+    $.getJSON('/static/json/map_style.json', function(mapstyle) {
+    var map = new google.maps.Map(document.getElementById('googleMap'), {
+    center:new google.maps.LatLng(53.346834137467795,-6.254525456712543),
+    zoom:12,
+    styles: mapstyle
+ }); 
+             $.getJSON('http://127.0.0.1:8000/main/route_result', function(data2) {
+             var coordinates2 = [];
+             var names = [];
+             for (var i = 0; i < data2.length; i++) {
+                 var iarr = data2[i];
+                 coordinates2.push({lat: iarr.coord[1], lng: iarr.coord[0]});
+                 names.push(iarr.stop_name);
+
+                 
+             }
+                    console.log(names);
+     infowindow = new google.maps.InfoWindow();
+     var stop_icon = {
+       path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+       fillColor: '#e6f2ff',
+       fillOpacity: 0.8,
+       scale: 1,
+       strokeColor: '#99ccff',
+       strokeWeight: 1
+     };
+     var stop_icon_h = {
+       path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+       fillColor: 'yellow',
+       fillOpacity: 0.8,
+       scale: 1,
+       strokeColor: 'blue',
+       strokeWeight: 1
+     };
+ for (var i = 0; i < coordinates2.length; i++) {
+ var stop = coordinates2[i];
+ var stop_name = names[i];
+
+     var bus_stop = new google.maps.Marker({
+       position: stop,
+       icon: stop_icon,
+       map: map
+     });
+     showHideMarker(map, bus_stop, stop_name);
+             };
+     bus_stop.setMap(map);
+     function showHideMarker(map, bus_stop) {
+     var infowindow = new google.maps.InfoWindow({
+         content: stop_name
+       });    
+         
+                     
+         
+ bus_stop.addListener('mouseout', function () {
+     bus_stop.setOptions({icon: stop_icon});
+     infowindow.close(bus_stop.get('map'), bus_stop);
+
+ });
+ bus_stop.addListener('mouseover', function () {
+     bus_stop.setOptions({icon: stop_icon_h});
+     infowindow.open(bus_stop.get('map'), bus_stop);
+
+ });
+          }
+
+});
+
+    $.getJSON('/static/json/routes.json', function(data) {
+    var coordinates_arr = [];
+
+    //iterates through each key in json
+    $.each(data, function(index, data) {
+    var coordinates = [];
+//                console.log(data.length);
+    for (var i = 0; i < data.length; i++) {
+    var iarr = data[i];
+    coordinates.push({lat: iarr[1], lng: iarr[0]});
+    if (i == data.length - 1) {
+        coordinates_arr.push(coordinates);
+        coordinates = [];
+    }
+    }
+    })
+    console.log(coordinates_arr);
+
+ for (var i = 0; i < coordinates_arr.length; i++) {
+ var line = coordinates_arr[i];
+  var busroute = new google.maps.Polyline({
+    path: line,
+    geodesic: true,
+    strokeColor: '#b3ccff',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+  });
+
+  busroute.setMap(map);
+      };
+    });
+});
+
+
+
         var stationsTable = document.getElementById("stationsTable");
 
         var $j = jQuery.noConflict();
@@ -319,7 +161,5 @@
             })
         })
     </script>
-     <!-- <script src="https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyD_5XUkLLoj_Xe6gyIreayAcrlP21_Nh88&center=-33.9,151.14999999999998&zoom=12&format=png&maptype=roadmap&style=element:geometry%7Ccolor:0x212121&style=element:labels.icon%7Cvisibility:off&style=element:labels.text.fill%7Ccolor:0x757575&style=element:labels.text.stroke%7Ccolor:0x212121&style=feature:administrative%7Celement:geometry%7Ccolor:0x757575&style=feature:administrative.country%7Celement:labels.text.fill%7Ccolor:0x9e9e9e&style=feature:administrative.land_parcel%7Cvisibility:off&style=feature:administrative.locality%7Celement:labels.text.fill%7Ccolor:0xbdbdbd&style=feature:poi%7Celement:labels.text.fill%7Ccolor:0x757575&style=feature:poi.park%7Celement:geometry%7Ccolor:0x181818&style=feature:poi.park%7Celement:labels.text.fill%7Ccolor:0x616161&style=feature:poi.park%7Celement:labels.text.stroke%7Ccolor:0x1b1b1b&style=feature:road%7Celement:geometry.fill%7Ccolor:0x2c2c2c&style=feature:road%7Celement:labels.text.fill%7Ccolor:0x8a8a8a&style=feature:road.arterial%7Celement:geometry%7Ccolor:0x373737&style=feature:road.arterial%7Celement:labels%7Cvisibility:off&style=feature:road.highway%7Celement:geometry%7Ccolor:0x3c3c3c&style=feature:road.highway%7Celement:labels%7Cvisibility:off&style=feature:road.highway.controlled_access%7Celement:geometry%7Ccolor:0x4e4e4e&style=feature:road.local%7Cvisibility:off&style=feature:road.local%7Celement:labels.text.fill%7Ccolor:0x616161&style=feature:transit%7Celement:labels.text.fill%7Ccolor:0x757575&style=feature:water%7Celement:geometry%7Ccolor:0x000000&style=feature:water%7Celement:labels.text.fill%7Ccolor:0x3d3d3d&size=480x360&callback=initMap" async defer></script> -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_5XUkLLoj_Xe6gyIreayAcrlP21_Nh88&callback=initMap" async defer></script>
 </body>
 {% endblock %}

@@ -37,8 +37,6 @@ class Stops(models.Model):
     lat = models.DecimalField(max_digits=10, decimal_places=8)
     lng = models.DecimalField(max_digits=10, decimal_places=8)
     routes = ArrayField(models.CharField(max_length=10))
-    operator = models.CharField(max_length=10)
-
     def __str__(self):
         return "STOP: "+self.stopid+" OP: "+self.operator
 
@@ -108,6 +106,7 @@ class BankHolidays(models.Model):
 class Linked(models.Model):
     stop_name = models.TextField(null=True)
     linked = ArrayField(models.TextField(null=True))
+    
 
     def __str__(self):
         return self.stop_name
