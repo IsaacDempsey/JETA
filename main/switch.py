@@ -10,12 +10,16 @@ class Switch_start():
         self.linked_dict = Linked.objects.all().values()
 
     def switch_check(self):
-        print('Inswitch')
         linkedJson = []
-        print(self.linked_dict)
         for i in self.linked_dict:
             linkedJson.append(dict(i))
-        
+        print(linkedJson)
+        print('Inswitch')
+            linkedJson = []
+            print(self.linked_dict)
+            for i in self.linked_dict:
+                linkedJson.append(dict(i))
+
         print(linkedJson)
         # linked_start = False
         # new_start = self.start_id
@@ -35,8 +39,8 @@ class Switch_start():
         #             # Start and destination linked
         #         else:
         #             linked_start = True
-                    
-        # if linked_start == True:      
+
+        # if linked_start == True:
         #     for k in linked:
         #         for key,value in self.routes_dict[0].items():
         #             j = value.tolist()
@@ -46,4 +50,4 @@ class Switch_start():
         #                 if self.start_id and self.destination_id in slic:
         #                     new_start = k
         #                     return True, new_start
-                            # Start and destination NOT linked, returns new start stop id
+        # Start and destination NOT linked, returns new start stop id
