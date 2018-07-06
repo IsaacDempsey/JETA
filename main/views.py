@@ -1,4 +1,3 @@
-from django.db import connection
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -19,6 +18,7 @@ def stops(request):
     print(stops_df.head(5))
 
     return HttpResponse(stops_df.to_json(orient='index'), content_type='application/json')
+
 
     # Alternative code - building json from list of dicts.
 
