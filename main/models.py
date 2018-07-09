@@ -36,7 +36,7 @@ class Stops(models.Model):
     address = models.TextField()
     lat = models.DecimalField(max_digits=10, decimal_places=8)
     lng = models.DecimalField(max_digits=10, decimal_places=8)
-    routes = ArrayField(models.CharField(max_length=10))
+    lines = ArrayField(models.CharField(max_length=10))
 
     def __str__(self):
         return "STOP: "+self.stopid
