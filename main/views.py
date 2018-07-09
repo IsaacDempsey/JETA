@@ -3,6 +3,8 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from .models import Stops, Linked, Routes, Coefficients
+from .destinations import Destinations
+from .route_result import Route_result
 
 import json
 import pandas as pd
@@ -16,22 +18,8 @@ def index(request):
 
 def stops(request):
     stops = Stops.objects.all()[:10].values()
-
     stops_df = pd.DataFrame.from_records(stops, index='stopid')
-
-    # Test that stop df contains data in server terminal.
-    print(stops_df.head(5))
-
     return HttpResponse(stops_df.to_json(orient='index'), content_type='application/json')
-
-
-    # Alternative code - building json from list of dicts.
-
-    # stopsJson = []
-    # for i in stops:
-    #     stopsJson.append(dict(i))
-
-    # return JsonResponse(stopsJson, safe=False)
 
 
 def journeytime(request):
