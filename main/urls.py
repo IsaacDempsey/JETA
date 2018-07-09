@@ -5,6 +5,7 @@ app_name='main'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('journeytime', views.journeytime, name='journeytime'),
     path('get_address', views.get_address, name='get_address'),
     path('linked', views.linked, name='linked'),
     path('routes', views.routes, name='routes'),
