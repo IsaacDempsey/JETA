@@ -44,7 +44,8 @@
 					</div>
 				</form>
 			</div>
-		</div>
+        </div>
+        
         <script type="text/javascript">
 
         $('#get_start').on('submit', function(event){
@@ -56,10 +57,22 @@
         function start() {
             console.log("start is working!"); // sanity check
             console.log($('#source').val());
+            var result=""
             $.ajax({
                 url : "{% url 'main:get_start' %}",
                 data : { start_text : $('#source').val() },
+                type: 'POST',
+                dataType: 'json',
+                success : function(resp){
+                    result = resp;
+                    alert("resp: ",resp[0]['stop_id']);
+                },
+                error : function() {
+                    alert(OnError(data));
+                },
                 });
+            console.log("Try");
+            console.log(result);
         };
 
 
@@ -71,7 +84,7 @@
 		  zoom:12,
 		  styles: mapstyle
 		}); 
-		           $.getJSON('http://127.0.0.1:8000/main/route_result', function(data2) {
+		           $.getJSON('http://127.0.0.1:8000/main/destinations', function(data2) {
 		           var coordinates2 = [];
 		           var names = [];
 		           for (var i = 0; i < data2.length; i++) {
