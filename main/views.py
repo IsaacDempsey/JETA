@@ -17,22 +17,8 @@ def index(request):
 
 def stops(request):
     stops = Stops.objects.all()[:10].values()
-
     stops_df = pd.DataFrame.from_records(stops, index='stopid')
-
-    # Test that stop df contains data in server terminal.
-    print(stops_df.head(5))
-
     return HttpResponse(stops_df.to_json(orient='index'), content_type='application/json')
-
-
-    # Alternative code - building json from list of dicts.
-
-    # stopsJson = []
-    # for i in stops:
-    #     stopsJson.append(dict(i))
-
-    # return JsonResponse(stopsJson, safe=False)
 
 
 def journeytime(request):
@@ -82,7 +68,7 @@ def journeytime(request):
         print("Error: multiple possible routes.")
         print(routes)
 
-    # Convert list of stopids to list
+    # Convert pandas list of stopids to list. If multiple possible routes, take first row.
     stop_list = routes['stopids'].tolist()[0]
 
     # Slice list by source and destination stop
@@ -136,10 +122,7 @@ def journeytime(request):
     json_dict = {}
     json_dict['arrivaltime'] = round(arrivaltime)
     json_dict['totaltraveltime'] = round(totaltraveltime)
-    json_dict['segment_times'] = {}
-
-    for i in segment_times:
-        json_dict['segment_times'][i[0]] = i[1]
+    json_dict['segment_times'] = {i[0]:i[1] for i in segment_times}
 
     return HttpResponse(json.dumps(json_dict), content_type='application/json')
 
