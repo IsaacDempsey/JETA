@@ -3,10 +3,11 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from .models import Stops, Linked, Routes, Coefficients
-
+from .destinations import Destinations
+from .route_result import Route_result
 import json
 import pandas as pd
-
+from django.views.decorators.csrf import csrf_exempt
 import time
 from datetime import datetime, timedelta
 from pytz import timezone
@@ -187,6 +188,8 @@ def route_result(request):
     route1 = Route_result(start, destination).route_json()
     return JsonResponse(route1, safe=False)
 
+
+@csrf_exempt
 def get_start(request):
     print("In GET START")
     print(request)
@@ -196,13 +199,8 @@ def get_start(request):
         start_split = start_text.split(",")
         id_space = start_split[-1]
         id = id_space.replace(" ", "")
-        dest = Destinations(id).destinations_json()
+        dest = Destinations(int(id)).destinations_json()
     else:
-        start_text = request.GET.get('start_text','')
-        print("START REQUEST:",start_text)
-        start_split = start_text.split(",")
-        print("SPLIT FILES: ",start_split)
-        id_space = start_split[-1]
-        start_id = id_space.replace(" ", "")
-        dest = Destinations(int(start_id)).destinations_json()
+        dest="fail"
+    print(dest)
     return JsonResponse(dest, safe=False)

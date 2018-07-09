@@ -58,9 +58,19 @@
             console.log($('#source').val());
             $.ajax({
                 url : "{% url 'main:get_start' %}",
-                data : { start_text : $('#source').val() },
+                data : { 
+					start_text : $('#source').val(),
+				 },
+				contentType: "application/json;charset=utf-8",
+				dataType : "json",
+				success: function (data) {
+					receiveData(data)
+				},
                 });
         };
+		function receiveData(data){
+			console.log(data);
+		}
 
 
 
