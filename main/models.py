@@ -129,6 +129,7 @@ class BankHolidays(models.Model):
 class Linked(models.Model):
     stop_name = models.TextField(null=True)
     linked = ArrayField(models.TextField(null=True))
+    
 
     def __str__(self):
         return self.stop_name

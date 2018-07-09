@@ -147,7 +147,7 @@ def get_address(request):
         results = []
         for badd in badds:
             badd_json = {}
-            badd_json['label'] = badd.address +" , "+ badd.stopid
+            badd_json['label'] = badd.address +", "+ badd.stopid
             results.append(badd_json)
         data = json.dumps(results)
     else:
@@ -167,5 +167,39 @@ def routes(request):
 def linked(request):
     linked = Linked.objects.all().values()
 
-    
+    linkedJson = []
+    for i in linked:
+        linkedJson.append(dict(i))
+
     return JsonResponse(linkedJson, safe=False)
+
+def destinations(request):
+    start = 15
+    dest1 = Destinations(start).destinations_json()
+    return JsonResponse(dest1, safe=False)
+
+def route_result(request):
+    start = 1165
+    destination = 7564
+    route1 = Route_result(start, destination).route_json()
+    return JsonResponse(route1, safe=False)
+
+def get_start(request):
+    print("In GET START")
+    print(request)
+    if request.is_ajax():
+        start_text = request.GET.get("start_text",'')
+        print("START REQUEST:",start_text)
+        start_split = start_text.split(",")
+        id_space = start_split[-1]
+        id = id_space.replace(" ", "")
+        dest = Destinations(id).destinations_json()
+    else:
+        start_text = request.GET.get('start_text','')
+        print("START REQUEST:",start_text)
+        start_split = start_text.split(",")
+        print("SPLIT FILES: ",start_split)
+        id_space = start_split[-1]
+        start_id = id_space.replace(" ", "")
+        dest = Destinations(int(start_id)).destinations_json()
+    return JsonResponse(dest, safe=False)
