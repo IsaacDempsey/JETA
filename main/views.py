@@ -98,20 +98,17 @@ def journeytime(request):
 
     # Load queryset into pd dataframe
     coefficients = pd.DataFrame.from_records(coefficients_qs)
-    print(coefficients.head(5))
 
     # Sort values by journey_segment segmentid
     coefficients['segment'] = coefficients['segment'].astype("category")
     coefficients['segment'].cat.set_categories(journey_segments, inplace=True)
     coefficients = coefficients.sort_values(["segment"])
-    print(coefficients.head(5))
 
     # Rearrange columns and set segment id as index
     coefficients = coefficients[["segment", "intercept", "arrivaltime", "rain", 
     "dayofweek_Monday", "dayofweek_Tuesday", "dayofweek_Thursday", 
     "dayofweek_Friday", "dayofweek_Saturday", "dayofweek_Sunday"]]    
     coefficients = coefficients.set_index('segment')
-    print(coefficients.head(5))
 
     # Loop through rows of coefficients df, calculating segment travel time
     arrivaltime = model_inputs[0]
