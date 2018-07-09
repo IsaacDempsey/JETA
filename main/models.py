@@ -38,7 +38,7 @@ class Stops(models.Model):
     lng = models.DecimalField(max_digits=10, decimal_places=8)
     routes = ArrayField(models.CharField(max_length=10))
     def __str__(self):
-        return "STOP: "+self.stopid+" OP: "+self.operator
+        return "STOP: "+self.stopid
 
     class Meta:
         verbose_name_plural = "Stops" 
@@ -51,6 +51,28 @@ class Stops(models.Model):
 #     dayofweek = models.CharField(max_length=10)
 #     times = ArrayField(models.CharField(max_length=10))
 
+class Coefficients(models.Model):
+    segment = models.CharField(max_length=10, primary_key=True)
+    intercept = models.FloatField(null=True)
+    arrivaltime = models.FloatField(null=True)
+    rain = models.FloatField(null=True)
+    dayofweek_Friday = models.FloatField(null=True)
+    dayofweek_Monday = models.FloatField(null=True)
+    dayofweek_Saturday = models.FloatField(null=True)
+    dayofweek_Sunday = models.FloatField(null=True)
+    dayofweek_Thursday = models.FloatField(null=True)
+    dayofweek_Tuesday = models.FloatField(null=True)
+
+    def __str__(self):
+        return "Segment: "+self.segment
+
+    class Meta:
+        verbose_name_plural = "Coefficients" 
+        indexes = [
+            models.Index(fields=['segment'],)
+        ]
+
+# May remove this table eventually.
 class JourneyLogs(models.Model):
     routeid = models.CharField(max_length=10, primary_key=True)
     segments = ArrayField(models.CharField(max_length=15))
