@@ -76,6 +76,7 @@ $j(function () {
                             // Send only data from stop till to stop
                             if (endData == []){
                                 setMarkers(data, startStop, endStop);
+                                
                             }else{
                                 setMarkers(endData, startStop, endStop);
                             }
@@ -200,6 +201,7 @@ function setMarkers(data, stopid, endstop="None"){
      var markerCluster = new MarkerClusterer(map, markers,
             {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
+
 
 // This is the major Display Map function
 // function displayMap(data2, startBusStop){
