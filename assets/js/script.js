@@ -76,11 +76,10 @@ $j(function () {
                             // Send only data from stop till to stop
                             if (endData == []){
                                 setMarkers(data, startStop, endStop);
-                                
                             }else{
                                 setMarkers(endData, startStop, endStop);
                             }
-                            
+                            getLines(startStop, endStop);                            
                         }
                     });
                     
@@ -99,16 +98,6 @@ $(document).ready(function () {
     loadMap();
 });
 
-<<<<<<< HEAD
-function start() {
-    console.log("start is working!"); // sanity check
-    console.log($('#source').val());
-    $.ajax({
-        url : localAddress + '/main/get_start',
-        data : { 
-            start_text : $('#source').val() 
-            },
-=======
 // Separate Function to render the map
 function loadMap() {
     $.getJSON('/static/json/map_style.json', function (mapstyle) {
@@ -134,7 +123,6 @@ function loadMap() {
           fullscreenControl: false,
           zoom: 12,
           styles: mapstyle
->>>>>>> aaf6f5a3502f97626fc60a1b8e98e5ff766f72db
         });
         setGlobalMap(map);
     });
@@ -213,7 +201,20 @@ function setMarkers(data, stopid, endstop="None"){
             {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
 
-
+function getLines(startStop, endStop){
+    $.ajax({
+      url: localAddress + "/main/lines",
+      data: {
+        source: startStop,
+        destination: endStop,
+      },
+      contentType: "application/json;charset=utf-8",
+      dataType: "json",
+      success: function (data) {
+          alert("successfull");
+      }
+    });
+}
 // This is the major Display Map function
 // function displayMap(data2, startBusStop){
 //         var coordinates2 = [];
