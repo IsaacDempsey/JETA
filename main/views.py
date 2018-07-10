@@ -154,9 +154,9 @@ def journeytime(request):
 def get_address(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
-        badds = Stops.objects.filter(address__icontains=q)[:20]
+        bus_adds = Stops.objects.filter(address__icontains=q)[:20]
         results = []
-        for badd in badds:
+        for badd in bus_adds:
             badd_json = {}
             badd_json['label'] = badd.address +", "+ badd.stopid
             results.append(badd_json)
@@ -166,11 +166,13 @@ def get_address(request):
 
     return HttpResponse(data, content_type='application/json')
 
+
 def routes(request):
     routes = Routes.objects.all().values()
     routesJson = [dict(i) for i in routes]
 
     return JsonResponse(routesJson, safe=False)
+
 
 def linked(request):
     linked = Linked.objects.all().values()
@@ -178,10 +180,12 @@ def linked(request):
 
     return JsonResponse(linkedJson, safe=False)
 
+
 def destinations(request):
     start = 15
     dest1 = Destinations(start).destinations_json()
     return JsonResponse(dest1, safe=False)
+
 
 def route_result(request):
     start = 1165
@@ -191,17 +195,46 @@ def route_result(request):
 
 
 def get_start(request):
-    # print("In GET START")
-    # print(request)
     if request.is_ajax():
         start_text = request.GET.get("start_text",'')
-        # print("START REQUEST:",start_text)
         start_split = start_text.split(",")
-        # print("SPLIT: ",start_split)
         id_space = start_split[-1]
-        id = id_space.replace(" ", "")
-        dest = Destinations(int(id)).destinations_json()
+        start_id = id_space.replace(" ", "")
+
+        # Get df containing any rows from the linked table which have the start_id
+        linked = Linked.objects.filter(linked__contains=[start_id]).values()
+        linked_df = pd.DataFrame.from_records(linked)
+
+        # Get linked stops as array of arrays and flatten
+        linked_stops = linked_df['linked'].tolist()
+        linked_stops = sum(linked_stops, [])
+
+        # Get unique stops and make sure that start_id is included
+        linked_stops = list(set(linked_stops + [start_id]))
+
+        # Convert all values to ints (currently, datatype = strings)
+        linked_stops = list(map(int, linked_stops))
+
+        # Get df of routes which contain these stopids
+        routes = Routes.objects.filter(stopids__overlap=[linked_stops]).values()
+        routes_df = pd.DataFrame.from_records(routes)
+
+        # Get list of related_routes stops and flatten, get unique values
+        routes_stops = routes_df['stopids'].tolist()
+        routes_stops = sum(routes_stops, [])
+        routes_stops = set(routes_stops)
+
+        # Get related_routes_stops rows in stops table
+        stops = Stops.objects.filter(stopid__in=routes_stops).values()
+        stops_df = pd.DataFrame.from_records(stops)
+
+        # Arrange selected_stops dataframe in correct format for json
+        df = stops_df[['stopid', 'address', 'lat', 'lng']]
+        df = df.groupby(['stopid', 'address'], as_index=False).apply(lambda x: x[['lat','lng']].values.tolist()[0]).reset_index()
+        df = df.rename(columns={0:'coord', 'stopid':'stop_id', 'stop_name':'stop_name'})
+
+        dest = df.to_json(orient='records')
     else:
-        dest="fail"
-    print(dest)
-    return JsonResponse(dest, safe=False)
+        dest="Error - not ajax request."
+
+    return HttpResponse(dest, content_type='application/json')
