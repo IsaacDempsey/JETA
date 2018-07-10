@@ -180,6 +180,7 @@ def get_start(request):
         start_text = request.GET.get("start_text",'')
         print("START REQUEST:",start_text)
         start_split = start_text.split(",")
+        print("SPLIT: ",start_split)
         id_space = start_split[-1]
         id = id_space.replace(" ", "")
         dest = Destinations(int(id)).destinations_json()

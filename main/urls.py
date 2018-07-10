@@ -11,7 +11,7 @@ urlpatterns = [
     path('routes', views.routes, name='routes'),
     path('destinations', views.destinations, name='destinations'),
     path('route_result', views.route_result, name='route_result'),
-    re_path('get_start', views.get_start, name='get_start'),
+    path('get_start', views.get_start, name='get_start'),
 
     path('stops', views.stops, name='stops')
 ]
