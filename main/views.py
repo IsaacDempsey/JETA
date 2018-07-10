@@ -6,6 +6,7 @@ from django.urls import reverse
 from .models import Coefficients, Lines, Linked, Routes, Stops
 from .destinations import Destinations
 from .route_result import Route_result
+from django.db.models import Q
 
 from datetime import datetime, timedelta
 import json
@@ -144,8 +145,8 @@ def journeytime(request):
 
     # Construct json
     json_dict = {}
-    json_dict['arrivaltime'] = round(arrivaltime)
-    json_dict['totaltraveltime'] = round(totaltraveltime)
+    json_dict['arrivaltime'] = str(timedelta(seconds=round(int(arrivaltime))))
+    json_dict['totaltraveltime'] = str(timedelta(seconds=round(int(totaltraveltime))))
     json_dict['segment_times'] = {i[0]:i[1] for i in segment_times}
 
     return HttpResponse(json.dumps(json_dict), content_type='application/json')
@@ -154,7 +155,11 @@ def journeytime(request):
 def get_address(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
+<<<<<<< HEAD
         bus_adds = Stops.objects.filter(address__icontains=q)[:20]
+=======
+        badds = Stops.objects.filter(Q(address__icontains=q) | Q(stopid__contains=q))[:20]
+>>>>>>> 087be6115b24b01898c194a6da9b4e00ee31cf15
         results = []
         for badd in bus_adds:
             badd_json = {}

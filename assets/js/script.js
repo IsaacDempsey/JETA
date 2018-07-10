@@ -3,7 +3,8 @@ var localAddress = window.location.protocol // Local url
 var stationsTable = document.getElementById("stationsTable");
 var $j = jQuery.noConflict(); // No conflict with the major jquery for autocomplete widget
 
-
+var __startStop;
+var __endStop;
 // Autocomplete Feature when the user enters in the source address
 $j(function () {
     // Check for the HTML DOM element who has #source as the id
@@ -12,6 +13,8 @@ $j(function () {
         source: localAddress + '/main/get_address',
         // Start autocompleting when the user enter's atleast 2 characters
         minLength: 2,
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
         // When the user selects the required input ...-->
         select: function (e, ui) {
             // ..--> Send an ajax query to the api at the below URL
@@ -93,8 +96,10 @@ $j(function () {
 // On Document Ready
 $(document).ready(function () {
     // When the document loads
-    let today = moment().format("YYYY-MM-DDTHH:MM")
+    let today = moment().format("YYYY-MM-DDTHH:mm");
     document.querySelector("#datetime").value = today;
+    $("#lineholder").hide();
+    $("#journeyholder").hide();
     loadMap();
 });
 
@@ -197,11 +202,13 @@ function setMarkers(data, stopid, endstop="None"){
             infowindow.open(bus_stop.get('map'), bus_stop);
         });
     };
-     var markerCluster = new MarkerClusterer(map, markers,
-            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+    //  var markerCluster = new MarkerClusterer(map, markers,
+    //         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
 
 function getLines(startStop, endStop){
+    __startStop = startStop;
+    __endStop = endStop;
     $.ajax({
       url: localAddress + "/main/lines",
       data: {
@@ -211,9 +218,41 @@ function getLines(startStop, endStop){
       contentType: "application/json;charset=utf-8",
       dataType: "json",
       success: function (data) {
-          alert("successfull");
+          $("#lineholder").show();
+          $("#linecontent").html('');
+          for (var i = 0; i < data.length; i ++){
+              $('<div class= "col-sm-* mr-1 btn btn-info" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</div>").appendTo("#linecontent");
+          }
       }
     });
+}
+function getTravelTime(content) {
+    console.log($("#datetime").val());
+    var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
+    console.log(__startStop);
+    console.log(__endStop);
+    console.log(content.innerHTML);
+    console.log(datetime);
+    $.ajax({
+        url: localAddress + "/main/journeytime",
+        data: {
+            source: __startStop,
+            destination: __endStop,
+            lineid: content.innerHTML,
+            time: datetime,
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            $("#journeyholder").show();
+            $("#journeycontent").html("");
+            $('<div class= "col-sm-6 text-center">Route: </div><div class= "col-sm-6 text-center"><b>' + content.innerHTML + "</b> </div>").appendTo("#journeycontent");
+            $('<div class= "col-sm-6 text-center">Journey Time: </div><div class= "col-sm-6 text-center"><b>' + data.totaltraveltime + "</b> </div>").appendTo("#journeycontent");
+            $('<div class= "col-sm-6 text-center">Arrival Time: </div><div class= "col-sm-6 text-center"><b>' + data.arrivaltime + "</b> </div>").appendTo("#journeycontent");
+        }
+    });
+
+    
 }
 // This is the major Display Map function
 // function displayMap(data2, startBusStop){
