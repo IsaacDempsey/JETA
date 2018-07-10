@@ -1,13 +1,10 @@
-#This file is used to build the table structure in the database
-
-# DJANGO MODEL IMPORTS
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 class Routes(models.Model):
     routeid = models.CharField(max_length=10, primary_key=True)
     direction = models.IntegerField(null=True)
-    stopid = ArrayField(models.IntegerField(null=True))
+    stopids = ArrayField(models.IntegerField(null=True))
 
     def __str__(self):
         return "Route ID: "+self.routeid
@@ -36,11 +33,10 @@ class Stops(models.Model):
     address = models.TextField()
     lat = models.DecimalField(max_digits=10, decimal_places=8)
     lng = models.DecimalField(max_digits=10, decimal_places=8)
-    routes = ArrayField(models.CharField(max_length=10))
-    operator = models.CharField(max_length=10)
+    lines = ArrayField(models.CharField(max_length=10))
 
     def __str__(self):
-        return "STOP: "+self.stopid+" OP: "+self.operator
+        return "STOP: "+self.stopid
 
     class Meta:
         verbose_name_plural = "Stops" 
@@ -52,6 +48,42 @@ class Stops(models.Model):
 #     stopid = models.CharField(max_length=10)
 #     dayofweek = models.CharField(max_length=10)
 #     times = ArrayField(models.CharField(max_length=10))
+
+class Coefficients(models.Model):
+    segment = models.CharField(max_length=10, primary_key=True)
+    intercept = models.FloatField(null=True)
+    arrivaltime = models.FloatField(null=True)
+    rain = models.FloatField(null=True)
+    dayofweek_Friday = models.FloatField(null=True)
+    dayofweek_Monday = models.FloatField(null=True)
+    dayofweek_Saturday = models.FloatField(null=True)
+    dayofweek_Sunday = models.FloatField(null=True)
+    dayofweek_Thursday = models.FloatField(null=True)
+    dayofweek_Tuesday = models.FloatField(null=True)
+
+    def __str__(self):
+        return "Segment: "+self.segment
+
+    class Meta:
+        verbose_name_plural = "Coefficients" 
+        indexes = [
+            models.Index(fields=['segment'],)
+        ]
+
+# May remove this table eventually.
+class JourneyLogs(models.Model):
+    routeid = models.CharField(max_length=10, primary_key=True)
+    segments = ArrayField(models.CharField(max_length=15))
+    seg_num = ArrayField(models.IntegerField(null=True))
+
+    def __str__(self):
+        return self.routeid
+
+    class Meta:
+        verbose_name_plural = "Journey Logs"
+        indexes = [
+            models.Index(fields=['routeid'],)
+        ]    
 
 
 class Weather(models.Model):
@@ -90,3 +122,17 @@ class BankHolidays(models.Model):
     
     class Meta:
         verbose_name_plural = "Bank Holidays"
+
+class Linked(models.Model):
+    stop_name = models.TextField(null=True)
+    linked = ArrayField(models.TextField(null=True))
+    
+    def __str__(self):
+        return self.stop_name
+    
+    class Meta:
+        verbose_name_plural = "Linked Stops"
+        indexes = [
+            models.Index(fields=['stop_name'],),
+            models.Index(fields=['linked'],),
+        ]
