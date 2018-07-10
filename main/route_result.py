@@ -5,6 +5,7 @@ import pandas as pd
 from .models import Routes, Stops
 from .switch import Switch_start
 
+# Gives json containing all bus stops between start and stop
 class Route_result():
     def __init__(self, start_id, destination_id):
         self.start_id = start_id
@@ -13,8 +14,9 @@ class Route_result():
         self.stops = Stops.objects.all().values()
 
     def route_json(self):
-        switch = Switch_start(self.start_id,self.destination_id).switch_check()
-        if switch != False:
+        # Returns True if start and destination are not linked by a route.
+        switch = Switch_start(self.start_id, self.destination_id).switch_check()
+        if switch == True:
             self.start_id = switch[1]
             print("Start switched!")
         

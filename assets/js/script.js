@@ -11,8 +11,10 @@ function start() {
     console.log("start is working!"); // sanity check
     console.log($('#source').val());
     $.ajax({
-        url : "{% url 'main:get_start' %}",
-        data : { start_text : $('#source').val() },
+        url : localAddress + '/main/get_start',
+        data : { 
+            start_text : $('#source').val() 
+            },
         });
 };
 
