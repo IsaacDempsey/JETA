@@ -5,8 +5,8 @@
 		<div class="row p-3 text-center">
 			<div class="col-xl-12">
 				<div class="display-5 p-3" style="color: #000;">Get your Journey Time</div>
-				</div>
 			</div>
+		</div>
 		<div class="row p-3">
 			<div class="col-sm-12">
 				<input class="form-control inputRow" id="source" placeholder="Enter Source" type="text">
@@ -23,11 +23,27 @@
 			</div>
 			<!-- All functions are accessed via the $j('#datetimepicker').datetimepicker(FUNCTION) -->
 		</div>
-		<div class="row p-3">
+		<div class="row px-3" id="lineholder">
+			<div class="col-xl-12 text-center">
+				<div class="display-5 px-3" style="color: #000;">Routes for your Journey</div>
+			</div>
+			<div class="row px-3" id="linecontent">
+
+			</div>
+		</div>
+		<div class="row px-3" id="journeyholder">
+			<div class="col-xl-12 text-center">
+				<div class="display-5 px-3" style="color: #000;">Total Journey Time</div>
+			</div>
+			<div class="row px-3" id="journeycontent">
+		
+			</div>
+		</div>
+		<!-- <div class="row p-3">
 			<div class="col-xl-12 text-center">
 				<button type="button" class="btn btn-primary">Get My Travel Time</button>
 			</div>
-		</div>
+		</div> -->
 	</div>
 </div>
 {% endblock %}
