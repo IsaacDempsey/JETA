@@ -2,16 +2,16 @@ from django.db import connection
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
+
 from .models import Coefficients, Lines, Linked, Routes, Stops
 from .destinations import Destinations
 from .route_result import Route_result
 
+from datetime import datetime, timedelta
 import json
 import pandas as pd
-
-import time
-from datetime import datetime, timedelta
 from pytz import timezone
+import time
 
 def index(request):
     return render(request, 'index.html')
@@ -189,20 +189,19 @@ def route_result(request):
     route1 = Route_result(start, destination).route_json()
     return JsonResponse(route1, safe=False)
 
+
 def get_start(request):
+    # print("In GET START")
+    # print(request)
     if request.is_ajax():
         start_text = request.GET.get("start_text",'')
-        print("START REQUEST:",start_text)
+        # print("START REQUEST:",start_text)
         start_split = start_text.split(",")
+        # print("SPLIT: ",start_split)
         id_space = start_split[-1]
         id = id_space.replace(" ", "")
-        dest = Destinations(id).destinations_json()
+        dest = Destinations(int(id)).destinations_json()
     else:
-        start_text = request.GET.get('start_text','')
-        print("START REQUEST:",start_text)
-        start_split = start_text.split(",")
-        print("SPLIT FILES: ",start_split)
-        id_space = start_split[-1]
-        start_id = id_space.replace(" ", "")
-        dest = Destinations(int(start_id)).destinations_json()
+        dest="fail"
+    print(dest)
     return JsonResponse(dest, safe=False)
