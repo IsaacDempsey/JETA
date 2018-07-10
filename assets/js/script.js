@@ -197,8 +197,8 @@ function setMarkers(data, stopid, endstop="None"){
             infowindow.open(bus_stop.get('map'), bus_stop);
         });
     };
-    //  var markerCluster = new MarkerClusterer(map, markers,
-    //         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+     var markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
 
 // This is the major Display Map function

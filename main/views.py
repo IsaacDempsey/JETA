@@ -178,10 +178,10 @@ def get_start(request):
     # print("In GET START")
     # print(request)
     if request.is_ajax():
-        start_text = request.POST.get("start_text",'')
+        start_text = request.GET.get("start_text",'')
         # print("START REQUEST:",start_text)
         start_split = start_text.split(",")
-        print("SPLIT: ",start_split)
+        # print("SPLIT: ",start_split)
         id_space = start_split[-1]
         id = id_space.replace(" ", "")
         dest = Destinations(int(id)).destinations_json()
