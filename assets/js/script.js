@@ -93,6 +93,8 @@ $j(function () {
 // On Document Ready
 $(document).ready(function () {
     // When the document loads
+    let today = moment().format("YYYY-MM-DDTHH:MM")
+    document.querySelector("#datetime").value = today;
     loadMap();
 });
 

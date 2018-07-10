@@ -5,6 +5,8 @@ from django.urls import reverse
 from .models import Stops, Linked, Routes, Coefficients
 from .destinations import Destinations
 from .route_result import Route_result
+
+from django.views.decorators.csrf import csrf_exempt
 import json
 import pandas as pd
 from django.views.decorators.csrf import csrf_exempt
@@ -171,14 +173,13 @@ def route_result(request):
     route1 = Route_result(start, destination).route_json()
     return JsonResponse(route1, safe=False)
 
-
 @csrf_exempt
 def get_start(request):
-    print("In GET START")
-    print(request)
+    # print("In GET START")
+    # print(request)
     if request.is_ajax():
-        start_text = request.GET.get("start_text",'')
-        print("START REQUEST:",start_text)
+        start_text = request.POST.get("start_text",'')
+        # print("START REQUEST:",start_text)
         start_split = start_text.split(",")
         print("SPLIT: ",start_split)
         id_space = start_split[-1]
