@@ -4,6 +4,7 @@ from collections import defaultdict
 import pandas as pd
 from .models import Routes, Linked, Stops
 
+# Shows relevant (can be reached in 1 ride) destination bus stops to start bus stops
 class Destinations():
     def __init__(self, start_id):
         self.start_id = start_id
@@ -14,8 +15,10 @@ class Destinations():
     def destinations_json(self):
         df1 = pd.DataFrame.from_records(self.linked)
         linked_dict = df1.to_dict('index')
+
         df2 = pd.DataFrame.from_records(self.routes)
         routes_dict = df2.to_dict('index')
+        
         df3 = pd.DataFrame.from_records(self.stops)
         df3['stopid'] = df3['stopid'].astype(int)
         df3['lat'] = df3['lat'].astype(float)

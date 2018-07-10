@@ -99,6 +99,16 @@ $(document).ready(function () {
     loadMap();
 });
 
+<<<<<<< HEAD
+function start() {
+    console.log("start is working!"); // sanity check
+    console.log($('#source').val());
+    $.ajax({
+        url : localAddress + '/main/get_start',
+        data : { 
+            start_text : $('#source').val() 
+            },
+=======
 // Separate Function to render the map
 function loadMap() {
     $.getJSON('/static/json/map_style.json', function (mapstyle) {
@@ -124,6 +134,7 @@ function loadMap() {
           fullscreenControl: false,
           zoom: 12,
           styles: mapstyle
+>>>>>>> aaf6f5a3502f97626fc60a1b8e98e5ff766f72db
         });
         setGlobalMap(map);
     });

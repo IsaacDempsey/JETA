@@ -2,20 +2,20 @@ from django.db import connection
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
-from .models import Stops, Linked, Routes, Coefficients
+
+from .models import Coefficients, Lines, Linked, Routes, Stops
 from .destinations import Destinations
 from .route_result import Route_result
 
-from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime, timedelta
 import json
 import pandas as pd
-from django.views.decorators.csrf import csrf_exempt
-import time
-from datetime import datetime, timedelta
 from pytz import timezone
+import time
 
 def index(request):
     return render(request, 'index.html')
+
 
 def stops(request):
     stops = Stops.objects.all()[:10].values()
@@ -23,7 +23,29 @@ def stops(request):
     return HttpResponse(stops_df.to_json(orient='index'), content_type='application/json')
 
 
+def lines(request):
+    """
+    Arguments: source bus stop, destination bus stop
+    Returns json of bus lines which have routes that use these two bus stops.  
+    """
+    source = request.GET.get('source', '')
+    destination = request.GET.get('destination', '')
+
+    routes = Routes.objects.filter(stopids__contains=[source, destination]).values_list('routeid', flat=True)
+    lines = Lines.objects.filter(routes__overlap=list(routes)).values_list('lineid', flat=True)
+
+    return HttpResponse(json.dumps(list(lines)), content_type='application/json')
+
+
 def journeytime(request):
+    """
+    Arguments: source and destination bus stops, lineid (e.g. 39A), time (unixtime)
+    Returns json showing model prediction:
+        - Arrival time at destination
+        - Total travel time
+        - Travel time for each segment of the journey (distance between each bus stop)
+    """
+
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
     lineid = request.GET.get('lineid', '')
@@ -146,19 +168,13 @@ def get_address(request):
 
 def routes(request):
     routes = Routes.objects.all().values()
-
-    routesJson = []
-    for i in routes:
-        routesJson.append(dict(i))
+    routesJson = [dict(i) for i in routes]
 
     return JsonResponse(routesJson, safe=False)
 
 def linked(request):
     linked = Linked.objects.all().values()
-
-    linkedJson = []
-    for i in linked:
-        linkedJson.append(dict(i))
+    linkedJson = [dict(i) for i in linked]
 
     return JsonResponse(linkedJson, safe=False)
 
@@ -173,7 +189,7 @@ def route_result(request):
     route1 = Route_result(start, destination).route_json()
     return JsonResponse(route1, safe=False)
 
-@csrf_exempt
+
 def get_start(request):
     # print("In GET START")
     # print(request)

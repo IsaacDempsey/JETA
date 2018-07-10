@@ -1,6 +1,3 @@
-#This file is used to build the table structure in the database
-
-# DJANGO MODEL IMPORTS
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
@@ -130,7 +127,6 @@ class Linked(models.Model):
     stop_name = models.TextField(null=True)
     linked = ArrayField(models.TextField(null=True))
     
-
     def __str__(self):
         return self.stop_name
     

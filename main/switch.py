@@ -1,6 +1,7 @@
 from .models import Linked, Stops, Routes
 import pandas as pd
 
+# Checks whether start and destination stops are linked by a route or not.
 class Switch_start():
     def __init__(self, start_id, destination_id):
         self.start_id = start_id
@@ -8,6 +9,8 @@ class Switch_start():
         self.routes = Routes.objects.all().values()
         self.linked = Linked.objects.all().values()
 
+    # Returns True if start and destination are not linked.
+    # If True, also returns stopid of station
     def switch_check(self):
         df1 = pd.DataFrame.from_records(self.linked)
         linked_dict = df1.to_dict('index')
