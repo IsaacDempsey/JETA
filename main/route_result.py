@@ -17,7 +17,7 @@ class Route_result():
         # Returns True if start and destination are not linked by a route.
         switch = Switch_start(self.start_id, self.destination_id).switch_check()
         if switch == True:
-            self.start_id = switch[1]
+            self.start_id = switch[1] 
             print("Start switched!")
         
         df2 = pd.DataFrame.from_records(self.routes)

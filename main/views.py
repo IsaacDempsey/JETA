@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection # useful for viewing django sql using print(connection.queries)
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -28,6 +28,8 @@ def lines(request):
     """
     Arguments: source bus stop, destination bus stop
     Returns json of bus lines which have routes that use these two bus stops.  
+    Note: does not check that source stop is before the destination stop.
+        - Logically this will always be the case since routes are one way.
     """
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
@@ -40,7 +42,7 @@ def lines(request):
 
 def journeytime(request):
     """
-    Arguments: source and destination bus stops, lineid (e.g. 39A), time (unixtime)
+    Arguments: source & destination bus stops, lineid (e.g. 39A), time (unixtime)
     Returns json showing model prediction:
         - Arrival time at destination
         - Total travel time
@@ -75,19 +77,9 @@ def journeytime(request):
     model_inputs = [seconds_since_midnight, rain] + week_dummies
 
     # Get stop lists associated with query lineid, start stop and end stop
-    cursor = connection.cursor()
-    sql = """
-    SELECT * 
-    FROM main_routes 
-    WHERE routeid IN (
-        SELECT UNNEST(routes) 
-        FROM main_lines 
-        WHERE main_lines.lineid = %s
-    ) 
-    AND %s = ANY(main_routes.stopids) 
-    AND %s = ANY(main_routes.stopids);
-    """
-    routes = pd.read_sql(sql, connection, params=[lineid, source, destination])
+    lineids = Lines.objects.filter(lineid=lineid).values_list('routes', flat=True)
+    routes = Routes.objects.filter(routeid__in=(list(lineids)[0 ]), stopids__contains=[source, destination]).values()
+    routes = pd.DataFrame.from_records(routes)
 
     if routes.shape[0] > 1:
         print("Error: multiple possible routes.")
@@ -105,10 +97,8 @@ def journeytime(request):
     # Make stopids into segments
     journey_segments = [ '_'.join(x) for x in zip(stringified[0:], stringified[1:])]
 
-    # Select coefficient rows with these segment ids
+    # Select coefficient rows with these segment ids, and load into pd dataframe.
     coefficients_qs = Coefficients.objects.filter(pk__in=journey_segments).values()
-
-    # Load queryset into pd dataframe
     coefficients = pd.DataFrame.from_records(coefficients_qs)
 
     # Sort values by journey_segment segmentid
@@ -161,11 +151,11 @@ def get_address(request):
             badd_json = {}
             badd_json['label'] = badd.address +", "+ badd.stopid
             results.append(badd_json)
-        data = json.dumps(results)
+        data = results
     else:
-        data = 'fail'
+        data = {"error": {"code": 400,"message": "Not Ajax request."}}
 
-    return HttpResponse(data, content_type='application/json')
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def routes(request):
@@ -196,6 +186,17 @@ def route_result(request):
 
 
 def get_start(request):
+    """
+    Arguments: Address string like "Dublin (UCD Stillorgan Rd Flyover), 768".
+    Returns json showing stops which can be reached from start_id:
+        - Takes final number from argument address string - the stopid.
+        - Checks if this stop has any linked stops (stops with similar address name).
+        - Gets ids of stops that can be reached by a single bus route from:
+            + The start stop
+            + Any of the linked stops
+        - Returns json of name, address and coordinates of all these stopids.
+    """
+
     if request.is_ajax():
         start_text = request.GET.get("start_text",'')
         start_split = start_text.split(",")
@@ -203,7 +204,7 @@ def get_start(request):
         start_id = id_space.replace(" ", "")
         start_id = int(start_id)
 
-        # Get df containing any rows from the linked table which have the start_id
+        # Get df containing any rows from the linked table which include the start_id
         linked = Linked.objects.filter(linked__contains=[start_id]).values()
         linked_df = pd.DataFrame.from_records(linked)
 
@@ -224,7 +225,7 @@ def get_start(request):
         routes = Routes.objects.filter(stopids__overlap=[linked_stops]).values()
         routes_df = pd.DataFrame.from_records(routes)
 
-        # Slice stopids to right of start_stop to remove stops previous to the start stop
+        # Slice stopids to left of start_stop to remove stops previous to the start stop
         routes_df['stopids'] = routes_df['stopids'].apply(lambda x: x[x.index(start_id):])
 
         # Get list of related_routes stops and flatten, get unique values
@@ -232,7 +233,7 @@ def get_start(request):
         routes_stops = sum(routes_stops, [])
         routes_stops = set(routes_stops)
 
-        # Get related_routes_stops rows in stops table
+        # Get routes_stops rows in stops table
         stops = Stops.objects.filter(stopid__in=routes_stops).values()
         stops_df = pd.DataFrame.from_records(stops)
 
@@ -245,6 +246,6 @@ def get_start(request):
 
         #dest = json.dumps(Destinations(start_id).destinations_json())
     else:
-        dest="Error - not ajax request."
+        dest = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
 
     return HttpResponse(dest, content_type='application/json')
