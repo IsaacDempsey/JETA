@@ -1,4 +1,5 @@
 from django.db import connection # useful for viewing django sql using print(connection.queries)
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -6,7 +7,6 @@ from django.urls import reverse
 from .models import Coefficients, Lines, Linked, Routes, Stops
 from .destinations import Destinations
 from .route_result import Route_result
-from django.db.models import Q
 
 from datetime import datetime, timedelta
 import json
@@ -146,8 +146,8 @@ def get_address(request):
         error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
         return HttpResponse(error_json, content_type='application/json')
 
-    q = request.GET.get('term', '')
-    bus_adds = Stops.objects.filter(address__icontains=q)[:20]
+    term = request.GET.get('term', '')
+    bus_adds = Stops.objects.filter(Q(stopid__startswith=term) | Q(address__icontains=term))[:20]
     results = []
     for badd in bus_adds:
         badd_json = {}
@@ -197,9 +197,9 @@ def get_start(request):
         - Returns json of name, address and coordinates of all these stopids.
     """
 
-    # if not request.is_ajax():
-    #     error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
-    #     return HttpResponse(error_json, content_type='application/json')
+    if not request.is_ajax():
+        error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
+        return HttpResponse(error_json, content_type='application/json')
 
     start_text = request.GET.get("start_text",'')
     start_split = start_text.split(",")
