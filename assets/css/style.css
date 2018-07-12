@@ -30,7 +30,7 @@ body {
 
 .wrapper {
   position: relative;
-  height:88vh;
+  height:100%;
   margin: 0;
   padding: 0;
   }
@@ -45,7 +45,7 @@ body {
   width: 400px;
   z-index: 99;
   border-radius: 5px;
-  background-color: #DFDFDF;
+  background-color: #FFF;
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
   align-content: center;
   justify-content: center;
