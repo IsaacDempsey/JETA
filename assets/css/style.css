@@ -1,8 +1,4 @@
-
-
-#wrapper {
-    position: relative;
-}
+/* The css for the autocomplete selection box that appears for source and destination */
 .ui-autocomplete{
     max-height: 200px !important;
     max-width: 300px;
@@ -10,17 +6,18 @@
     /* prevent horizontal scrollbar */
     overflow-x: hidden;
     /* add padding to account for vertical scrollbar */
-    padding-right: 80px;
 }
  	/* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 
+/* Map division */
 #map {
   height: 100%;
 }
 
 /* Optional: Makes the sample page fill the window. */
 
+/* Since we need all the parent of the map to have 100% height. Hence this */
 html,
 body {
   height: 100%;
@@ -28,6 +25,15 @@ body {
   padding: 0;
 }
 
+/* Set relative padding for the input boxes */
+.inputRow{
+  padding: 1rem;
+  float: none;
+}
+
+
+
+/* The parent wrapper for both the map and the form */
 .wrapper {
   position: relative;
   height:100%;
@@ -35,6 +41,8 @@ body {
   padding: 0;
   }
 
+
+/* Positioning the form over the map and on the right of the screen. Parameters are pretty self explanatory */
 #form {
   position: absolute;
   margin-top: 0px;
@@ -51,14 +59,42 @@ body {
   justify-content: center;
 }
 
-.inputRow{
-  padding: 1rem;
-}
 
+/* The class which is defined for displaying lines. Only display by jquery */
 #lineholder{
   display: None;
 }
+
+/* The class which is defined for travel time display on the form. Only display by jquery */
 #journeyholder{
   display: None;
 }
 
+.col-centered{
+  float: none;
+  margin: 0 auto;
+}
+
+/* Customizing the navigation link */
+a.nav-link.active{
+  background-color: #DFDFDF !important;
+}
+
+a.nav-link{
+  color: white;
+}
+
+/* CSS For the form when the device is opened in mobile */
+@media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
+  .mobile-form { /* Use this class */
+    position: fixed; /* Make the position of the form fixed */
+    height: 100vh !important; /* Full device height */
+    width: 100vw !important; /* Full device width */
+    left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+    transform: translate(-50%, 0%); /* Same reasons from above [To position the form] */
+  }
+  .mobile-col-centered{
+    float: none;
+    margin: 0 auto;
+}
+}

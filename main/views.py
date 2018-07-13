@@ -159,7 +159,7 @@ def get_address(request):
         results = []
         for badd in badds:
             badd_json = {}
-            badd_json['label'] = badd.address +", "+ badd.stopid
+            badd_json['label'] = badd.address +", "+ str(badd.stopid)
             results.append(badd_json)
         data = json.dumps(results)
     else:
