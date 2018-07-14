@@ -41,14 +41,8 @@ $j(function () {
                     if (autocomplete_data == []){
                         autocomplete_data.push({ label: "No Data to Display" });
                     }
-                    // before any new markers are set delete the old ones
-                    if (markers.length>0){
-                        for (var i =0; i<=markers.length-1;i++){
-                            markers[i].setMap(null);
-                            delete markers[i];
-                        }
-                        markers = [];
-                    }
+                    // before any new markers are set delete the old ones and then set the new ones
+                    deleteMarkers(markers);
                     setMarkers(data, startStop);
                     // refresh autocomplete for destination
                     var endstop;
@@ -61,13 +55,7 @@ $j(function () {
                             var endStop = stopId[stopId.length - 1];
                             endStop = endStop.trim();
                             var endData = [];
-                            if (markers.length > 0) {
-                                for (var i = 0; i <= markers.length - 1; i++) {
-                                    markers[i].setMap(null);
-                                    delete markers[i];
-                                }
-                                markers = [];
-                            }
+                            deleteMarkers(markers);
                             for (var i = 0; i<data.length;i++){
                                 if (data[i].stop_id == endStop){
                                     endData.push(data[i]);
@@ -91,6 +79,7 @@ $j(function () {
         }
     });
 });
+
 
 
 // On Document Ready
@@ -139,6 +128,7 @@ function setGlobalMap(Asyncmap) {
     map = Asyncmap;
 }
 
+// Function to automatically load markers on the map
 var markers = [];
 function setMarkers(data, stopid, endstop="None"){
     var coordinates = [];
@@ -204,6 +194,17 @@ function setMarkers(data, stopid, endstop="None"){
     };
     //  var markerCluster = new MarkerClusterer(map, markers,
     //         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+}
+
+// Function to delete markers from the map
+function deleteMarkers(markers){
+    if (markers.length > 0) {
+        for (var i = 0; i <= markers.length - 1; i++) {
+            markers[i].setMap(null);
+            delete markers[i];
+        }
+        markers = [];
+    }
 }
 
 function getLines(startStop, endStop){
