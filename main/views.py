@@ -147,7 +147,7 @@ def get_address(request):
         return HttpResponse(error_json, content_type='application/json')
 
     term = request.GET.get('term', '')
-    bus_adds = Stops.objects.filter(Q(stopid__startswith=term) | Q(address__icontains=term))[:20]
+    bus_adds = Stops.objects.filter(Q(stopid__startswith=term) | Q(address__icontains=term))
     results = []
     for badd in bus_adds:
         badd_json = {}

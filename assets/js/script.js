@@ -17,6 +17,11 @@ $j(function () {
         dataType: "json",
         // When the user selects the required input ...-->
         select: function (e, ui) {
+            // Get the stop id for the start
+            var start = ui.item.label;
+            var stopId = start.split(",");
+            var startStop = stopId[stopId.length - 1];
+            startStop = startStop.trim();
             // ..--> Send an ajax query to the api at the below URL
             $.ajax({
                 url: localAddress + "/main/get_start",
@@ -26,10 +31,7 @@ $j(function () {
                 dataType: "json",
                 // On success send this data to the receive data function
                 success: function (data) {
-                    var start = ui.item.label;
-                    var stopId = start.split(",");
-                    var startStop = stopId[stopId.length - 1];
-                    startStop = startStop.trim();
+                    // Create a json input for destinations only to select data from the returned filter
                     var autocomplete_data = [];
                     for (var i = 0; i < data.length; i++) {
                         if (data[i].stop_id == startStop){
@@ -39,7 +41,7 @@ $j(function () {
                         }
                     }
                     if (autocomplete_data == []){
-                        autocomplete_data.push({ label: "No Data to Display" });
+                        autocomplete_data.push({ label: "No Destination for this source found" });
                     }
                     // before any new markers are set delete the old ones and then set the new ones
                     deleteMarkers(markers);
@@ -170,9 +172,7 @@ function setMarkers(data, stopid, endstop="None"){
         markers.push(bus_stop);
         bus_stop.setMap(map);
         showHideMarker(map, bus_stop, stop_name, data[i].stop_id);
-    }
-    
-    
+    }    
     function showHideMarker(map, bus_stop, stop_name, start_icon) {
         var stop_icon_h = "/static/img/HoverStop.png";
         var infowindow = new google.maps.InfoWindow({
