@@ -82,6 +82,7 @@ class Linked(models.Model):
 
 class Routes(models.Model):
     routeid = models.CharField(max_length=10, primary_key=True)
+    lineid = models.CharField(max_length=5, null=True)
     direction = models.IntegerField(null=True)
     stopids = ArrayField(models.IntegerField(null=True))
 

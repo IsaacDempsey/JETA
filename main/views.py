@@ -10,18 +10,13 @@ from .route_result import Route_result
 
 from datetime import datetime, timedelta
 import json
+from more_itertools import unique_everseen
 import pandas as pd
 from pytz import timezone
 import time
 
 def index(request):
     return render(request, 'index.html')
-
-
-def stops(request):
-    stops = Stops.objects.all()[:10].values()
-    stops_df = pd.DataFrame.from_records(stops, index='stopid')
-    return HttpResponse(stops_df.to_json(orient='index'), content_type='application/json')
 
 
 def lines(request):
@@ -185,72 +180,95 @@ def route_result(request):
     return JsonResponse(route1, safe=False)
 
 
-def get_start(request):
+def stops(request):
     """
-    Arguments: Address string like "Dublin (UCD Stillorgan Rd Flyover), 768".
-    Returns json showing stops which can be reached from start_id:
-        - Takes final number from argument address string - the stopid.
-        - Checks if this stop has any linked stops (stops with similar address name).
-        - Gets ids of stops that can be reached by a single bus route from:
-            + The start stop
-            + Any of the linked stops
-        - Returns json of name, address and coordinates of all these stopids.
+    Query Terms: source stopid, destination stopid, lineid.
+        - source and destination must be ints
+        - Either all or none of these terms can be added.
+    Returns json showing stop information:
+        - If source stopid is given, returns stopids that can be reached from this location.
+        - If source & destination stopid are given, returns stopids that connect these two via any route.
+        - If source, destination & lineid are given, returns stopids that connect these two via only this route
+    Stop information:
+        - stop_id
+        - stop_name = address of stop
+        - lineid = dictionary or form {lineid: order of stop on route}. E.g. {"46A":14,"46E":13,"7B":13}
+        - coord = list of coordinations [lat, lng].
     """
 
     if not request.is_ajax():
         error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
         return HttpResponse(error_json, content_type='application/json')
 
-    start_text = request.GET.get("start_text",'')
-    start_split = start_text.split(",")
-    id_space = start_split[-1]
-    start_id = id_space.replace(" ", "")
-    start_id = int(start_id)
+    source = request.GET.get("source")
+    destination = request.GET.get("destination")
+    lineid = request.GET.get("lineid")
 
-    # Get df containing any rows from the linked table which include the start_id
-    linked = Linked.objects.filter(linked__contains=[start_id]).values()
-    linked_df = pd.DataFrame.from_records(linked)
-
-    if linked_df.empty:
-        stops_list = [start_id]
-    else:
-        # Get linked stops as array of arrays and flatten
-        linked_stops = linked_df['linked'].tolist()
-        linked_stops = sum(linked_stops, [])
-
-        # Get unique stops and make sure that start_id is included
-        stops_list = list(set(linked_stops + [start_id]))
+    routes_qs = Routes.objects.all()
         
-    # Convert all values to ints (currently, datatype = strings)
-    stops_list = list(map(int, stops_list))
+    if source:
+        source = int(source)
+        routes_qs = routes_qs.filter(stopids__contains=[source])
 
-    # Get df of routes which contain these stopids
-    routes = Routes.objects.filter(stopids__overlap=[stops_list]).values()
-    routes_df = pd.DataFrame.from_records(routes)
+    if destination:
+        destination = int(destination)
+        routes_qs = routes_qs.filter(stopids__contains=[destination])
 
-    if routes_df.empty:
-        error_json = json.dumps({"error": {"code": 404,"message": "No route with this stopid."}})
+    if lineid:
+        routes_qs = routes_qs.filter(lineid=lineid)
+
+    routes = pd.DataFrame.from_records(routes_qs.values('lineid', 'stopids'))
+
+    if routes.empty:
+        error_json = json.dumps({"error": {"code": 404,"message": "No data fits these criteria."}})
         return HttpResponse(error_json, content_type='application/json')
 
     # Slice stopids to left of start_stop to remove stops previous to the start stop
-    routes_df['stopids'] = routes_df['stopids'].apply(lambda x: x[x.index(start_id):])
+    if source:
+        routes['stopids'] = routes['stopids'].apply(lambda x: x[x.index(source):])
 
-    # Get list of related_routes stops and flatten, get unique values
-    routes_stops = routes_df['stopids'].tolist()
-    routes_stops = sum(routes_stops, [])
-    routes_stops = set(routes_stops)
+    # Slice stopids by destination if it was given.
+    if destination:
+        routes['stopids'] = routes['stopids'].apply(lambda x: x[:(x.index(destination)+1)])
 
-    # Get routes_stops rows in stops table
-    stops = Stops.objects.filter(stopid__in=routes_stops).values()
-    stops_df = pd.DataFrame.from_records(stops)
+    # Remove duplicate stopids within routes, while maintaining stop order.
+    routes['stopids'] = routes['stopids'].apply(lambda x: list(unique_everseen(x)))
 
-    # Arrange selected_stops dataframe in correct format for json
-    df = stops_df[['stopid', 'address', 'lat', 'lng']]
-    df = df.groupby(['stopid', 'address'], as_index=False).apply(lambda x: x[['lng','lat']].values.tolist()[0]).reset_index()
-    df = df.rename(columns={0:'coord', 'stopid':'stop_id', 'address':'stop_name'})
+    # Remove routes with identical lineids. Favour routes with more stops.
+    routes['stopids_len'] = routes['stopids'].apply(lambda x: len(x))
+    routes = routes.sort_values('stopids_len').groupby('lineid').last()
+    routes = pd.DataFrame(routes).reset_index()
+    routes = routes[['lineid', 'stopids']]
 
-    dest = df.to_json(orient='records')
+    # Unstack stopids column.
+    routes_unstacked = routes.set_index('lineid').stopids.apply(pd.Series).stack().reset_index(level=-1, drop=True).astype(int).reset_index()
+    routes_unstacked = routes_unstacked.rename(columns={0:'stopid'})
 
-    #dest = json.dumps(Destinations(start_id).destinations_json())
+    # Create a column indicating the order (program number) of each stop in each route.
+    routes_unstacked['program'] = routes_unstacked.groupby('lineid').cumcount()
 
-    return HttpResponse(dest, content_type='application/json')
+    # Group lineid and program number into column containing a dict for each stopid. E.g. {'84X': 9, '46A': 15 ...}
+    routes = routes_unstacked.groupby(['stopid']).apply(lambda x: dict(x[['lineid','program']].values))
+    routes = pd.DataFrame(routes).reset_index()
+    routes = routes.rename(columns={0: 'lineid'})
+
+    # Get set of stops visted by the routes.
+    stops_list = list(set(routes['stopid'].tolist()))
+
+    # Get these rows in stops table
+    stops = Stops.objects.filter(stopid__in=stops_list).values()
+    stops = pd.DataFrame.from_records(stops)
+
+    # Group lat and lng columns into list of form [lat, lng]
+    stops = stops.groupby(['stopid', 'address'], as_index=False).apply(lambda x: x[['lat','lng']].values.tolist()[0])
+    stops = pd.DataFrame(stops).reset_index()
+    stops = stops.rename(columns={0: 'coord'})
+
+    # Merge line_stop and stops_df to combine lineid info with coordinate and address.
+    combined_df = pd.merge(stops, routes, on='stopid',sort=False)
+    combined_df = combined_df[['stopid', 'address', 'lineid', 'coord']]
+
+    # Rename to suit front end conventions
+    combined_df = combined_df.rename(columns={'stopid': 'stop_id', 'address': 'stop_name'})
+
+    return HttpResponse(combined_df.to_json(orient='index'), content_type='application/json')
