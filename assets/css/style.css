@@ -53,6 +53,17 @@ body {
   padding: 0;
   }
 
+.overlay {
+  background-color: rgb(33,37,41) !important;
+  opacity: 0.5;
+  display: none;
+  position: relative;
+  height:100vh;
+  margin: 0;
+  padding: 0;
+  z-index: 98;
+  }
+
 
 /* Positioning the form over the map and on the right of the screen. Parameters are pretty self explanatory */
 #form {
@@ -81,6 +92,12 @@ body {
 /* The class which is defined for travel time display on the form. Only display by jquery */
 #journeyholder{
   display: None;
+}
+
+/* Home 1 displays the routes after the user clicks get my travel time on the home tab */
+#home1{
+  color: white;
+  display: none;
 }
 
 .col-centered{
@@ -119,7 +136,7 @@ a.nav-link{
   .mobile-form { /* Use this class */
     background-color: rgba(33,37,41,0.8) !important;
     border-radius: 10px !important;
-    position: fixed !important; /* Make the position of the form fixed */
+    position: absolute !important; /* Make the position of the form fixed */
     top: 50% !important;
     /* bottom: 50% !important; */
     /* min-height: 100vh !important; Full device height */
@@ -135,4 +152,18 @@ a.nav-link{
   .mp-5{
     padding: 5px 5px 5px 5px !important;
   }
+}
+
+.errorreport{
+  color: white;
+  position: fixed !important; /* Make the position of the form fixed */
+  top: 50% !important;
+  left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+  right: 50% !important;
+  height: auto;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+  z-index:99;
 }

@@ -232,8 +232,15 @@ def get_start(request):
         error_json = json.dumps({"error": {"code": 404,"message": "No route with this stopid."}})
         return HttpResponse(error_json, content_type='application/json')
 
-    # Slice stopids to left of start_stop to remove stops previous to the start stop
-    routes_df['stopids'] = routes_df['stopids'].apply(lambda x: x[x.index(start_id):])
+    try:
+        # Slice stopids to left of start_stop to remove stops previous to the start stop
+        routes_df['stopids'] = routes_df['stopids'].apply(lambda x: x[x.index(start_id):])
+    except Exception as e:
+        response = HttpResponse(json.dumps({'stopids': start_id, 'err': 'No Stops Found'}),
+                                content_type='application/json')
+        response.status_code = 500
+        return response
+    
 
     # Get list of related_routes stops and flatten, get unique values
     routes_stops = routes_df['stopids'].tolist()

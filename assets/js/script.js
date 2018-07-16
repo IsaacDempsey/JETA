@@ -6,6 +6,7 @@ var $j = jQuery.noConflict(); // No conflict with the major jquery for autocompl
 var __startStop = "";
 var __endStop = "";
 var autocomplete_data = [];
+var startStopAutocompleteData;
 // Autocomplete Feature when the user enters in the source address
 
 
@@ -24,7 +25,11 @@ $(document).ready(function () {
     $("#journeyholder").hide();
     $("#noSource").hide();
     $("#noDestination").hide();
+    $("#home1").hide();
     $("#sourceFirst").hide();
+    $("#error").hide();
+    $("#errorsent").hide();
+    $(".overlay").hide();
     loadMap();
 });
 
@@ -92,8 +97,21 @@ $j(function () {
                 data: { start_text: ui.item.label },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("form").hide();
+                    $(".overlay").show();
+                    $j("#error").show("slide", { direction: "down" }, "fast");
+                    $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                },
                 // On success send this data to the receive data function
                 success: function (data) {
+                    startStopAutocompleteData = data;
                     // Create a json input for destinations only to select data from the returned filter
                     autocomplete_data = [];
                     for (var i = 0; i < data.length; i++) {
@@ -109,43 +127,27 @@ $j(function () {
                         $("#destination").attr("placeholder", "Enter Destination").css("background-color", "#ffffff");
                         $("#destination").prop('disabled', false);
                     }
-                    // before any new markers are set delete the old ones and then set the new ones
-                    deleteMarkers(markers);
-                    setMarkers(data, __startStop);
+                    
+                    addMarkers(data, __startStop);
                     // refresh autocomplete for destination
-                    var endstop;
                     $j("#destination").autocomplete({
 
                         source: autocomplete_data,
                         minLength: 1,
                         select: function (e, ui) {
+                            // alert("Selecting Destination");
                             $("#noDestination").hide();
                             var end = ui.item.label;
                             var stopId = end.split(",");
                             var endStop = stopId[stopId.length - 1];
                             __endStop = endStop.trim();
-                            var endData = [];
-                            deleteMarkers(markers);
-                            for (var i = 0; i < data.length; i++) {
-                                if (data[i].stop_id == __endStop) {
-                                    endData.push(data[i]);
-                                    break;
-                                } else {
-                                    endData.push(data[i]);
-                                }
-                            }
-                            // Send only data from stop till to stop
-                            if (endData == []) {
-                                setMarkers(data, __startStop, __endStop);
-                            } else {
-                                setMarkers(endData, __startStop, __endStop);
-                            }
+                            addMarkers(startStopAutocompleteData, __startStop, __endStop);
                         }
                     });  
                 }
             });
         }
-    });
+    });      
 });
 
 
@@ -166,58 +168,79 @@ $(function () {
         } else {
             $("#noSource").hide();
             $("#noDestination").hide();
+            // $("#home").animate({right:'-250px'});
+            $j("#home").hide("slide", { direction: "left" }, "fast",function () {
+                $j("#home1").show("slide", { direction: "right" }, "fast");
+            });
+            // 
             getLines(__startStop, __endStop);
         }
     });
+
+    // If go back to search button is clicked
+    $("#goBackSearch").click(function(){
+        $j("#home1").hide("slide", { direction: "left" }, "fast", function () {
+            $j("#home").show("slide", { direction: "right" }, "fast");
+        });
+    });
 })
+
+
 
 // Function to automatically load markers on the map
 var markers = [];
-function setMarkers(data, stopid, endstop="None"){
+function addMarkers(data, stopid, endstop="None"){
+    deleteMarkers(markers);
     var coordinates = [];
     var names = [];
-    var bus_stop;
-    if (bus_stop && bus_stop.setMap) {
-        bus_stop.setMap(null);
-    }
-    infowindow = new google.maps.InfoWindow();
-    if (data.length<=25){
-        map.setZoom(15)
+    if (endstop == "None" ){
+        map.setZoom(15);
     } else {
         map.setZoom(13);
     }
+    
     for (var i = 0; i < data.length; i++) {
         var stop = { lat: data[i].coord[1], lng: data[i].coord[0] };
         var stop_name = data[i].stop_name;
         var start_icon = "/static/img/StartStop.png";
         var end_icon = "/static/img/EndStop.png";
         if (data[i].stop_id == stopid) {
-            // var stop_icon = { path: "M0,0a8,8 0 1,0 20,0a8,8 0 1,0 -20,0", fillColor: "#81C784", fillOpacity: 0.8, scale: 1, strokeColor: "#99ccff", strokeWeight: 4 };
             var stop_icon = start_icon;
             map.setCenter(stop);
-
-        } else if (data[i].stop_id == endstop) {
-                // var stop_icon = { path: "M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0", fillColor: "#ef5350", fillOpacity: 0.8, scale: 1, strokeColor: "#99ccff", strokeWeight: 4 };
-            var stop_icon = end_icon;
-            map.setCenter(stop);
-        }else{
-            // var stop_icon = { path: "M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0", fillColor: "#e6f2ff", fillOpacity: 0.8, scale: 1, strokeColor: "#99ccff", strokeWeight: 4 };
+        } else {
             var stop_icon = "/static/img/InterStop.png";
         }
-        bus_stop = new google.maps.Marker({
+        if (endstop != "None"){
+            if (data[i].stop_id == endstop) {
+                var stop_icon = end_icon;
+                map.setCenter(stop);
+            }
+        }
+        var bus_stop = new google.maps.Marker({
             position: stop,
             icon: stop_icon,
-            map: map
-
+            map: map,
+            stopid: data[i].stop_id,
+            name: stop_name
         });
+        if (markers.length==0){
+        }
         markers.push(bus_stop);
-        bus_stop.setMap(map);
-        showHideMarker(map, bus_stop, stop_name, data[i].stop_id);
+        setMarker(map);
+        markerHover(map, bus_stop);
+        
     }    
-    function showHideMarker(map, bus_stop, stop_name, start_icon) {
+    
+    //  var markerCluster = new MarkerClusterer(map, markers,
+    //         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+}
+
+// Hover interaction of markers
+function markerHover(map, bus_stop) {
+    infowindow = new google.maps.InfoWindow();
         var stop_icon_h = "/static/img/HoverStop.png";
         var infowindow = new google.maps.InfoWindow({
-          content: stop_name + ", " + data[i].stop_id,
+            content: bus_stop.get("name") + ", " + bus_stop.get("stopid")
         });
         var lasthover;
         bus_stop.addListener('mouseout', function () {
@@ -231,21 +254,26 @@ function setMarkers(data, stopid, endstop="None"){
             // alert("Hover Out");
             bus_stop.setOptions({ icon: stop_icon_h });
             infowindow.open(bus_stop.get('map'), bus_stop);
-        });
-    };
-    //  var markerCluster = new MarkerClusterer(map, markers,
-    //         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+        });   
+};
+
+
+// Set inividual marker on the map
+function setMarker(map) {
+    for (var i =0; i < markers.length; i++){
+        markers[i].setMap(map);
+    }
+}
+
+// Clear the markers from the map
+function clearMarkers(){
+    setMarker(null);
 }
 
 // Function to delete markers from the map
 function deleteMarkers(markers){
-    if (markers.length > 0) {
-        for (var i = 0; i <= markers.length - 1; i++) {
-            markers[i].setMap(null);
-            delete markers[i];
-        }
-        markers = [];
-    }
+    clearMarkers();
+    markers = [];
 }
 
 function getLines(startStop, endStop){
@@ -263,18 +291,13 @@ function getLines(startStop, endStop){
           $("#lineholder").show();
           $("#linecontent").html('');
           for (var i = 0; i < data.length; i ++){
-              $('<div class= "col-sm-* mr-1 btn btn-info" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</div>").appendTo("#linecontent");
+              $('<div class= "col-sm-2 col-xs-2 px-3 btn btn-info" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</div>").appendTo("#linecontent");
           }
       }
     });
 }
 function getTravelTime(content) {
-    console.log($("#datetime").val());
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
-    console.log(__startStop);
-    console.log(__endStop);
-    console.log(content.innerHTML);
-    console.log(datetime);
     $.ajax({
         url: localAddress + "/main/journeytime",
         data: {
@@ -296,6 +319,22 @@ function getTravelTime(content) {
 
     
 }
+
+function sendErrorReport(){
+    $j("#errorcontent").hide("slide", { direction: "right" }, "fast", function () {
+        $j("#errorsent").show("slide", { direction: "right" }, "fast");
+    });
+    
+}
+
+$(function () {
+    $("#closeError").click(function () {
+      $("#error").hide();
+      $(".overlay").hide();
+      $("form").show();
+      location.reload();
+    });
+})
 // This is the major Display Map function
 // function displayMap(data2, startBusStop){
 //         var coordinates2 = [];
