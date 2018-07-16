@@ -1,5 +1,5 @@
 import json
-import numpy as np
+#import numpy as np
 from collections import defaultdict
 import pandas as pd
 from .models import Routes, Linked, Stops

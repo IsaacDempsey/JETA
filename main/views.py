@@ -10,6 +10,7 @@ from .route_result import Route_result
 
 from datetime import datetime, timedelta
 import json
+from more_itertools import unique_everseen
 import pandas as pd
 from pytz import timezone
 import time
@@ -181,19 +182,23 @@ def route_result(request):
 
 def stops(request):
     """
-    Arguments: Address string like "Dublin (UCD Stillorgan Rd Flyover), 768".
-    Returns json showing stops which can be reached from start_id:
-        - Takes final number from argument address string - the stopid.
-        - Checks if this stop has any linked stops (stops with similar address name).
-        - Gets ids of stops that can be reached by a single bus route from:
-            + The start stop
-            + Any of the linked stops
-        - Returns json of name, address and coordinates of all these stopids.
+    Query Terms: source stopid, destination stopid, lineid.
+        - source and destination must be ints
+        - Either all or none of these terms can be added.
+    Returns json showing stop information:
+        - If source stopid is given, returns stopids that can be reached from this location.
+        - If source & destination stopid are given, returns stopids that connect these two via any route.
+        - If source, destination & lineid are given, returns stopids that connect these two via only this route
+    Stop information:
+        - stop_id
+        - stop_name = address of stop
+        - lineid = dictionary or form {lineid: order of stop on route}. E.g. {"46A":14,"46E":13,"7B":13}
+        - coord = list of coordinations [lat, lng].
     """
 
-    # if not request.is_ajax():
-    #     error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
-    #     return HttpResponse(error_json, content_type='application/json')
+    if not request.is_ajax():
+        error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
+        return HttpResponse(error_json, content_type='application/json')
 
     source = request.GET.get("source")
     destination = request.GET.get("destination")
@@ -225,6 +230,9 @@ def stops(request):
     # Slice stopids by destination if it was given.
     if destination:
         routes['stopids'] = routes['stopids'].apply(lambda x: x[:(x.index(destination)+1)])
+
+    # Remove duplicate stopids within routes, while maintaining stop order.
+    routes['stopids'] = routes['stopids'].apply(lambda x: list(unique_everseen(x)))
 
     # Remove routes with identical lineids. Favour routes with more stops.
     routes['stopids_len'] = routes['stopids'].apply(lambda x: len(x))
