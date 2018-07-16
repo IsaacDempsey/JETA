@@ -3,85 +3,10 @@ var localAddress = window.location.protocol // Local url
 var stationsTable = document.getElementById("stationsTable");
 var $j = jQuery.noConflict(); // No conflict with the major jquery for autocomplete widget
 
-var __startStop;
-var __endStop;
+var __startStop = "";
+var __endStop = "";
+var autocomplete_data = [];
 // Autocomplete Feature when the user enters in the source address
-$j(function () {
-    // Check for the HTML DOM element who has #source as the id
-    $j("#source").autocomplete({
-        // Send a ajax request to the below address
-        source: localAddress + '/main/get_address',
-        // Start autocompleting when the user enter's atleast 2 characters
-        minLength: 2,
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        // When the user selects the required input ...-->
-        select: function (e, ui) {
-            // Get the stop id for the start
-            var start = ui.item.label;
-            var stopId = start.split(",");
-            var startStop = stopId[stopId.length - 1];
-            startStop = startStop.trim();
-            // ..--> Send an ajax query to the api at the below URL
-            $.ajax({
-                url: localAddress + "/main/get_start",
-                // Set the start text as the label value
-                data: { start_text: ui.item.label },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                // On success send this data to the receive data function
-                success: function (data) {
-                    // Create a json input for destinations only to select data from the returned filter
-                    var autocomplete_data = [];
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].stop_id == startStop){
-                            continue;
-                        } else {
-                            autocomplete_data.push({ label: data[i].stop_name + ", " + data[i].stop_id });
-                        }
-                    }
-                    if (autocomplete_data == []){
-                        autocomplete_data.push({ label: "No Destination for this source found" });
-                    }
-                    // before any new markers are set delete the old ones and then set the new ones
-                    deleteMarkers(markers);
-                    setMarkers(data, startStop);
-                    // refresh autocomplete for destination
-                    var endstop;
-                    $j("#destination").autocomplete({
-                        source: autocomplete_data,
-                        minLength: 2,
-                        select: function (e,ui) {
-                            var end = ui.item.label;
-                            var stopId = end.split(",");
-                            var endStop = stopId[stopId.length - 1];
-                            endStop = endStop.trim();
-                            var endData = [];
-                            deleteMarkers(markers);
-                            for (var i = 0; i<data.length;i++){
-                                if (data[i].stop_id == endStop){
-                                    endData.push(data[i]);
-                                    break;
-                                }else{
-                                    endData.push(data[i]);
-                                }
-                            }
-                            // Send only data from stop till to stop
-                            if (endData == []){
-                                setMarkers(data, startStop, endStop);
-                            }else{
-                                setMarkers(endData, startStop, endStop);
-                            }
-                            getLines(startStop, endStop);                            
-                        }
-                    });
-                    
-                }
-            });
-        }
-    });
-});
-
 
 
 // On Document Ready
@@ -89,8 +14,17 @@ $(document).ready(function () {
     // When the document loads
     let today = moment().format("YYYY-MM-DDTHH:mm");
     document.querySelector("#datetime").value = today;
+    if (autocomplete_data.length == 0) {
+        $("#destination")
+          .attr("placeholder", "Please select source first")
+            .css("background-color", "#CFD8DC");
+        $("#destination").prop('disabled',true);
+    }
     $("#lineholder").hide();
     $("#journeyholder").hide();
+    $("#noSource").hide();
+    $("#noDestination").hide();
+    $("#sourceFirst").hide();
     loadMap();
 });
 
@@ -98,27 +32,27 @@ $(document).ready(function () {
 function loadMap() {
     $.getJSON('/static/json/map_style.json', function (mapstyle) {
         var map = new google.maps.Map(document.getElementById("map"), {
-          center: new google.maps.LatLng(
-            53.346834137467795,
-            -6.254525456712543
-          ),
-          mapTypeControl: false,
-          mapTypeControlOptions: {
-              style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-              position: google.maps.ControlPosition.TOP_CENTER
-          },
-          zoomControl: true,
-          zoomControlOptions: {
-            position: google.maps.ControlPosition.LEFT_CENTER
-          },
-          scaleControl: true,
-          streetViewControl: true,
-          streetViewControlOptions: {
-            position: google.maps.ControlPosition.LEFT_TOP
-          },
-          fullscreenControl: false,
-          zoom: 12,
-          styles: mapstyle
+            center: new google.maps.LatLng(
+                53.346834137467795,
+                -6.254525456712543
+            ),
+            mapTypeControl: false,
+            mapTypeControlOptions: {
+                style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                position: google.maps.ControlPosition.TOP_CENTER
+            },
+            zoomControl: true,
+            zoomControlOptions: {
+                position: google.maps.ControlPosition.LEFT_CENTER
+            },
+            scaleControl: true,
+            streetViewControl: true,
+            streetViewControlOptions: {
+                position: google.maps.ControlPosition.LEFT_TOP
+            },
+            fullscreenControl: false,
+            zoom: 12,
+            styles: mapstyle
         });
         setGlobalMap(map);
     });
@@ -129,6 +63,113 @@ var map;
 function setGlobalMap(Asyncmap) {
     map = Asyncmap;
 }
+// Autocomplete feature for the UI inputs
+$j(function () {
+        // Check for the HTML DOM element who has #source as the id
+    $j("#source").autocomplete({
+        // Send a ajax request to the below address
+        source: localAddress + '/main/get_address',
+        // Start autocompleting when the user enter's atleast 2 characters
+        minLength: 1,
+        autoFocus: true,
+        classes: {
+            "ui-autocomplete": "highlight"
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        // When the user selects the required input ...-->
+        select: function (e, ui) {
+            // Get the stop id for the start
+            $("#noSource").hide();
+            var start = ui.item.label;
+            var stopId = start.split(",");
+            var startStop = stopId[stopId.length - 1];
+            __startStop = startStop.trim();
+            // ..--> Send an ajax query to the api at the below URL
+            $.ajax({
+                url: localAddress + "/main/get_start",
+                // Set the start text as the label value
+                data: { start_text: ui.item.label },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                // On success send this data to the receive data function
+                success: function (data) {
+                    // Create a json input for destinations only to select data from the returned filter
+                    autocomplete_data = [];
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].stop_id == __startStop){
+                            continue;
+                        } else {
+                            autocomplete_data.push({ label: data[i].stop_name + ", " + data[i].stop_id });
+                        }
+                    }
+                    if (autocomplete_data == []){
+                        autocomplete_data.push({ label: "No Destination for this source found" });
+                    } else{
+                        $("#destination").attr("placeholder", "Enter Destination").css("background-color", "#ffffff");
+                        $("#destination").prop('disabled', false);
+                    }
+                    // before any new markers are set delete the old ones and then set the new ones
+                    deleteMarkers(markers);
+                    setMarkers(data, __startStop);
+                    // refresh autocomplete for destination
+                    var endstop;
+                    $j("#destination").autocomplete({
+
+                        source: autocomplete_data,
+                        minLength: 1,
+                        select: function (e, ui) {
+                            $("#noDestination").hide();
+                            var end = ui.item.label;
+                            var stopId = end.split(",");
+                            var endStop = stopId[stopId.length - 1];
+                            __endStop = endStop.trim();
+                            var endData = [];
+                            deleteMarkers(markers);
+                            for (var i = 0; i < data.length; i++) {
+                                if (data[i].stop_id == __endStop) {
+                                    endData.push(data[i]);
+                                    break;
+                                } else {
+                                    endData.push(data[i]);
+                                }
+                            }
+                            // Send only data from stop till to stop
+                            if (endData == []) {
+                                setMarkers(data, __startStop, __endStop);
+                            } else {
+                                setMarkers(endData, __startStop, __endStop);
+                            }
+                        }
+                    });  
+                }
+            });
+        }
+    });
+});
+
+
+
+
+// JQuery function to execute when the user clicks Get Travel Time Button
+$(function () {
+    $("#getTime").click(function () {
+        if (__startStop == "" && __endStop == ""){
+            $("#noSource").show();
+            $("#noDestination").show();
+        } else if (__startStop == ""){
+            $("#noDestination").hide();
+            $("#noSource").show();
+        } else if (__endStop == ""){
+            $("#noSource").hide();
+            $("#noDestination").show();
+        } else {
+            $("#noSource").hide();
+            $("#noDestination").hide();
+            getLines(__startStop, __endStop);
+        }
+    });
+})
 
 // Function to automatically load markers on the map
 var markers = [];

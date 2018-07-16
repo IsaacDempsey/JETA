@@ -7,6 +7,17 @@
     overflow-x: hidden;
     /* add padding to account for vertical scrollbar */
 }
+
+.ui-autocomplete li {
+  border-top: 1px #ccc solid!important;
+}
+
+.ui-autocomplete li:first-child { border-top: none !important; padding-top: 0 !important; }
+
+.stopids{
+  background-color: blue;
+  color: white;
+}
  	/* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 
@@ -46,6 +57,7 @@ body {
 /* Positioning the form over the map and on the right of the screen. Parameters are pretty self explanatory */
 #form {
   position: absolute;
+  background-color: rgba(33,37,41,0.9) !important;
   margin-top: 0px;
   top: 0px;
   right: 0px;
@@ -83,6 +95,23 @@ a.nav-link.active{
 
 a.nav-link{
   color: white;
+}
+
+#noSource{
+  display: none;
+}
+
+#noDestination{
+  display: none;
+}
+
+#sourceFirst{
+  display: none;
+}
+
+/* Modifying tex-danger class */
+.text-danger{
+  color: #f44336 !important;
 }
 
 /* CSS For the form when the device is opened in mobile */
