@@ -50,6 +50,7 @@ $(document).ready(function () {
     $("#errorsent").hide();
     // Over layer of the entire app when an error occurs **
     $(".overlay").hide();
+    $j("#loadingtext").hide();
     // Once everything is hidden load the map
     loadMap();
     // After the map is loaded plot all the stops
@@ -104,7 +105,8 @@ function setGlobalMap(Asyncmap) {
 
 function loadAllStops(){
     $(".overlay").show();
-    $(".loader").show();
+    $("#loading").show();
+    $j("#loadingtext").show("slide", { direction: "right" }, "fast");
     $.ajax({
         url: localAddress + "/main/stops",
         contentType: "application/json;charset=utf-8",
@@ -279,7 +281,7 @@ $(function () {
 var markers = [];
 function addMarkers(data, stopid="None", endstop="None"){
     deleteMarkers(markers);
-    markers=[]
+    markers=[];
     var coordinates = [];
     var names = [];
     if (stopid == "None" && endstop == "None"){
@@ -320,7 +322,7 @@ function addMarkers(data, stopid="None", endstop="None"){
         
     }  
     
-    if (stopid=="None" || endstop == "None"){
+    if (stopid=="None" && endstop == "None"){
         var markerCluster = new MarkerClusterer(map, markers, {
           imagePath: "/static/img/markers/clusterer/m"
         });

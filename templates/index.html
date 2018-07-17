@@ -1,6 +1,6 @@
 {% extends "layout.html" %} {% block content %}
 
-<div class="overlay">
+<div class="overlay text-center">
 	<div class="errorreport mobile-col-centered" id="error">
 		<div class="mobile-col-centered" id="errorcontent"></div>
 		<div id="errorsent">
@@ -10,7 +10,14 @@
 			</div>
 		</div>
 	</div>
-	<div class="loader" id="loading"></div>
+	<div class="loadingcontent">
+		<div class="col-xs-12 loader mobile-col-centered" id="loading"></div>
+		<div id="loadingtext">
+			<div class="text-center display-5 mobile-col-centered mp-5 p-3">Getting all stops</div>
+		</div>
+	</div>
+	
+	
 </div>
 <div class="wrapper">
 	<div id="map"></div>

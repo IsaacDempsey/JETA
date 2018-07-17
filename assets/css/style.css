@@ -172,21 +172,34 @@ a.nav-link{
   z-index:99;
 }
 
-.loader {
-  transform: translate(-50%, -40%); /* Same reasons from above [To position the form] */
-  z-index:99;
-  top: 40% !important;
+.loadingcontent{
+  color: white;
+  position: fixed !important; /* Make the position of the form fixed */
+  top: 50% !important;
   left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
   right: 50% !important;
-  position: fixed !important;
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid #3498db;
-  width: 120px;
-  height: 120px;
+  transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+  z-index:99;
+  height: auto;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+}
+
+#loading {  
+  position: fixed !important; /* Make the position of the form fixed */
+  height: 100px;
+  width: 100px;
   -webkit-animation: spin 2s linear infinite; /* Safari */
   animation: spin 2s linear infinite;
   display: none;
+  
+}
+
+#loadingtext{
+  color: white;
+  z-index:99;
+  position: relative !important;
 }
 
 /* Safari */
