@@ -7,6 +7,17 @@
     overflow-x: hidden;
     /* add padding to account for vertical scrollbar */
 }
+
+.ui-autocomplete li {
+  border-top: 1px #ccc solid!important;
+}
+
+.ui-autocomplete li:first-child { border-top: none !important; padding-top: 0 !important; }
+
+.stopids{
+  background-color: blue;
+  color: white;
+}
  	/* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 
@@ -23,6 +34,7 @@ body {
   height: 100vh;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 /* Set relative padding for the input boxes */
@@ -41,10 +53,26 @@ body {
   padding: 0;
   }
 
+.overlay {
+  background-color: rgba(33,37,41,0.9) !important;
+  display: none;
+  position: absolute;
+  height:100vh;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  padding: 0;
+  z-index: 98;
+  }
+
 
 /* Positioning the form over the map and on the right of the screen. Parameters are pretty self explanatory */
 #form {
+  display: none;
   position: absolute;
+  background-color: rgba(33,37,41,0.9) !important;
   margin-top: 0px;
   top: 0px;
   right: 0px;
@@ -70,6 +98,12 @@ body {
   display: None;
 }
 
+/* Home 1 displays the routes after the user clicks get my travel time on the home tab */
+#home1{
+  color: white;
+  display: none;
+}
+
 .col-centered{
   float: none;
   margin: 0 auto;
@@ -84,12 +118,29 @@ a.nav-link{
   color: white;
 }
 
+#noSource{
+  display: none;
+}
+
+#noDestination{
+  display: none;
+}
+
+#sourceFirst{
+  display: none;
+}
+
+/* Modifying tex-danger class */
+.text-danger{
+  color: #f44336 !important;
+}
+
 /* CSS For the form when the device is opened in mobile */
 @media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
   .mobile-form { /* Use this class */
     background-color: rgba(33,37,41,0.8) !important;
     border-radius: 10px !important;
-    position: fixed !important; /* Make the position of the form fixed */
+    position: absolute !important; /* Make the position of the form fixed */
     top: 50% !important;
     /* bottom: 50% !important; */
     /* min-height: 100vh !important; Full device height */
@@ -105,4 +156,46 @@ a.nav-link{
   .mp-5{
     padding: 5px 5px 5px 5px !important;
   }
+}
+
+.errorreport{
+  color: white;
+  position: fixed !important; /* Make the position of the form fixed */
+  top: 50% !important;
+  left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+  right: 50% !important;
+  height: auto;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+  z-index:99;
+}
+
+.loader {
+  transform: translate(-50%, -40%); /* Same reasons from above [To position the form] */
+  z-index:99;
+  top: 40% !important;
+  left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+  right: 50% !important;
+  position: fixed !important;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  display: none;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

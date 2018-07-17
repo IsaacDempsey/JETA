@@ -1,19 +1,27 @@
 {% extends "layout.html" %} {% block content %}
+
+<div class="overlay">
+	<div class="errorreport mobile-col-centered" id="error">
+		<div class="mobile-col-centered" id="errorcontent"></div>
+		<div id="errorsent">
+			<div class="text-center display-5 mobile-col-centered mp-5 p-3">
+				Your Error Report has been successfully sent!
+				<button type="button" class="btn btn-primary mx-3 px-3 mp-5" id="closeError">Close</button>
+			</div>
+		</div>
+	</div>
+	<div class="loader" id="loading"></div>
+</div>
 <div class="wrapper">
 	<div id="map"></div>
 	
-	<div class="col-xs-6 mobile-form bg-dark" id="form">
+	<div class="col-xs-6 mobile-form" id="form">
 		<div class="col-xs-12 col-centered py-3">
 			<a class="mx-auto" href="#">
 				<img class="mx-auto d-block" src='{% static "img/Logo11.png" %}' alt="My Jeta Logo" />
 			</a>
 		</div>
 		<div class="col-xs-12 py-3">
-			<!-- <ul class="nav nav-tabs flex-column flex-sm-row" id="myTab" role="tablist">
-						<a class="flex-sm-fill text-sm-center nav-link active" href="#formContent" id="homeTab" data-toggle="tab" aria-controls="home" aria-selected="true">Start Journey</a>
-						<a class="flex-sm-fill text-sm-center nav-link" href="#latestNews" id="newsTab" data-toggle="tab" aria-controls="news" aria-selected="false">Latest News</a>
-						<a class="flex-sm-fill text-sm-center nav-link" href="#contact" id="contactTab" data-toggle="tab" aria-controls="contact" aria-selected="false">Contact Us</a>
-					</ul> -->
 			<ul class="nav nav-tabs px-3" id="myTab" role="tablist">
 				<li class="nav-item">
 					<a class="nav-link active" id="homeTab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
@@ -27,45 +35,57 @@
 			</ul>
 			<div class="tab-content" id="myTabContet">
 				<div class="tab-pane fade show active p-3" id="home" role="tabpanel" aria-labelledby="homeTab">
-					<div class="row p-3">
+					<div class="row px-3 pt-3">
 						<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
 							Get your Journey Time
 						</div>
 					</div>
-					<div class="row p-3">
-						<div class="col-sm-12 col-xs-12 mobile-col-centered">
-							<input class="form-control inputRow px-3 mp-5" id="source" placeholder="Enter Source" type="text">
+					<div class="row px-3 pt-3">
+						<div class="col-sm-12 col-xs-12 mobile-col-centered" id="sourceDiv">
+							<input class="form-control inputRow px-3 mp-5" id="source" placeholder="Enter Source" type="text"></input>
+							<span class="text-danger" id="noSource">! Please select a source</span>
 						</div>
 					</div>
-					<div class="row p-3">
+					<div class="row px-3 pt-3">
 						<div class="col-sm-12 col-xs-12 mobile-col-centered">
 							<input class="form-control inputRow px-3 mp-5" id="destination" placeholder="Enter Destination" type="text">
+							<span class="text-danger" id="noDestination">! Please select a destination</span>
 						</div>
 					</div>
-					<div class="row p-3">
+					<div class="row px-3 pt-3">
 						<div class="col-sm-12 col-xs-12 mobile-col-centered">
 							<input class="form-control inputRow px-3 mp-5" type="datetime-local" id="datetime" placeholder="Select Date and Time">
 						</div>
 					</div>
-					<div class="row p-3">
+					<div class="row px-3 pt-3">
 						<div class="col-sm-12 col-xs-12 mobile-col-centered">
-							<button type="button" class="btn btn-outline-success form-control inputRow px-3 mp-5">Get My Travel Time</button>
+							<button type="button" class="btn btn-outline-success form-control inputRow px-3 mp-5" id="getTime">Get My Travel Time</button>
 						</div>
-					</div>
-					<div class="row" id="lineholder">
-						<div class="col-xs-12 col-centered p-3 text-center display-5 mp-5" style="color: #fff;">
+					</div>					
+				</div>
+				<div class="tab-pane fade show active p-3" id="home1">
+					<div class="row px-3 pt-3" id="lineholder">
+						<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
 							Routes for your Journey
 						</div>
-						<div class="row px-3" id="linecontent">
-		
+					</div>
+					<div class="row px-3 pt-3">
+						<div class="col-sm-12 col-xs-12 mobile-col-centered"  id="linecontent">
+							
 						</div>
 					</div>
+					
 					<div class="row px-3" id="journeyholder">
 						<div class="col-xs-12 col-centered">
 							<div class="display-5 px-3" style="color: #000;">Total Journey Time</div>
 						</div>
 						<div class="row px-3" id="journeycontent">
-		
+					
+						</div>
+					</div>
+					<div class="row px-3 pt-3">
+						<div class="col-sm-12 col-xs-12 mobile-col-centered">
+							<button type="button" class="btn btn-outline-danger form-control inputRow px-3 mp-5" id="goBackSearch">Go Back to Search</button>
 						</div>
 					</div>
 				</div>
@@ -80,4 +100,7 @@
 		
 	</div>
 </div>
+
+
+
 {% endblock %}
