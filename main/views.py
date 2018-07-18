@@ -138,11 +138,13 @@ def journeytime(request):
 
 def get_address(request):
     if not request.is_ajax():
-        error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
-        return HttpResponse(error_json, content_type='application/json')
+        response = HttpResponse(json.dumps(
+            {"error": "Not Ajax Request"}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     term = request.GET.get('term', '')
-    bus_adds = Stops.objects.filter(Q(stopid__startswith=term) | Q(address__icontains=term))[:20]
+    bus_adds = Stops.objects.filter(Q(stopid__startswith=term) | Q(address__icontains=term))
     results = []
     for badd in bus_adds:
         badd_json = {}
@@ -197,8 +199,12 @@ def stops(request):
     """
 
     if not request.is_ajax():
-        error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
-        return HttpResponse(error_json, content_type='application/json')
+        # error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
+        # return HttpResponse(error_json, content_type='application/json')
+        response = HttpResponse(json.dumps(
+            {"error": "Not Ajax Request"}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     source = request.GET.get("source")
     destination = request.GET.get("destination")
@@ -220,8 +226,10 @@ def stops(request):
     routes = pd.DataFrame.from_records(routes_qs.values('lineid', 'stopids'))
 
     if routes.empty:
-        error_json = json.dumps({"error": {"code": 404,"message": "No data fits these criteria."}})
-        return HttpResponse(error_json, content_type='application/json')
+        response = HttpResponse(json.dumps(
+            {"error": "No Data Fits the Criteria"}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     # Slice stopids to left of start_stop to remove stops previous to the start stop
     if source:
@@ -260,7 +268,9 @@ def stops(request):
     stops = pd.DataFrame.from_records(stops)
 
     # Group lat and lng columns into list of form [lat, lng]
-    stops = stops.groupby(['stopid', 'address'], as_index=False).apply(lambda x: x[['lng','lat']].values.tolist()[0])
+
+    stops = stops.groupby(['stopid', 'address'], as_index=False).apply(
+        lambda x: x[['lng', 'lat']].values.tolist()[0])
     stops = pd.DataFrame(stops).reset_index()
     stops = stops.rename(columns={0: 'coord'})
 
@@ -271,4 +281,4 @@ def stops(request):
     # Rename to suit front end conventions
     combined_df = combined_df.rename(columns={'stopid': 'stop_id', 'address': 'stop_name'})
 
-    return HttpResponse(list(combined_df.to_json(orient='records')), content_type='application/json')
+    return HttpResponse(combined_df.to_json(orient='records'), content_type='application/json')
