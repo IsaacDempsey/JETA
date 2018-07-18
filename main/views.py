@@ -73,7 +73,7 @@ def journeytime(request):
 
     # Get stop lists associated with query lineid, start stop and end stop
     lineids = Lines.objects.filter(lineid=lineid).values_list('routes', flat=True)
-    routes = Routes.objects.filter(routeid__in=(list(lineids)[0 ]), stopids__contains=[source, destination]).values()
+    routes = Routes.objects.filter(routeid__in=(list(lineids)[0]), stopids__contains=[source, destination]).values()
     routes = pd.DataFrame.from_records(routes)
 
     if routes.shape[0] > 1:
@@ -182,7 +182,7 @@ def route_result(request):
 
 def stops(request):
     """
-    Query Terms: source stopid, destination stopid, lineid.
+    Query Terms: source stop id, destination stop id, bus line id.
         - source and destination must be ints
         - Either all or none of these terms can be added.
     Returns json showing stop information:
@@ -260,15 +260,15 @@ def stops(request):
     stops = pd.DataFrame.from_records(stops)
 
     # Group lat and lng columns into list of form [lat, lng]
-    stops = stops.groupby(['stopid', 'address'], as_index=False).apply(lambda x: x[['lat','lng']].values.tolist()[0])
+    stops = stops.groupby(['stopid', 'address'], as_index=False).apply(lambda x: x[['lng','lat']].values.tolist()[0])
     stops = pd.DataFrame(stops).reset_index()
     stops = stops.rename(columns={0: 'coord'})
 
-    # Merge line_stop and stops_df to combine lineid info with coordinate and address.
+    # Merge stops and routes to combine lineid info with coordinate and address.
     combined_df = pd.merge(stops, routes, on='stopid',sort=False)
     combined_df = combined_df[['stopid', 'address', 'lineid', 'coord']]
 
     # Rename to suit front end conventions
     combined_df = combined_df.rename(columns={'stopid': 'stop_id', 'address': 'stop_name'})
 
-    return HttpResponse(combined_df.to_json(orient='index'), content_type='application/json')
+    return HttpResponse(list(combined_df.to_json(orient='records')), content_type='application/json')
