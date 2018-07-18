@@ -54,7 +54,7 @@ $(document).ready(function () {
     // Once everything is hidden load the map
     loadMap();
     // After the map is loaded plot all the stops
-    loadAllStops();
+    // loadAllStops();
 });
 
 // Separate Function to render the map
@@ -322,12 +322,12 @@ function addMarkers(data, stopid="None", endstop="None"){
         
     }  
     
-    if (stopid=="None" && endstop == "None"){
-        var markerCluster = new MarkerClusterer(map, markers, {
-          imagePath: "/static/img/markers/clusterer/m"
-        });
+    // if (stopid=="None" && endstop == "None"){
+    //     var markerCluster = new MarkerClusterer(map, markers, {
+    //       imagePath: "/static/img/markers/clusterer/m"
+    //     });
          
-    }
+    // }
     
     
 }

@@ -29,6 +29,13 @@ def lines(request):
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
 
+    # Check that both source and destination are given, and that they are ints.
+    if not source.isnumeric() or not destination.isnumeric():
+        response = HttpResponse(json.dumps(
+            {"error": "Source and destination terms either not numbers or not given."}), content_type='application/json')
+        response.status_code = 400
+        return response
+
     routes = Routes.objects.filter(stopids__contains=[source, destination]).values_list('routeid', flat=True)
     lines = Lines.objects.filter(routes__overlap=list(routes)).values_list('lineid', flat=True)
 
@@ -72,8 +79,7 @@ def journeytime(request):
     model_inputs = [seconds_since_midnight, rain] + week_dummies
 
     # Get stop lists associated with query lineid, start stop and end stop
-    lineids = Lines.objects.filter(lineid=lineid).values_list('routes', flat=True)
-    routes = Routes.objects.filter(routeid__in=(list(lineids)[0]), stopids__contains=[source, destination]).values()
+    routes = Routes.objects.filter(lineid=lineid, stopids__contains=[source, destination]).values()
     routes = pd.DataFrame.from_records(routes)
 
     if routes.shape[0] > 1:
@@ -162,26 +168,6 @@ def routes(request):
     return JsonResponse(routesJson, safe=False)
 
 
-def linked(request):
-    linked = Linked.objects.all().values()
-    linkedJson = [dict(i) for i in linked]
-
-    return JsonResponse(linkedJson, safe=False)
-
-
-def destinations(request):
-    start = 15
-    dest1 = Destinations(start).destinations_json()
-    return JsonResponse(dest1, safe=False)
-
-
-def route_result(request):
-    start = 1165
-    destination = 7564
-    route1 = Route_result(start, destination).route_json()
-    return JsonResponse(route1, safe=False)
-
-
 def stops(request):
     """
     Query Terms: source stop id, destination stop id, bus line id.
@@ -199,8 +185,6 @@ def stops(request):
     """
 
     if not request.is_ajax():
-        # error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
-        # return HttpResponse(error_json, content_type='application/json')
         response = HttpResponse(json.dumps(
             {"error": "Not Ajax Request"}), content_type='application/json')
         response.status_code = 400
