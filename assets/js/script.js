@@ -53,6 +53,7 @@ $(document).ready(function () {
     $j("#loadingtext").hide();
     // Once everything is hidden load the map
     loadMap();
+    // $j("#form").show("slide", { direction: "right" }, "slow");
     // After the map is loaded plot all the stops
     loadAllStops();
 });
@@ -104,6 +105,7 @@ function setGlobalMap(Asyncmap) {
 }
 
 function loadAllStops(){
+    console.log("Loading all Stops");
     $(".overlay").show();
     $("#loading").show();
     $j("#loadingtext").show("slide", { direction: "right" }, "fast");
@@ -147,61 +149,64 @@ $j(function () {
             $("#noSource").hide();
             var start = ui.item.label;
             var stopId = start.split(",");
-            var startStop = stopId[stopId.length - 1];
-            __startStop = startStop.trim();
+            var startStop = stopId[stopId.length - 1]; 
             $("#destination").val("");
             // ..--> Send an ajax query to the api at the below URL
-            $.ajax({
-                url: localAddress + "/main/stops",
-                // Set the start text as the label value
-                data: { source: __startStop },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                error: function (jqXHR, textStatus, errorThrown) {
-                    $j("#form").hide("slide", { direction: "right" }, "slow");
-                    $(".overlay").show();
-                    $j("#error").show("slide", { direction: "down" }, "fast");
-                    $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
-                },
-                // On success send this data to the receive data function
-                success: function (data) {
-                    startStopAutocompleteData = data;
-                    // Create a json input for destinations only to select data from the returned filter
-                    autocomplete_data = [];
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].stop_id == __startStop){
-                            continue;
-                        } else {
-                            autocomplete_data.push({ label: data[i].stop_name + ", " + data[i].stop_id });
-                        }
-                    }
-                    if (autocomplete_data == []){
-                        autocomplete_data.push({ label: "No Destination for this source found" });
-                    } else{
-                        $("#destination").attr("placeholder", "Enter Destination").css("background-color", "#ffffff");
-                        $("#destination").prop('disabled', false);
-                    }
-                    addMarkers(data, __startStop);
-                    // refresh autocomplete for destination
-                    $j("#destination").autocomplete({
-
-                        source: autocomplete_data,
-                        minLength: 1,
-                        select: function (e, ui) {
-                            // alert("Selecting Destination");
-                            $("#noDestination").hide();
-                            var end = ui.item.label;
-                            var stopId = end.split(",");
-                            var endStop = stopId[stopId.length - 1];
-                            __endStop = endStop.trim();
-                            addMarkers(startStopAutocompleteData, __startStop, __endStop);
-                        }
-                    });  
-                }
-            });
+            getStops(startStop.trim());
         }
     });      
 });
+function getStops(startstop) {
+    __startStop = startstop
+    $.ajax({
+        url: localAddress + "/main/stops",
+        // Set the start text as the label value
+        data: { source: __startStop },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function (jqXHR, textStatus, errorThrown) {
+            $j("#form").hide("slide", { direction: "right" }, "slow");
+            $(".overlay").show();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+        // On success send this data to the receive data function
+        success: function (data) {
+            startStopAutocompleteData = data;
+            // Create a json input for destinations only to select data from the returned filter
+            autocomplete_data = [];
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].stop_id == __startStop) {
+                    continue;
+                } else {
+                    autocomplete_data.push({ label: data[i].stop_name + ", " + data[i].stop_id });
+                }
+            }
+            if (autocomplete_data == []) {
+                autocomplete_data.push({ label: "No Destination for this source found" });
+            } else {
+                $("#destination").attr("placeholder", "Enter Destination").css("background-color", "#ffffff");
+                $("#destination").prop('disabled', false);
+            }
+            addMarkers(data, __startStop);
+            // refresh autocomplete for destination
+            $j("#destination").autocomplete({
+
+                source: autocomplete_data,
+                minLength: 1,
+                select: function (e, ui) {
+                    // alert("Selecting Destination");
+                    $("#noDestination").hide();
+                    var end = ui.item.label;
+                    var stopId = end.split(",");
+                    var endStop = stopId[stopId.length - 1];
+                    __endStop = endStop.trim();
+                    addMarkers(startStopAutocompleteData, __startStop, __endStop);
+                }
+            });
+        }
+    });
+}
 
 function deactivateDestination(val) {
     if (val.length == 0) {
@@ -275,53 +280,114 @@ $(function () {
     });
 })
 
-
-
+/* ----------------------------------------------------------------------- */
+/*************************** MANIPULATION OF MARKERS ***********************/
+/* ----------------------------------------------------------------------- */
 // Function to automatically load markers on the map
 var markers = [];
+var content_string;
 function addMarkers(data, stopid="None", endstop="None"){
     deleteMarkers(markers);
     markers=[];
+    var infowindow = new google.maps.InfoWindow();
     var coordinates = [];
     var names = [];
     if (stopid == "None" && endstop == "None"){
         map.setZoom(11);
     }
-    else if (endstop == "None" ){
+    else if (endstop == "None" || data.length <= 5){
         map.setZoom(15);
-    } else {
+    } else  {
         map.setZoom(13);
     }
     for (var i = 0; i < data.length; i++) {
+        // Setting the content string
+        
         var stop = { lat: data[i].coord[1], lng: data[i].coord[0] };
         var stop_name = data[i].stop_name;
         var start_icon = "/static/img/markers/StartStop.png";
         var end_icon = "/static/img/markers/EndStop.png";
+        var stop_icon_h = "/static/img/markers/HoverStop.png";
+        var lasthover;
+        var flag = false;
         if (data[i].stop_id == stopid) {
             var stop_icon = start_icon;
             map.setCenter(stop);
+            flag = true;
         } else {
             var stop_icon = "/static/img/markers/InterStop.png";
         }
         if (endstop != "None"){
+            __endStop = endstop;
             if (data[i].stop_id == endstop) {
                 var stop_icon = end_icon;
                 map.setCenter(stop);
             }
         }
-        var bus_stop = new google.maps.Marker({
-            position: stop,
-            icon: stop_icon,
-            map: map,
-            stopid: data[i].stop_id,
-            name: stop_name
+
+        var marker = new google.maps.Marker({
+          position: stop,
+          icon: stop_icon,
+          map: map,
+          stopid: data[i].stop_id,
+          name: stop_name
+        });   
+        
+
+        // Set a variable that checks whether the user wanted to just hover or click. Because if we add just a mouseout function
+        // the infowindow disappears even after the user has clicked on the marker
+        // We want the infowindow to stay when clicked and disappear when not
+        var hover_status = true;
+        marker.addListener('mouseout', function () {
+            // alert("Hover In");            
+            this.setOptions({ icon: lasthover });
+            if (hover_status){
+                infowindow.close(map, this);
+            }
+            
         });
-        markers.push(bus_stop);
-        setMarker(map);
-        markerHover(map, bus_stop);
+        
+        
+        if (flag){
+            marker.addListener('mouseover', function () {
+                lasthover = this.getIcon();
+                // alert("Hover Out");
+                content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div>';
+                infowindow.setContent(content_string);
+                this.setOptions({ icon: stop_icon_h });
+                infowindow.open(map, this);
+                hover_status = true;
+            }); 
+            marker.addListener("click", function() {
+              infowindow.open(map, this);
+              hover_status = false;
+            }); 
+        } else {
+            marker.addListener('mouseover', function () {
+                lasthover = this.getIcon();
+                // alert("Hover Out");
+                var marker_name = this.get("name");
+                marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
+                
+                infowindow.setContent(content_string);
+                this.setOptions({ icon: stop_icon_h });
+                infowindow.open(map, this);
+                hover_status = true;
+            });
+            marker.addListener("click", function () {
+                infowindow.open(map, this);
+                hover_status = false;
+            }); 
+        }
+        
+
+        markers.push(marker);    
+        // markerHover(map, marker);
         
     }  
-    
+
+    setMarker(map);
     if (stopid=="None" && endstop == "None"){
         var markerCluster = new MarkerClusterer(map, markers, {
           imagePath: "/static/img/markers/clusterer/m"
@@ -331,29 +397,6 @@ function addMarkers(data, stopid="None", endstop="None"){
     
     
 }
-
-// Hover interaction of markers
-function markerHover(map, bus_stop) {
-    infowindow = new google.maps.InfoWindow();
-    var stop_icon_h = "/static/img/markers/HoverStop.png";
-        var infowindow = new google.maps.InfoWindow({
-            content: bus_stop.get("name") + ", " + bus_stop.get("stopid")
-        });
-        var lasthover;
-        bus_stop.addListener('mouseout', function () {
-            // alert("Hover In");            
-            bus_stop.setOptions({ icon: lasthover });
-            infowindow.close(bus_stop.get('map'), bus_stop);
-        });
-
-        bus_stop.addListener('mouseover', function () {
-            lasthover = bus_stop.getIcon();
-            // alert("Hover Out");
-            bus_stop.setOptions({ icon: stop_icon_h });
-            infowindow.open(bus_stop.get('map'), bus_stop);
-        });   
-};
-
 
 // Set inividual marker on the map
 function setMarker(map) {
@@ -369,10 +412,28 @@ function clearMarkers(){
 
 // Function to delete markers from the map
 function deleteMarkers(markers){
+    console.log("Deleting all stops");
     clearMarkers();
     markers = [];
 }
 
+// });
+function setValueOnForm(address, stopid, flag) {
+    console.log(address);
+    if (flag=='source'){
+        // If the source button is clicked set the new source value as the concat of the address and the stopid
+        var source_new_value = address + ', '+stopid;
+        $("#source").val(source_new_value);
+        getStops(stopid); // Get the data and the markers now with this stop as the source
+    } else {
+        var destination_new_value = address + ', ' + stopid;
+        $("#destination").val(destination_new_value);
+        addMarkers(startStopAutocompleteData, __startStop, stopid);
+    }
+}
+/* ----------------------------------------------------------------------- */
+/*************************** MANIPULATION OF MARKERS ***********************/
+/* ----------------------------------------------------------------------- */
 function getLines(startStop, endStop){
     __startStop = startStop;
     __endStop = endStop;
