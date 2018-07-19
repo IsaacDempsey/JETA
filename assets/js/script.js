@@ -19,6 +19,8 @@ var $j = jQuery.noConflict(); // No conflict with the major jquery for autocompl
 // they might seem useful to use
 var __startStop = ""; // Global Variable for Start Stop selected by the user on the form
 var __endStop = ""; // End Stop selected by the user on the form
+var __oldStartStop = ""; // Old start stop to make the undo feature
+var __oldEndStop = ""; // Old End Stop to make the undo feature
 var autocomplete_data = []; // This a global variable for the data that will be used to select for the destination field in the form
 var startStopAutocompleteData; // A separate variable after the destination is entered by the user in order to plot markers
 // Autocomplete Feature when the user enters in the source address
@@ -90,6 +92,32 @@ function loadMap() {
             zoom: 12,
             styles: mapstyle
         });
+
+        // Auto complete of generic search to plot bus stops near a paricular location
+        // Create the search box and link it to the UI element.
+        var input = document.getElementById('pac-input');
+        var searchform = document.getElementById('search-form');
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchform);
+
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener('bounds_changed', function () {
+            searchBox.setBounds(map.getBounds());
+        });
+
+        searchBox.addListener('places_changed', function () {
+            var places = searchBox.getPlaces();
+            if (places.length == 0) {
+                return;
+            } else {
+                console.log(places[0].geometry.location.lat());
+                console.log(places[0].geometry.location.lng());
+
+            }
+
+        });
+
         // Finally set the map as a global map variable
         setGlobalMap(map);
     });
@@ -103,6 +131,8 @@ function setGlobalMap(Asyncmap) {
     // end of the load. Hence setting the map globally.
     map = Asyncmap;
 }
+
+
 
 function loadAllStops(){
     console.log("Loading all Stops");
@@ -131,6 +161,9 @@ function loadAllStops(){
 }
 // Autocomplete feature for the UI inputs
 $j(function () {
+    if ($("#source")!=""){
+        __oldStartStop = $("#source").val();
+    }
         // Check for the HTML DOM element who has #source as the id
     $j("#source").autocomplete({
         // Send a ajax request to the below address
@@ -187,6 +220,9 @@ function getStops(startstop) {
             } else {
                 $("#destination").attr("placeholder", "Enter Destination").css("background-color", "#ffffff");
                 $("#destination").prop('disabled', false);
+            }
+            if ($("#destination") != "") {
+                __oldEndStop = $("#destination").val();
             }
             addMarkers(data, __startStop);
             // refresh autocomplete for destination
@@ -423,12 +459,25 @@ function setValueOnForm(address, stopid, flag) {
     if (flag=='source'){
         // If the source button is clicked set the new source value as the concat of the address and the stopid
         var source_new_value = address + ', '+stopid;
+        if ($("#source").val()!=""){
+            __oldStartStop = $("#source").val();
+        }
+        if ($("#destination").val() != "") {
+            __oldEndStop = $("#destination").val();
+        }
+        
         $("#source").val(source_new_value);
         $("#destination").val("");
         __endStop == "";
         getStops(stopid); // Get the data and the markers now with this stop as the source
     } else {
         var destination_new_value = address + ', ' + stopid;
+        if ($("#source").val() != "") {
+            __oldStartStop = $("#source").val();
+        }
+        if ($("#destination").val() != "") {
+            __oldEndStop = $("#destination").val();
+        }
         $("#destination").val(destination_new_value);
         addMarkers(startStopAutocompleteData, __startStop, stopid);
         

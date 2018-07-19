@@ -19,7 +19,23 @@
 </div>
 
 <div class="wrapper">
-	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
+	<div class="form" id="search-form">
+		<div class="row">
+			<input id="pac-input" class="col-xs-6 controls form-control mt-3 p-3 " type="text" placeholder="Search around Dublin">
+			<div class="switch-field col-xs-6 p-3 ml-3 mp-5">
+				<div class="display-5">Select Radius</div>
+				<input type="radio" id="switch_3_left" name="switch_3" value="yes" checked/>
+				<label for="switch_3_left">100m</label>
+				<input type="radio" id="switch_3_center" name="switch_3" value="maybe" />
+				<label for="switch_3_center">200m</label>
+				<input type="radio" id="switch_3_right" name="switch_3" value="no" />
+				<label for="switch_3_right">500m</label>
+			</div>
+		</div>
+		
+		<!-- <button type="button" class="col-xs-6 btn btn-outline-success form-control" id="getTime">Get My Travel Time</button> -->
+	</div>	
+	
 	<div id="map"></div>
 	
 	<div class="col-xs-6 mobile-form" id="form">
