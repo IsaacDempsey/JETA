@@ -222,6 +222,7 @@ def stops(request):
 
     if lineid:
         routes_qs = routes_qs.filter(lineid=lineid)
+    
 
     routes = pd.DataFrame.from_records(routes_qs.values('lineid', 'stopids'))
 
