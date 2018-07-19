@@ -92,6 +92,9 @@ def journeytime(request):
     # Slice list by source and destination stop
     journey_stops = stop_list[stop_list.index(int(source)):(stop_list.index(int(destination))+1)]
 
+    # Remove duplicate stops from list, while maintaining stop order.
+    journey_stops = list(unique_everseen(journey_stops))
+
     # Change each stopid into string
     stringified = list(map(str, journey_stops))
 
@@ -169,6 +172,13 @@ def routes(request):
 
 
 def locations(request):
+    """
+    Query Terms: latitude, longitude and the radius of the distance from the point/line given.
+        - Radius given in degrees from given lat/lng. In Dublin, 0.0005 degrees is very roughly 55 meters.
+        - Either latitude or longitude or both can be given. 
+        - If only lat or lng are given, any bus stop closer than the radius distance all along that line are returned.
+    """
+
     lat = request.GET.get('lat', '')
     lng = request.GET.get('lng', '')
     radius = request.GET.get('radius', '')
@@ -194,23 +204,22 @@ def locations(request):
     if isfloat(lng):
         lng = float(lng)
         stops_qs = stops_qs.filter(lng__gte=(lng-r), lng__lte=(lng+r))
-        
+
     stops = pd.DataFrame.from_records(stops_qs.values())
 
     if stops.empty:
         response = HttpResponse(json.dumps(
-            {"error": "No Data Fits the Criteria"}), content_type='application/json')
+            {"error": "No Data fits the Criteria"}), content_type='application/json')
         response.status_code = 400
         return response
 
-    # Group lat and lng columns into list of form [lat, lng]
+    # Group lat and lng columns into list of form [lng, lat]
     stops = stops.groupby(['stopid', 'address'], as_index=False).apply(
         lambda x: x[['lng', 'lat']].values.tolist()[0])
     stops = pd.DataFrame(stops).reset_index()
     stops = stops.rename(columns={'stopid': 'stop_id', 'address': 'stop_name', 0: 'coord'})
 
     return HttpResponse(stops.to_json(orient='records'), content_type='application/json')    
-
 
 
 
@@ -229,12 +238,6 @@ def stops(request):
         - lineid = dictionary or form {lineid: order of stop on route}. E.g. {"46A":14,"46E":13,"7B":13}
         - coord = list of coordinations [lat, lng].
     """
-
-    if not request.is_ajax():
-        response = HttpResponse(json.dumps(
-            {"error": "Not Ajax Request"}), content_type='application/json')
-        response.status_code = 400
-        return response
 
     source = request.GET.get("source")
     destination = request.GET.get("destination")
@@ -257,7 +260,7 @@ def stops(request):
 
     if routes.empty:
         response = HttpResponse(json.dumps(
-            {"error": "No Data Fits the Criteria"}), content_type='application/json')
+            {"error": "No Data fits the Criteria"}), content_type='application/json')
         response.status_code = 400
         return response
 
@@ -297,7 +300,7 @@ def stops(request):
     stops = Stops.objects.filter(stopid__in=stops_list).values()
     stops = pd.DataFrame.from_records(stops)
 
-    # Group lat and lng columns into list of form [lat, lng]
+    # Group lat and lng columns into list of form [lng, lat]
     stops = stops.groupby(['stopid', 'address'], as_index=False).apply(
         lambda x: x[['lng', 'lat']].values.tolist()[0])
     stops = pd.DataFrame(stops).reset_index()
