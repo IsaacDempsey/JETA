@@ -465,6 +465,9 @@ function getLines(startStop, endStop){
 }
 function getTravelTime(content) {
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
+    var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
+    var url3 = '&format=json';
+    var live_db = url1.concat(__startStop, url3);
     $.ajax({
         url: localAddress + "/main/journeytime",
         data: {
@@ -481,8 +484,29 @@ function getTravelTime(content) {
             $('<div class= "col-sm-6 text-center">Route: </div><div class= "col-sm-6 text-center"><b>' + content.innerHTML + "</b> </div>").appendTo("#journeycontent");
             $('<div class= "col-sm-6 text-center">Journey Time: </div><div class= "col-sm-6 text-center"><b>' + data.totaltraveltime + "</b> </div>").appendTo("#journeycontent");
             $('<div class= "col-sm-6 text-center">Arrival Time: </div><div class= "col-sm-6 text-center"><b>' + data.arrivaltime + "</b> </div>").appendTo("#journeycontent");
+            $.getJSON(live_db, function(bus) {
+                var nextbuses = [];
+                var nextbus = "";
+                for (var i = 0; i < bus.results.length; i++) {
+                    var iarr = bus.results[i];
+                    if (iarr.route == content.innerHTML) {
+                        nextbuses.push(bus.results[i].duetime);
+                    }
+                }
+                if (nextbuses[0] != "Due") {
+                    var nextbus = nextbuses[0] + " mins";
+                }
+                else if (nextbuses[0] != "1") {
+                    var nextbus = nextbuses[0] + " min";
+                }
+                else {
+                    var nextbus = nextbuses[0];
+                }
+                $('<div class= "col-sm-6 text-center">Next bus arriving in: </div><div class= "col-sm-6 text-center"><b>' + nextbus + "</b> </div>").appendTo("#journeycontent");
+            });
         }
     });
+
 
     
 }
