@@ -29,10 +29,17 @@ def lines(request):
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
 
-    routes = Routes.objects.filter(stopids__contains=[source, destination]).values_list('routeid', flat=True)
-    lines = Lines.objects.filter(routes__overlap=list(routes)).values_list('lineid', flat=True)
+    # Check that both source and destination are given, and that they are ints.
+    if not source.isnumeric() or not destination.isnumeric():
+        response = HttpResponse(json.dumps(
+            {"error": "Source and destination terms either not numbers or not given."}), content_type='application/json')
+        response.status_code = 400
+        return response
 
-    return HttpResponse(json.dumps(list(lines)), content_type='application/json')
+    routes = Routes.objects.filter(stopids__contains=[source, destination]).values_list('lineid', flat=True)
+    lines = list(set(list(routes)))
+
+    return HttpResponse(json.dumps(lines), content_type='application/json')
 
 
 def journeytime(request):
@@ -72,8 +79,7 @@ def journeytime(request):
     model_inputs = [seconds_since_midnight, rain] + week_dummies
 
     # Get stop lists associated with query lineid, start stop and end stop
-    lineids = Lines.objects.filter(lineid=lineid).values_list('routes', flat=True)
-    routes = Routes.objects.filter(routeid__in=(list(lineids)[0 ]), stopids__contains=[source, destination]).values()
+    routes = Routes.objects.filter(lineid=lineid, stopids__contains=[source, destination]).values()
     routes = pd.DataFrame.from_records(routes)
 
     if routes.shape[0] > 1:
@@ -162,29 +168,55 @@ def routes(request):
     return JsonResponse(routesJson, safe=False)
 
 
-def linked(request):
-    linked = Linked.objects.all().values()
-    linkedJson = [dict(i) for i in linked]
+def locations(request):
+    lat = request.GET.get('lat', '')
+    lng = request.GET.get('lng', '')
+    radius = request.GET.get('radius', '')
 
-    return JsonResponse(linkedJson, safe=False)
+    def isfloat(x):
+        try:
+            float(x)
+            return True
+        except:
+            return False
+
+    if isfloat(radius):
+        r = float(radius)
+    else:
+        r = 0.0005
+
+    stops_qs = Stops.objects.all()
+
+    if isfloat(lat):
+        lat = float(lat)
+        stops_qs = stops_qs.filter(lat__gte=(lat-r), lat__lte=(lat+r))
+
+    if isfloat(lng):
+        lng = float(lng)
+        stops_qs = stops_qs.filter(lng__gte=(lng-r), lng__lte=(lng+r))
+        
+    stops = pd.DataFrame.from_records(stops_qs.values())
+
+    if stops.empty:
+        response = HttpResponse(json.dumps(
+            {"error": "No Data Fits the Criteria"}), content_type='application/json')
+        response.status_code = 400
+        return response
+
+    # Group lat and lng columns into list of form [lat, lng]
+    stops = stops.groupby(['stopid', 'address'], as_index=False).apply(
+        lambda x: x[['lng', 'lat']].values.tolist()[0])
+    stops = pd.DataFrame(stops).reset_index()
+    stops = stops.rename(columns={'stopid': 'stop_id', 'address': 'stop_name', 0: 'coord'})
+
+    return HttpResponse(stops.to_json(orient='records'), content_type='application/json')    
 
 
-def destinations(request):
-    start = 15
-    dest1 = Destinations(start).destinations_json()
-    return JsonResponse(dest1, safe=False)
-
-
-def route_result(request):
-    start = 1165
-    destination = 7564
-    route1 = Route_result(start, destination).route_json()
-    return JsonResponse(route1, safe=False)
 
 
 def stops(request):
     """
-    Query Terms: source stopid, destination stopid, lineid.
+    Query Terms: source stop id, destination stop id, bus line id.
         - source and destination must be ints
         - Either all or none of these terms can be added.
     Returns json showing stop information:
@@ -199,8 +231,6 @@ def stops(request):
     """
 
     if not request.is_ajax():
-        # error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
-        # return HttpResponse(error_json, content_type='application/json')
         response = HttpResponse(json.dumps(
             {"error": "Not Ajax Request"}), content_type='application/json')
         response.status_code = 400
@@ -274,7 +304,7 @@ def stops(request):
     stops = pd.DataFrame(stops).reset_index()
     stops = stops.rename(columns={0: 'coord'})
 
-    # Merge line_stop and stops_df to combine lineid info with coordinate and address.
+    # Merge stops and routes to combine lineid info with coordinate and address.
     combined_df = pd.merge(stops, routes, on='stopid',sort=False)
     combined_df = combined_df[['stopid', 'address', 'lineid', 'coord']]
 

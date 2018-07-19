@@ -423,17 +423,15 @@ function addMarkers(data, stopid="None", endstop="None"){
         markers.push(marker);    
         // markerHover(map, marker);
         
-    }  
+    }
 
     setMarker(map);
+
     if (stopid=="None" && endstop == "None"){
         var markerCluster = new MarkerClusterer(map, markers, {
           imagePath: "/static/img/markers/clusterer/m"
-        });
-         
+        });    
     }
-    
-    
 }
 
 // Set inividual marker on the map
