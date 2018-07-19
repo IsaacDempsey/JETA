@@ -57,6 +57,8 @@ def journeytime(request):
     start_time = request.GET.get('time', '')
     rain = request.GET.get('rain', '')
 
+    rain = float(rain)
+
     # rain = 0.5 # Should come from table or API query
 
     # Get Irish timezone (utc + daylight saving time (DST))
