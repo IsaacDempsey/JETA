@@ -8,6 +8,7 @@ urlpatterns = [
     path('get_address', views.get_address, name='get_address'),
     path('journeytime', views.journeytime, name='journeytime'),
     path('lines', views.lines, name='lines'),
+    path('locations', views.locations, name='locations'),
     path('routes', views.routes, name='routes'),
     path('stops', views.stops, name='stops')
 ]

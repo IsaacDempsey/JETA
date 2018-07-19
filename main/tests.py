@@ -2,8 +2,6 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.test import SimpleTestCase
 from django.urls import reverse
-
-import json
 import unittest
 
 from . import models
@@ -37,32 +35,38 @@ class TestIndex(SimpleTestCase):
 
 
 class TestLines(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up data for the whole TestCase
+        cls.foo = Routes.objects.create(routeid=1_80, direction=1, stopids=[1, 2, 3, 4, 5])
 
     def test_lines_no_terms_status_code(self):
     	response = self.client.get('/main/lines')
     	self.assertEquals(response.status_code, 400)
 
     def test_lines_no_source_status_code(self):
-    	response = self.client.get('/main/lines?destination=4407')
+    	response = self.client.get('/main/lines', {'destination': 4})
     	self.assertEquals(response.status_code, 400)
 
     def test_lines_no_destination_status_code(self):
-    	response = self.client.get('/main/lines?source=325')
+    	response = self.client.get('/main/lines', {'source': 2})
     	self.assertEquals(response.status_code, 400)   
 
     def test_lines_bad_terms_status_code(self):
-    	response = self.client.get('/main/lines?source=325A&destination=4407X')
+    	response = self.client.get('/main/lines', {'source': '325X', 'destination': '4407Y'})
     	self.assertEquals(response.status_code, 400)		
 
     def test_lines_good_terms_status_code(self):
-    	response = self.client.get('/main/lines?source=325&destination=4407')
+    	response = self.client.get('/main/lines', {'source': 325, 'destination': 4407})
     	self.assertEquals(response.status_code, 200)
 
     def test_lines_contains_correct_json(self):
-    	response = self.client.get('/main/lines?source=325&destination=4407')
-    	expected_data = json.dumps(['145'])
+    	response = self.client.get('/main/lines', {'source': 325, 'destination': 4407})
+    	print("Response: ", response)
+    	print("Response content:", response.content)
+    	print("Response json: ", response.json())
     	self.assertEquals(response.status_code, 200)
-    	self.assertJSONEqual(response.json(), expected_data)
+    	self.assertJSONEqual(response.content, '["145"]')
 
 
 # class TestJourneytime(TestCase):

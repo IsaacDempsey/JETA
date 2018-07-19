@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat|Raleway');
+
 /* The css for the autocomplete selection box that appears for source and destination */
 .ui-autocomplete{
     max-height: 200px !important;
@@ -31,6 +33,7 @@
 /* Since we need all the parent of the map to have 100% height. Hence this */
 html,
 body {
+  font-family: 'Raleway', sans-serif;
   height: 100vh;
   margin: 0;
   padding: 0;
@@ -187,19 +190,12 @@ a.nav-link{
 }
 
 #loading {  
-  position: fixed !important; /* Make the position of the form fixed */
-  height: 100px;
-  width: 100px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
   animation: spin 2s linear infinite;
-  display: none;
-  
-}
-
-#loadingtext{
-  color: white;
-  z-index:99;
-  position: relative !important;
 }
 
 /* Safari */
@@ -211,4 +207,18 @@ a.nav-link{
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.iWindow{
+  overflow: hidden;
+  height: auto;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+}
+.gm-style-iw{
+  text-align: center !important;
+}
+#stopName{
+  font-size: 1.2em;
 }
