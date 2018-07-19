@@ -29,10 +29,17 @@ def lines(request):
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
 
-    routes = Routes.objects.filter(stopids__contains=[source, destination]).values_list('routeid', flat=True)
-    lines = Lines.objects.filter(routes__overlap=list(routes)).values_list('lineid', flat=True)
+    # Check that both source and destination are given, and that they are ints.
+    if not source.isnumeric() or not destination.isnumeric():
+        response = HttpResponse(json.dumps(
+            {"error": "Source and destination terms either not numbers or not given."}), content_type='application/json')
+        response.status_code = 400
+        return response
 
-    return HttpResponse(json.dumps(list(lines)), content_type='application/json')
+    routes = Routes.objects.filter(stopids__contains=[source, destination]).values_list('lineid', flat=True)
+    lines = list(set(list(routes)))
+
+    return HttpResponse(json.dumps(lines), content_type='application/json')
 
 
 def journeytime(request):
@@ -72,8 +79,7 @@ def journeytime(request):
     model_inputs = [seconds_since_midnight, rain] + week_dummies
 
     # Get stop lists associated with query lineid, start stop and end stop
-    lineids = Lines.objects.filter(lineid=lineid).values_list('routes', flat=True)
-    routes = Routes.objects.filter(routeid__in=(list(lineids)[0 ]), stopids__contains=[source, destination]).values()
+    routes = Routes.objects.filter(lineid=lineid, stopids__contains=[source, destination]).values()
     routes = pd.DataFrame.from_records(routes)
 
     if routes.shape[0] > 1:
@@ -85,6 +91,9 @@ def journeytime(request):
 
     # Slice list by source and destination stop
     journey_stops = stop_list[stop_list.index(int(source)):(stop_list.index(int(destination))+1)]
+
+    # Remove duplicate stops from list, while maintaining stop order.
+    journey_stops = list(unique_everseen(journey_stops))
 
     # Change each stopid into string
     stringified = list(map(str, journey_stops))
@@ -162,29 +171,61 @@ def routes(request):
     return JsonResponse(routesJson, safe=False)
 
 
-def linked(request):
-    linked = Linked.objects.all().values()
-    linkedJson = [dict(i) for i in linked]
+def locations(request):
+    """
+    Query Terms: latitude, longitude and the radius of the distance from the point/line given.
+        - Radius given in degrees from given lat/lng. In Dublin, 0.0005 degrees is very roughly 55 meters.
+        - Either latitude or longitude or both can be given. 
+        - If only lat or lng are given, any bus stop closer than the radius distance all along that line are returned.
+    """
 
-    return JsonResponse(linkedJson, safe=False)
+    lat = request.GET.get('lat', '')
+    lng = request.GET.get('lng', '')
+    radius = request.GET.get('radius', '')
 
+    def isfloat(x):
+        try:
+            float(x)
+            return True
+        except:
+            return False
 
-def destinations(request):
-    start = 15
-    dest1 = Destinations(start).destinations_json()
-    return JsonResponse(dest1, safe=False)
+    if isfloat(radius):
+        r = float(radius)
+    else:
+        r = 0.0005
 
+    stops_qs = Stops.objects.all()
 
-def route_result(request):
-    start = 1165
-    destination = 7564
-    route1 = Route_result(start, destination).route_json()
-    return JsonResponse(route1, safe=False)
+    if isfloat(lat):
+        lat = float(lat)
+        stops_qs = stops_qs.filter(lat__gte=(lat-r), lat__lte=(lat+r))
+
+    if isfloat(lng):
+        lng = float(lng)
+        stops_qs = stops_qs.filter(lng__gte=(lng-r), lng__lte=(lng+r))
+
+    stops = pd.DataFrame.from_records(stops_qs.values())
+
+    if stops.empty:
+        response = HttpResponse(json.dumps(
+            {"error": "No Data fits the Criteria"}), content_type='application/json')
+        response.status_code = 400
+        return response
+
+    # Group lat and lng columns into list of form [lng, lat]
+    stops = stops.groupby(['stopid', 'address'], as_index=False).apply(
+        lambda x: x[['lng', 'lat']].values.tolist()[0])
+    stops = pd.DataFrame(stops).reset_index()
+    stops = stops.rename(columns={'stopid': 'stop_id', 'address': 'stop_name', 0: 'coord'})
+
+    return HttpResponse(stops.to_json(orient='records'), content_type='application/json')    
+
 
 
 def stops(request):
     """
-    Query Terms: source stopid, destination stopid, lineid.
+    Query Terms: source stop id, destination stop id, bus line id.
         - source and destination must be ints
         - Either all or none of these terms can be added.
     Returns json showing stop information:
@@ -197,14 +238,6 @@ def stops(request):
         - lineid = dictionary or form {lineid: order of stop on route}. E.g. {"46A":14,"46E":13,"7B":13}
         - coord = list of coordinations [lat, lng].
     """
-
-    if not request.is_ajax():
-        # error_json = json.dumps({"error": {"code": 400,"message": "Not Ajax request."}})
-        # return HttpResponse(error_json, content_type='application/json')
-        response = HttpResponse(json.dumps(
-            {"error": "Not Ajax Request"}), content_type='application/json')
-        response.status_code = 400
-        return response
 
     source = request.GET.get("source")
     destination = request.GET.get("destination")
@@ -222,12 +255,13 @@ def stops(request):
 
     if lineid:
         routes_qs = routes_qs.filter(lineid=lineid)
+    
 
     routes = pd.DataFrame.from_records(routes_qs.values('lineid', 'stopids'))
 
     if routes.empty:
         response = HttpResponse(json.dumps(
-            {"error": "No Data Fits the Criteria"}), content_type='application/json')
+            {"error": "No Data fits the Criteria"}), content_type='application/json')
         response.status_code = 400
         return response
 
@@ -267,13 +301,13 @@ def stops(request):
     stops = Stops.objects.filter(stopid__in=stops_list).values()
     stops = pd.DataFrame.from_records(stops)
 
-    # Group lat and lng columns into list of form [lat, lng]
+    # Group lat and lng columns into list of form [lng, lat]
     stops = stops.groupby(['stopid', 'address'], as_index=False).apply(
         lambda x: x[['lng', 'lat']].values.tolist()[0])
     stops = pd.DataFrame(stops).reset_index()
     stops = stops.rename(columns={0: 'coord'})
 
-    # Merge line_stop and stops_df to combine lineid info with coordinate and address.
+    # Merge stops and routes to combine lineid info with coordinate and address.
     combined_df = pd.merge(stops, routes, on='stopid',sort=False)
     combined_df = combined_df[['stopid', 'address', 'lineid', 'coord']]
 
