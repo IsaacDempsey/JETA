@@ -592,9 +592,17 @@ function getLines(startStop, endStop){
 }
 function getTravelTime(content) {
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
+    var rain = 0.0
     var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
     var url3 = '&format=json';
     var live_db = url1.concat(__startStop, url3);
+    var proxy = 'https://cors-anywhere.herokuapp.com/';
+    var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
+    var weather_url = proxy.concat(darksky);
+        $.getJSON(weather_url, function(weather) {
+            console.log(weather.currently.precipIntensity);
+            var rain = weather.currently.precipIntensity;
+    });
     $.ajax({
         url: localAddress + "/main/journeytime",
         data: {
@@ -602,6 +610,7 @@ function getTravelTime(content) {
             destination: __endStop,
             lineid: content.innerHTML,
             time: datetime,
+            rain: rain,
         },
         contentType: "application/json;charset=utf-8",
         dataType: "json",
@@ -623,7 +632,7 @@ function getTravelTime(content) {
                 if (nextbuses[0] != "Due") {
                     var nextbus = nextbuses[0] + " mins";
                 }
-                else if (nextbuses[0] != "1") {
+                else if (nextbuses[0] == "1") {
                     var nextbus = nextbuses[0] + " min";
                 }
                 else {
