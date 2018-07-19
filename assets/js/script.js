@@ -247,7 +247,7 @@ $(function () {
 
 
 // JQuery function to execute when the user clicks Get Travel Time Button
-$(function () {
+$(function onGetTravelTime() {
     
     $("#getTime").click(function () {
         if (__startStop == "" && __endStop == ""){
@@ -271,14 +271,16 @@ $(function () {
             getLines(__startStop, __endStop);
         }
     });
+})
 
+$(function onSearchAgain(){
     // If go back to search button is clicked
-    $("#goBackSearch").click(function(){
+    $("#goBackSearch").click(function () {
         $j("#home1").hide("slide", { direction: "left" }, "fast", function () {
             $j("#home").show("slide", { direction: "right" }, "fast");
         });
     });
-})
+});
 
 /* ----------------------------------------------------------------------- */
 /*************************** MANIPULATION OF MARKERS ***********************/
@@ -337,7 +339,7 @@ function addMarkers(data, stopid="None", endstop="None"){
         // Set a variable that checks whether the user wanted to just hover or click. Because if we add just a mouseout function
         // the infowindow disappears even after the user has clicked on the marker
         // We want the infowindow to stay when clicked and disappear when not
-        var hover_status = true;
+        var hover_status;
         marker.addListener('mouseout', function () {
             // alert("Hover In");            
             this.setOptions({ icon: lasthover });
@@ -422,11 +424,18 @@ function setValueOnForm(address, stopid, flag) {
         // If the source button is clicked set the new source value as the concat of the address and the stopid
         var source_new_value = address + ', '+stopid;
         $("#source").val(source_new_value);
+        $("#destination").val("");
+        __endStop == "";
         getStops(stopid); // Get the data and the markers now with this stop as the source
     } else {
         var destination_new_value = address + ', ' + stopid;
         $("#destination").val(destination_new_value);
         addMarkers(startStopAutocompleteData, __startStop, stopid);
+        
+    }
+    var visibility = $("#home").is(":visible");
+    if (visibility == false) {
+        $("#goBackSearch").click();
     }
 }
 /* ----------------------------------------------------------------------- */
