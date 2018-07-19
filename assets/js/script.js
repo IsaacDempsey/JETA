@@ -56,6 +56,7 @@ $(document).ready(function () {
     // Once everything is hidden load the map
     loadMap();
     $j("#form").show("slide", { direction: "right" }, "slow");
+    
     // After the map is loaded plot all the stops
     // loadAllStops();
 });
@@ -105,18 +106,61 @@ function loadMap() {
         map.addListener('bounds_changed', function () {
             searchBox.setBounds(map.getBounds());
         });
-
+        var radius = '500m';
+        var lat = null;
+        var lng = null;
+        var places = [];
+        var current_flag = false;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(runCurrentStopLoader);
+        } else {
+            console.log( "Geolocation is not supported by this browser.");
+        }
+        $("input[type=radio][name=switch_3]").change(function () {
+            radius = this.value;
+            if (places.length != 0 || current_flag == true) {
+              runGenericStopLoader(lat, lng, radius);
+            }
+            
+        });
         searchBox.addListener('places_changed', function () {
-            var places = searchBox.getPlaces();
+            places = searchBox.getPlaces();
             if (places.length == 0) {
-                return;
+                is_places_entered = false;
             } else {
-                console.log(places[0].geometry.location.lat());
-                console.log(places[0].geometry.location.lng());
-
+                is_places_entered = true;
+                lat = places[0].geometry.location.lat();
+                lng = places[0].geometry.location.lng();
+                
+                // console.log(places[0].geometry.location.lat());
+                // console.log(places[0].geometry.location.lng());
+                runGenericStopLoader(lat,lng,radius);
             }
 
         });
+        function runCurrentStopLoader(position){
+            current_flag = true;
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            if (radius == "500m") {
+              radius = 0.005;
+            } else if (radius == "1km") {
+              radius = 0.01;
+            } else if (radius == "2km") {
+              radius = 0.02;
+            }
+            loadGenericStops(lat, lng, radius);
+        }
+        function runGenericStopLoader(lat,lng,radius){
+            if (radius == '500m') {
+                radius = 0.005
+            } else if (radius == '1km') {
+                radius = 0.01
+            } else if (radius == '2km') {
+                radius = 0.02
+            }
+            loadGenericStops(lat, lng, radius);
+        }
 
         // Finally set the map as a global map variable
         setGlobalMap(map);
@@ -131,9 +175,30 @@ function setGlobalMap(Asyncmap) {
     // end of the load. Hence setting the map globally.
     map = Asyncmap;
 }
-
-
-
+// This function loads all the stops either searched in the generic search bar or from current location
+function loadGenericStops(latitude, longitude,rad){
+    $.ajax({
+      url: localAddress + "/main/locations",
+      data:{
+          lat: latitude,
+          lng: longitude,
+          radius: rad
+      },
+      contentType: "application/json;charset=utf-8",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        $("#form").hide();
+        $(".overlay").show();
+        $(".loadingcontent").hide();
+        $j("#error").show("slide", { direction: "down" }, "fast");
+          $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+      },
+      success: function(data) {
+        addMarkers(data);
+      }
+    });
+}
 function loadAllStops(){
     console.log("Loading all Stops");
     $(".overlay").show();
@@ -144,10 +209,10 @@ function loadAllStops(){
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            $("form").hide();
+            $("#form").hide();
             $(".overlay").show();
             $j("#error").show("slide", { direction: "down" }, "fast");
-            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
         },
         success: function (data) {
             addMarkers(data);
@@ -178,6 +243,7 @@ $j(function () {
         dataType: "json",
         // When the user selects the required input ...-->
         select: function (e, ui) {
+            $("#pac-input").val("");
             // Get the stop id for the start
             $("#noSource").hide();
             var start = ui.item.label;
@@ -330,14 +396,15 @@ function addMarkers(data, stopid="None", endstop="None"){
     var infowindow = new google.maps.InfoWindow();
     var coordinates = [];
     var names = [];
-    if (stopid == "None" && endstop == "None"){
-        map.setZoom(11);
-    }
-    else if (endstop == "None" || data.length <= 5){
-        map.setZoom(15);
-    } else  {
-        map.setZoom(13);
-    }
+    // if (stopid == "None" && endstop == "None"){
+    //     map.setZoom(11);
+    // }
+    // else if (endstop == "None" || data.length <= 5){
+    //     map.setZoom(15);
+    // } else  {
+    //     map.setZoom(13);
+    // }
+    // if (data.length<=25){}
     for (var i = 0; i < data.length; i++) {
         // Setting the content string
         
@@ -426,14 +493,27 @@ function addMarkers(data, stopid="None", endstop="None"){
     }
 
     setMarker(map);
+    setMapBounds();
 
-    if (stopid=="None" && endstop == "None"){
-        var markerCluster = new MarkerClusterer(map, markers, {
-          imagePath: "/static/img/markers/clusterer/m"
-        });    
-    }
+    // if (stopid=="None" && endstop == "None"){
+    //     var markerCluster = new MarkerClusterer(map, markers, {
+    //       imagePath: "/static/img/markers/clusterer/m"
+    //     });    
+    // }
 }
 
+function setMapBounds() {
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0; i < markers.length; i++) {
+        bounds.extend(markers[i].getPosition());
+    }
+    map.fitBounds(bounds);
+    var listener = google.maps.event.addListener(map, "bounds_changed", function () {
+        if (map.getZoom() > 16) map.setZoom(16);
+        google.maps.event.removeListener(listener);
+    });
+    
+}
 // Set inividual marker on the map
 function setMarker(map) {
     for (var i =0; i < markers.length; i++){
@@ -455,7 +535,7 @@ function deleteMarkers(markers){
 
 // });
 function setValueOnForm(address, stopid, flag) {
-    console.log(address);
+    $("#pac-input").val("");
     if (flag=='source'){
         // If the source button is clicked set the new source value as the concat of the address and the stopid
         var source_new_value = address + ', '+stopid;
