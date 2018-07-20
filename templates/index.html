@@ -24,9 +24,9 @@
 			<input id="pac-input" class="col-xs-6 controls form-control mt-3 p-3 " type="text" placeholder="Search around Dublin">
 			<div class="switch-field col-xs-6 p-3 ml-3 mp-5">
 				<div class="display-5">Select Span</div>
-				<input type="radio" id="switch_3_left" name="switch_3" value="500m" checked/>
+				<input type="radio" id="switch_3_left" name="switch_3" value="500m"/>
 				<label for="switch_3_left">500m</label>
-				<input type="radio" id="switch_3_center" name="switch_3" value="1km" />
+				<input type="radio" id="switch_3_center" name="switch_3" value="1km" checked/>
 				<label for="switch_3_center">1km</label>
 				<input type="radio" id="switch_3_right" name="switch_3" value="2km" />
 				<label for="switch_3_right">2km</label>
@@ -81,8 +81,11 @@
 						</div>
 					</div>
 					<div class="row px-3 pt-3">
-						<div class="col-sm-12 col-xs-12 mobile-col-centered">
+						<div class="col-sm-8 col-xs-8 mobile-col-centered">
 							<button type="button" class="btn btn-outline-success form-control inputRow px-3 mp-5" id="getTime">Get My Travel Time</button>
+						</div>
+						<div class="col-sm-4 col-xs-4 mobile-col-centered">
+							<button type="button" class="btn btn-outline-light form-control inputRow px-3 mp-5" id="undo">Undo</button>
 						</div>
 					</div>					
 				</div>

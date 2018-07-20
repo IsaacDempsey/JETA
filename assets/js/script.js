@@ -23,6 +23,7 @@ var __oldStartStop = ""; // Old start stop to make the undo feature
 var __oldEndStop = ""; // Old End Stop to make the undo feature
 var autocomplete_data = []; // This a global variable for the data that will be used to select for the destination field in the form
 var startStopAutocompleteData; // A separate variable after the destination is entered by the user in order to plot markers
+var current_flag = false; // This flag is set when the user allows to use the current location
 // Autocomplete Feature when the user enters in the source address
 
 
@@ -53,6 +54,7 @@ $(document).ready(function () {
     // Over layer of the entire app when an error occurs **
     $(".overlay").hide();
     $j("#loadingtext").hide();
+    $("#undo").addClass("disabled");
     // Once everything is hidden load the map
     loadMap();
     $j("#form").show("slide", { direction: "right" }, "slow");
@@ -106,11 +108,10 @@ function loadMap() {
         map.addListener('bounds_changed', function () {
             searchBox.setBounds(map.getBounds());
         });
-        var radius = '500m';
+        var radius = '1km';
         var lat = null;
         var lng = null;
         var places = [];
-        var current_flag = false;
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(runCurrentStopLoader);
         } else {
@@ -211,6 +212,7 @@ function loadAllStops(){
         error: function (jqXHR, textStatus, errorThrown) {
             $("#form").hide();
             $(".overlay").show();
+            $(".loadingcontent").hide();
             $j("#error").show("slide", { direction: "down" }, "fast");
             $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
         },
@@ -226,9 +228,7 @@ function loadAllStops(){
 }
 // Autocomplete feature for the UI inputs
 $j(function () {
-    if ($("#source")!=""){
-        __oldStartStop = $("#source").val();
-    }
+    
         // Check for the HTML DOM element who has #source as the id
     $j("#source").autocomplete({
         // Send a ajax request to the below address
@@ -243,12 +243,19 @@ $j(function () {
         dataType: "json",
         // When the user selects the required input ...-->
         select: function (e, ui) {
+            current_flag = false;
+            if (__oldStartStop != "") {
+                $("#undo").removeClass("disabled");
+            }
             $("#pac-input").val("");
             // Get the stop id for the start
             $("#noSource").hide();
             var start = ui.item.label;
             var stopId = start.split(",");
             var startStop = stopId[stopId.length - 1]; 
+            if (__oldStartStop == "") {
+                __oldStartStop = startStop;
+            }
             $("#destination").val("");
             // ..--> Send an ajax query to the api at the below URL
             getStops(startStop.trim());
@@ -264,10 +271,12 @@ function getStops(startstop) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            $j("#form").hide("slide", { direction: "right" }, "slow");
+            console.log(jqXHR);
+            $("#form").hide();
             $(".overlay").show();
+            $(".loadingcontent").hide();
             $j("#error").show("slide", { direction: "down" }, "fast");
-            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
         },
         // On success send this data to the receive data function
         success: function (data) {
@@ -506,6 +515,11 @@ function setMapBounds() {
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0; i < markers.length; i++) {
         bounds.extend(markers[i].getPosition());
+        var icon = markers[i].getIcon();
+        console.log(icon);
+        if (icon =="/static/img/markers/StartStop.png"){
+            map.setCenter(markers[i]);
+        }
     }
     map.fitBounds(bounds);
     var listener = google.maps.event.addListener(map, "bounds_changed", function () {
@@ -536,10 +550,12 @@ function deleteMarkers(markers){
 // });
 function setValueOnForm(address, stopid, flag) {
     $("#pac-input").val("");
+    current_flag = false;
     if (flag=='source'){
         // If the source button is clicked set the new source value as the concat of the address and the stopid
         var source_new_value = address + ', '+stopid;
         if ($("#source").val()!=""){
+            $("#undo").removeClass("disabled");
             __oldStartStop = $("#source").val();
         }
         if ($("#destination").val() != "") {
@@ -567,6 +583,22 @@ function setValueOnForm(address, stopid, flag) {
         $("#goBackSearch").click();
     }
 }
+
+$(function(){
+    $("#undo").click(function () {
+        if (__oldStartStop == "") {
+            return;
+        } else {
+            var newStop = __oldStartStop;
+            __oldStartStop = $("#source").val();
+            $("#source").val(newStop);
+            var stopId = newStop.split(",");
+            var startStop = stopId[stopId.length - 1];
+            getStops(startStop.trim());
+        }
+    });    
+    
+});
 /* ----------------------------------------------------------------------- */
 /*************************** MANIPULATION OF MARKERS ***********************/
 /* ----------------------------------------------------------------------- */
@@ -579,6 +611,14 @@ function getLines(startStop, endStop){
         source: startStop,
         destination: endStop,
       },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
       contentType: "application/json;charset=utf-8",
       dataType: "json",
       success: function (data) {
@@ -613,7 +653,15 @@ function getTravelTime(content) {
             rain: rain,
         },
         contentType: "application/json;charset=utf-8",
-        dataType: "json",
+        dataType: "json", 
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
         success: function (data) {
             $("#journeyholder").show();
             $("#journeycontent").html("");
