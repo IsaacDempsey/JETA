@@ -683,8 +683,11 @@ function getTravelTime(content) {
                 else if (nextbuses[0] == "1") {
                     var nextbus = nextbuses[0] + " min";
                 }
-                else {
+                else if (nextbuses[0] == "Due") {
                     var nextbus = nextbuses[0];
+                }
+                else {
+                    var nextbus = "No live bus information available.";
                 }
                 $('<div class= "col-sm-6 text-center">Next bus arriving in: </div><div class= "col-sm-6 text-center"><b>' + nextbus + "</b> </div>").appendTo("#journeycontent");
             });
