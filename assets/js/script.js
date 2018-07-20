@@ -632,7 +632,7 @@ function getLines(startStop, endStop){
 }
 function getTravelTime(content) {
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
-    var rain = 0.0
+    var rain = "0.5"
     var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
     var url3 = '&format=json';
     var live_db = url1.concat(__startStop, url3);
