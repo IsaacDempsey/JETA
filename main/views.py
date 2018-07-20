@@ -57,8 +57,6 @@ def journeytime(request):
     start_time = request.GET.get('time', '')
     rain_str = request.GET.get('rain', '')
 
-    rain = float(rain)
-
     # rain = 0.5 # Should come from table or API query
     rain = float(rain_str)
 
