@@ -37,14 +37,11 @@ body {
   height: 100vh;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
+  min-width: 650px !important;
 }
 
-/* Set relative padding for the input boxes */
-.inputRow{
-  padding: 1rem;
-  float: none;
-}
+
 
 
 
@@ -138,6 +135,15 @@ a.nav-link{
   color: #f44336 !important;
 }
 
+/* Set relative padding for the input boxes */
+.inputRow{
+  padding: 1rem;
+  float: none;
+}
+#toggle-button{
+  display: none;
+}
+
 /* CSS For the form when the device is opened in mobile */
 @media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
   .mobile-form { /* Use this class */
@@ -147,17 +153,48 @@ a.nav-link{
     top: 50% !important;
     /* bottom: 50% !important; */
     /* min-height: 100vh !important; Full device height */
-    max-height: 550px !important;
+    /* max-height: 550px !important; */
     left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
     right: 50% !important;
     transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+    height: auto !important;
+    margin: 10px !important;
+    width: -webkit-max-content;
+    width: -moz-max-content;
+    width: max-content;
   }
   .mobile-col-centered{
     float: none;
     margin: 0 auto;
   }
   .mp-5{
-    padding: 5px 5px 5px 5px !important;
+    padding: 0px 8px 8px 8px !important;
+  }
+  .mmt-5{
+    margin-top: 5px;
+  }
+  #brand-img{
+    display: none;
+  }
+  #myTab{
+    display: none;
+  }
+  .tab-pane{
+    padding: 0px !important;
+  }
+  #undo{
+    margin-top: 10px;
+  }
+  #form{
+    width: -webkit-max-content !important;
+    width: -moz-max-content !important;
+    width: max-content !important;
+  }
+  #toggle-button{
+    display: block !important;
+  }
+  .navbar{
+    float: left;
   }
 }
 
