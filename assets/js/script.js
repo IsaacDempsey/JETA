@@ -26,10 +26,52 @@ var startStopAutocompleteData; // A separate variable after the destination is e
 var current_flag = false; // This flag is set when the user allows to use the current location
 // Autocomplete Feature when the user enters in the source address
 
+// Window resize add and remove classes and show hide toggle buttons
+function resizeWindow() {
+    if ($(window).width() <= 650) {
+        $("#toggle-button").show();
+        $("#navbarToggleExternalContent").addClass("collapse");
+        
+    } else {
+        $("#toggle-button").hide();
+        $("#navbarToggleExternalContent").removeClass("collapse");
+    }
+}
+
 
 // On Document Ready
 $(document).ready(function () {
     // When the document loads
+    // Window resize add and remove classes and show hide toggle buttons
+    resizeWindow();
+    $(window).resize(function () {
+        resizeWindow();
+    });
+    $("#toggle-button").click(function () {
+        var measure = ($(window).width() - $j("#form").position().left);
+        
+        if (measure>100){
+            console.log(measure);
+            $("#form").css("paddingRight", "0px");
+            // $j("#form").position({
+            //     my: "center",
+            //     at: "right",
+            //     of: "body"
+            // });
+        } else {
+            $("#form").css("paddingRight", '250px');
+            
+            // $j("#form").position(
+            //     {
+            //         my: "center",
+            //         at: "center",
+            //         of: "body"
+            //     }
+            // );
+        }
+        
+        
+    });
     // Autoload the date and time for the user with the current time
     let today = moment().format("YYYY-MM-DDTHH:mm");
     document.querySelector("#datetime").value = today;
