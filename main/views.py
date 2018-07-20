@@ -55,11 +55,10 @@ def journeytime(request):
     destination = request.GET.get('destination', '')
     lineid = request.GET.get('lineid', '')
     start_time = request.GET.get('time', '')
-    rain = request.GET.get('rain', '')
-
-    rain = float(rain)
+    rain_str = request.GET.get('rain', '')
 
     # rain = 0.5 # Should come from table or API query
+    rain = float(rain_str)
 
     # Get Irish timezone (utc + daylight saving time (DST))
     irish_time = timezone('Europe/Dublin')
