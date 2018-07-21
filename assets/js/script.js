@@ -138,6 +138,35 @@ function loadMap() {
             styles: mapstyle
         });
 
+        $.getJSON('/static/json/routes.json', function(data) {
+            var coordinates_arr = [];
+     
+            //iterates through each key in json
+            $.each(data, function(index, data) {
+            var coordinates = [];
+            for (var i = 0; i < data.length; i++) {
+            var iarr = data[i];
+            coordinates.push({lat: iarr[1], lng: iarr[0]});
+            if (i == data.length - 1) {
+                coordinates_arr.push(coordinates);
+                coordinates = [];
+            }
+            }
+            })
+         for (var i = 0; i < coordinates_arr.length; i++) {
+         var line = coordinates_arr[i];
+         var busroute = new google.maps.Polyline({
+            path: line,
+            geodesic: true,
+            strokeColor: '#b3ccff',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
+     
+          busroute.setMap(map);
+              };
+            });
+
         // Auto complete of generic search to plot bus stops near a paricular location
         // Create the search box and link it to the UI element.
         var input = document.getElementById('pac-input');
@@ -304,6 +333,56 @@ $j(function () {
         }
     });      
 });
+
+
+
+function getFinalStops() {
+    $.ajax({
+        url: localAddress + "/main/get_route",
+        // Set the start text as the label value
+        data: { 
+            source: __startStop,
+            destination: __endStop,
+            },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+        // On success send this data to the receive data function
+        success: function (data) {
+            finalData = data;
+            var coordinates_arr = [];
+            var coordinates = [];
+            for (var i = 0; i < finalData.length; i++) {
+            var iarr = finalData[i];
+            coordinates.push({lat: iarr.coord[1], lng: iarr.coord[0]});
+            }
+            coordinates_arr.push(coordinates);
+                var line = coordinates_arr[0];
+                var route = new google.maps.Polyline({
+                   path: line,
+                   geodesic: true,
+                   strokeColor: 'yellow',
+                   strokeOpacity: 1.0,
+                   strokeWeight: 8
+                 });
+                 
+                 route.setMap(map);
+                 addMarkers(finalData, __startStop, __endStop);
+        }
+    });
+}
+
+
+
+
+
 function getStops(startstop) {
     __startStop = startstop
     $.ajax({
@@ -353,6 +432,7 @@ function getStops(startstop) {
                     var end = ui.item.label;
                     var stopId = end.split(",");
                     var endStop = stopId[stopId.length - 1];
+                    console.log(endStop);
                     __endStop = endStop.trim();
                     addMarkers(startStopAutocompleteData, __startStop, __endStop);
                 }
@@ -675,6 +755,7 @@ function getLines(startStop, endStop){
 function getTravelTime(content) {
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
     var rain = "0.5"
+    var busnumber = content.innerHTML;
     var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
     var url3 = '&format=json';
     var live_db = url1.concat(__startStop, url3);
@@ -682,7 +763,6 @@ function getTravelTime(content) {
     var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
     var weather_url = proxy.concat(darksky);
         $.getJSON(weather_url, function(weather) {
-            console.log(weather.currently.precipIntensity);
             var rain = weather.currently.precipIntensity;
     });
     $.ajax({
@@ -705,6 +785,7 @@ function getTravelTime(content) {
             $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
         },
         success: function (data) {
+            getFinalStops()
             $("#journeyholder").show();
             $("#journeycontent").html("");
             $('<div class= "col-sm-6 text-center">Route: </div><div class= "col-sm-6 text-center"><b>' + content.innerHTML + "</b> </div>").appendTo("#journeycontent");
@@ -719,8 +800,8 @@ function getTravelTime(content) {
                         nextbuses.push(bus.results[i].duetime);
                     }
                 }
-                if (nextbuses[0] != "Due") {
-                    var nextbus = nextbuses[0] + " mins";
+                if (nextbuses.length = []) {
+                    var nextbus = "No live bus information available.";
                 }
                 else if (nextbuses[0] == "1") {
                     var nextbus = nextbuses[0] + " min";
@@ -728,9 +809,10 @@ function getTravelTime(content) {
                 else if (nextbuses[0] == "Due") {
                     var nextbus = nextbuses[0];
                 }
-                else {
-                    var nextbus = "No live bus information available.";
+                else if (nextbuses[0] != "Due") {
+                    var nextbus = nextbuses[0] + " mins";
                 }
+                console.log(nextbuses.length);
                 $('<div class= "col-sm-6 text-center">Next bus arriving in: </div><div class= "col-sm-6 text-center"><b>' + nextbus + "</b> </div>").appendTo("#journeycontent");
             });
         }

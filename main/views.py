@@ -317,3 +317,12 @@ def stops(request):
     combined_df = combined_df.rename(columns={'stopid': 'stop_id', 'address': 'stop_name'})
 
     return HttpResponse(combined_df.to_json(orient='records'), content_type='application/json')
+
+
+
+def get_route(request):
+    source = request.GET.get("source")
+    destination = request.GET.get("destination")
+
+    route1 = Route_result(source, destination).route_json()
+    return JsonResponse(route1, safe=False)
