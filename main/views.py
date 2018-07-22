@@ -53,10 +53,17 @@ def journeytime(request):
 
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
-    lineid = request.GET.get('lineid', '')
-    start_time = request.GET.get('time', '')
+    lineid = request.GET.get('lineid')
+    start_time = request.GET.get('time')
+    #rain = request.GET.get('rain')
 
     rain = 0.5 # Should come from table or API query
+
+    if not source.isnumeric() or not destination.isnumeric() or not lineid or not start_time:
+        response = HttpResponse(json.dumps(
+            {"error": "Missing query term/query term invalid."}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     # Get Irish timezone (utc + daylight saving time (DST))
     irish_time = timezone('Europe/Dublin')
@@ -236,12 +243,18 @@ def stops(request):
         - stop_id
         - stop_name = address of stop
         - lineid = dictionary or form {lineid: order of stop on route}. E.g. {"46A":14,"46E":13,"7B":13}
-        - coord = list of coordinations [lat, lng].
+        - coord = list of coordinations [lng, lat].
     """
 
-    source = request.GET.get("source")
-    destination = request.GET.get("destination")
-    lineid = request.GET.get("lineid")
+    source = request.GET.get('source')
+    destination = request.GET.get('destination')
+    lineid = request.GET.get('lineid')
+
+    if (source and not source.isnumeric()) or (destination and not destination.isnumeric()):
+        response = HttpResponse(json.dumps(
+            {"error": "Source/Destination query terms not numeric."}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     routes_qs = Routes.objects.all()
         
