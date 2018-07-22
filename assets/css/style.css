@@ -37,7 +37,7 @@ body {
   height: 100vh;
   margin: 0;
   padding: 0;
-  overflow: auto;
+  overflow: hidden;
   min-width: 650px !important;
 }
 
@@ -159,9 +159,10 @@ a.nav-link{
     transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
     height: auto !important;
     margin: 10px !important;
-    width: -webkit-max-content;
-    width: -moz-max-content;
-    width: max-content;
+    width: 400px !important;
+  }
+  #home1{
+    width: 400px !important;
   }
   .mobile-col-centered{
     float: none;
@@ -196,6 +197,48 @@ a.nav-link{
   .navbar{
     float: left;
   }
+  li.nav-item{
+  padding: 0.5px !important;
+  }
+  .pac-card {
+  /* margin: 10px 10px 0 0; */
+  border-radius: 2px 0 0 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+  font-family: Roboto;
+}
+
+#pac-container {
+  padding-bottom: 12px;
+  margin-right: 12px;
+}
+
+.pac-controls {
+  display: inline-block;
+  /* padding: 5px 11px; */
+}
+
+.pac-controls label {
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#pac-input {
+  background-color: #fff;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 280px !important;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;
+}
 }
 
 .errorreport{
@@ -373,4 +416,10 @@ a.nav-link{
 
 .gm-style{
   font-size: 1em !important;
+}
+li.nav-item{
+  padding: 1.5px;
+}
+a#lineid.nav-link.active{
+  background-color: red !important;
 }

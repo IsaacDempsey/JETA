@@ -28,7 +28,10 @@ var current_flag = false; // This flag is set when the user allows to use the cu
 
 // Window resize add and remove classes and show hide toggle buttons
 function resizeWindow() {
+    // $j(".mobile-form").css('width', $(window).width());
     if ($(window).width() <= 650) {
+        // //console.log("Width: ",($(window).width()-25));
+        // $("#pac-input").css('width',$(window).width());
         $("#toggle-button").show();
         $("#navbarToggleExternalContent").addClass("collapse");
         
@@ -50,8 +53,8 @@ $(document).ready(function () {
     $("#toggle-button").click(function () {
         var measure = ($(window).width() - $j("#form").position().left);
         
-        if (measure>100){
-            console.log(measure);
+        if (measure>150){
+            //console.log(measure);
             $("#form").css("paddingRight", "0px");
             // $j("#form").position({
             //     my: "center",
@@ -129,7 +132,7 @@ function loadMap() {
                 position: google.maps.ControlPosition.LEFT_CENTER
             },
             scaleControl: true,
-            streetViewControl: true,
+            streetViewControl: false,
             streetViewControlOptions: {
                 position: google.maps.ControlPosition.LEFT_TOP
             },
@@ -143,8 +146,17 @@ function loadMap() {
         var input = document.getElementById('pac-input');
         var searchform = document.getElementById('search-form');
         var searchBox = new google.maps.places.SearchBox(input);
+        if ($(window).width() <= 650) {
+            map.controls[google.maps.ControlPosition.LEFT_TOP].push(searchform);
+        }
+        $(window).resize(function () {
+            if ($(window).width() <= 650) {
+                map.controls[google.maps.ControlPosition.LEFT_TOP].push(searchform);
+            }
+        });
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchform);
+        
 
         // Bias the SearchBox results towards current map's viewport.
         map.addListener('bounds_changed', function () {
@@ -175,8 +187,8 @@ function loadMap() {
                 lat = places[0].geometry.location.lat();
                 lng = places[0].geometry.location.lng();
                 
-                // console.log(places[0].geometry.location.lat());
-                // console.log(places[0].geometry.location.lng());
+                // //console.log(places[0].geometry.location.lat());
+                // //console.log(places[0].geometry.location.lng());
                 runGenericStopLoader(lat,lng,radius);
             }
 
@@ -230,7 +242,7 @@ function loadGenericStops(latitude, longitude,rad){
       contentType: "application/json;charset=utf-8",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR);
+        //console.log(jqXHR);
         $("#form").hide();
         $(".overlay").show();
         $(".loadingcontent").hide();
@@ -243,7 +255,7 @@ function loadGenericStops(latitude, longitude,rad){
     });
 }
 function loadAllStops(){
-    console.log("Loading all Stops");
+    //console.log("Loading all Stops");
     $(".overlay").show();
     $("#loading").show();
     $j("#loadingtext").show("slide", { direction: "right" }, "fast");
@@ -313,7 +325,7 @@ function getStops(startstop) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
+            //console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -442,6 +454,7 @@ $(function onSearchAgain(){
 var markers = [];
 var content_string;
 function addMarkers(data, stopid="None", endstop="None"){
+    //console.log(data);
     deleteMarkers(markers);
     markers=[];
     var infowindow = new google.maps.InfoWindow();
@@ -555,17 +568,23 @@ function addMarkers(data, stopid="None", endstop="None"){
 
 function setMapBounds() {
     var bounds = new google.maps.LatLngBounds();
+    var center_point="";
     for (var i = 0; i < markers.length; i++) {
         bounds.extend(markers[i].getPosition());
         var icon = markers[i].getIcon();
-        console.log(icon);
+        //console.log(icon);
         if (icon =="/static/img/markers/StartStop.png"){
-            map.setCenter(markers[i]);
+            center_point = markers[i];
         }
     }
     map.fitBounds(bounds);
     var listener = google.maps.event.addListener(map, "bounds_changed", function () {
-        if (map.getZoom() > 16) map.setZoom(16);
+        if (map.getZoom() > 16){
+            if (center_point != ""){
+                map.setCenter(center_point);
+            }            
+            map.setZoom(16);
+        } 
         google.maps.event.removeListener(listener);
     });
     
@@ -584,7 +603,7 @@ function clearMarkers(){
 
 // Function to delete markers from the map
 function deleteMarkers(markers){
-    console.log("Deleting all stops");
+    //console.log("Deleting all stops");
     clearMarkers();
     markers = [];
 }
@@ -654,7 +673,7 @@ function getLines(startStop, endStop){
         destination: endStop,
       },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
+            //console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -665,14 +684,15 @@ function getLines(startStop, endStop){
       dataType: "json",
       success: function (data) {
           $("#lineholder").show();
-          $("#linecontent").html('');
+          $("#line-pills").html('');
           for (var i = 0; i < data.length; i ++){
-              $('<div class= "col-sm-2 col-xs-2 px-3 btn btn-info" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</div>").appendTo("#linecontent");
+              $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</a></li>").appendTo("#line-pills");
           }
       }
     });
 }
 function getTravelTime(content) {
+    
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
     var rain = "0.5"
     var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
@@ -682,9 +702,13 @@ function getTravelTime(content) {
     var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
     var weather_url = proxy.concat(darksky);
         $.getJSON(weather_url, function(weather) {
-            console.log(weather.currently.precipIntensity);
             var rain = weather.currently.precipIntensity;
     });
+    var lin = content.innerHTML;
+    startStopAutocompleteData.sort(function (a, b) {
+        return Number(a.lineid[lin]) - Number(b.lineid[lin]);
+    });
+    getRoute(startStopAutocompleteData, lin);
     $.ajax({
         url: localAddress + "/main/journeytime",
         data: {
@@ -697,7 +721,6 @@ function getTravelTime(content) {
         contentType: "application/json;charset=utf-8",
         dataType: "json", 
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -707,9 +730,9 @@ function getTravelTime(content) {
         success: function (data) {
             $("#journeyholder").show();
             $("#journeycontent").html("");
-            $('<div class= "col-sm-6 text-center">Route: </div><div class= "col-sm-6 text-center"><b>' + content.innerHTML + "</b> </div>").appendTo("#journeycontent");
-            $('<div class= "col-sm-6 text-center">Journey Time: </div><div class= "col-sm-6 text-center"><b>' + data.totaltraveltime + "</b> </div>").appendTo("#journeycontent");
-            $('<div class= "col-sm-6 text-center">Arrival Time: </div><div class= "col-sm-6 text-center"><b>' + data.arrivaltime + "</b> </div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Route: </div><div class= "col-xs-6 px-3"><b>' + content.innerHTML + "</b> </div></div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Journey Time: </div><div class= "col-xs-6 px-3"><b>' + data.totaltraveltime + "</b> </div></div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Arrival Time: </div><div class= "col-xs-6 px-3"><b>' + data.arrivaltime + "</b> </div></div>").appendTo("#journeycontent");
             $.getJSON(live_db, function(bus) {
                 var nextbuses = [];
                 var nextbus = "";
@@ -728,7 +751,7 @@ function getTravelTime(content) {
                 else {
                     var nextbus = nextbuses[0];
                 }
-                $('<div class= "col-sm-6 text-center">Next bus arriving in: </div><div class= "col-sm-6 text-center"><b>' + nextbus + "</b> </div>").appendTo("#journeycontent");
+                $('<div class="row px-3"><div class= "col-xs-6">Arrival Time: </div><div class= "col-xs-6 px-3"><b>' + nextbus + "</b> </div></div>").appendTo("#journeycontent");
             });
         }
     });
@@ -737,6 +760,24 @@ function getTravelTime(content) {
     
 }
 
+function getRoute(data,line) {
+    var routeData = [];
+    var firstStop = 0;
+    var lastStop;
+    for (var i =0 ; i < data.length; i++){
+        if (data[i].stop_id==__endStop){
+            lastStop = Number(data[i].lineid[line]);
+        }
+    }
+    for (var i=0; i<data.length;i++){
+        if (data[i].lineid[line]>= firstStop && data[i].lineid[line] <= lastStop) {
+            routeData.push(data[i]);
+        }
+    }
+    // //console.log(routeData);
+    addMarkers(routeData,__startStop,__endStop);
+    
+}
 function sendErrorReport(){
     $j("#errorcontent").hide("slide", { direction: "right" }, "fast", function () {
         $j("#errorsent").show("slide", { direction: "right" }, "fast");
@@ -752,60 +793,4 @@ $(function () {
       location.reload();
     });
 })
-// This is the major Display Map function
-// function displayMap(data2, startBusStop){
-//         var coordinates2 = [];
-//         var names = [];
-//         for (var i = 0; i < data2.length; i++) {
-//             var iarr = data2[i];
-//             coordinates2.push({ lat: iarr.coord[1], lng: iarr.coord[0] });
-//             names.push(iarr.stop_name);
-//         }
-        
-//         var stop_icon = {
-//             path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
-//             fillColor: '#e6f2ff',
-//             fillOpacity: 0.8,
-//             scale: 1,
-//             strokeColor: '#99ccff',
-//             strokeWeight: 1
-//         };
-//         var stop_icon_h = {
-//             path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
-//             fillColor: 'yellow',
-//             fillOpacity: 0.8,
-//             scale: 1,
-//             strokeColor: 'blue',
-//             strokeWeight: 1
-//         };
-//         for (var i = 0; i < coordinates2.length; i++) {
-//             var stop = coordinates2[i];
-//             var stop_name = names[i];
-
-//             var bus_stop = new google.maps.Marker({
-//                 position: stop,
-//                 icon: stop_icon,
-//                 map: map
-//             });
-
-//             showHideMarker(map, bus_stop, stop_name);
-//         };
-//         bus_stop.setMap(map);
-//         function showHideMarker(map, bus_stop) {
-//             var infowindow = new google.maps.InfoWindow({
-//                 content: stop_name
-//             });
-
-//             bus_stop.addListener('mouseout', function () {
-//                 bus_stop.setOptions({ icon: stop_icon });
-//                 infowindow.close(bus_stop.get('map'), bus_stop);
-//             });
-
-//             bus_stop.addListener('mouseover', function () {
-//                 bus_stop.setOptions({ icon: stop_icon_h });
-//                 infowindow.open(bus_stop.get('map'), bus_stop);
-//             });
-//         };
-// }
-// Display Map Function ------------------------------
 
