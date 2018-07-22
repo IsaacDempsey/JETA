@@ -34,6 +34,11 @@ function resizeWindow() {
         // $("#pac-input").css('width',$(window).width());
         $("#toggle-button").show();
         $("#navbarToggleExternalContent").addClass("collapse");
+        $j("#form").position({
+                my: "right center",
+                at: "right",
+                of: ".wrapper"
+            });
         
     } else {
         $("#toggle-button").hide();
@@ -106,6 +111,10 @@ $(document).ready(function () {
     
     // After the map is loaded plot all the stops
     // loadAllStops();
+    //close marker window on phone
+    $('.close').click(function () {
+        $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
+    });
 });
 
 // Separate Function to render the map
@@ -172,9 +181,11 @@ function loadMap() {
 
         // Auto complete of generic search to plot bus stops near a paricular location
         // Create the search box and link it to the UI element.
+        var infowindow = new google.maps.InfoWindow();
         var input = document.getElementById('pac-input');
         var searchform = document.getElementById('search-form');
         var searchBox = new google.maps.places.SearchBox(input);
+        var marker = "";
         if ($(window).width() <= 650) {
             map.controls[google.maps.ControlPosition.LEFT_TOP].push(searchform);
         }
@@ -212,10 +223,24 @@ function loadMap() {
             if (places.length == 0) {
                 is_places_entered = false;
             } else {
+                console.log(places);
                 is_places_entered = true;
                 lat = places[0].geometry.location.lat();
                 lng = places[0].geometry.location.lng();
+                var myLatLng = { lat: places[0].geometry.location.lat(), lng: places[0].geometry.location.lng() };
+                if(marker != ""){
+                    if (map
+                        .getBounds()
+                        .contains(marker.getPosition())){
+                            marker.setMap(null);
+                        }
+                }
                 
+                marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map: map
+                });
+                map.setCenter(marker);
                 // //console.log(places[0].geometry.location.lat());
                 // //console.log(places[0].geometry.location.lng());
                 runGenericStopLoader(lat,lng,radius);
@@ -226,6 +251,19 @@ function loadMap() {
             current_flag = true;
             lat = position.coords.latitude;
             lng = position.coords.longitude;
+            var myLatLng = { lat: position.coords.latitude, lng: position.coords.longitude };
+            if (marker != "") {
+                if (map
+                    .getBounds()
+                    .contains(marker.getPosition())) {
+                    marker.setMap(null);
+                }
+            }
+
+            marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map
+            });
             if (radius == "500m") {
               radius = 0.005;
             } else if (radius == "1km") {
@@ -595,40 +633,61 @@ function addMarkers(data, stopid="None", endstop="None"){
             }
             
         });
-        
-        
-        if (flag){
-            marker.addListener('mouseover', function () {
-                lasthover = this.getIcon();
-                // alert("Hover Out");
-                content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div>';
-                infowindow.setContent(content_string);
-                this.setOptions({ icon: stop_icon_h });
-                infowindow.open(map, this);
-                hover_status = true;
-            }); 
-            marker.addListener("click", function() {
-              infowindow.open(map, this);
-              hover_status = false;
-            }); 
+        if ($(window).width() < 650) {
+            if(flag){
+                marker.addListener("click", function () {
+                    $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
+                    $("#markerwindow-content").html("");
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div></div>';
+                    $(content_string).appendTo("#markerwindow-content");
+                }); 
+            } else {
+                marker.addListener("click", function() {
+                    $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
+                    $("#markerwindow-content").html("");
+                    var marker_name = this.get("name");
+                    marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div>";
+                    $(content_string).appendTo("#markerwindow-content");
+                }); 
+            }
         } else {
-            marker.addListener('mouseover', function () {
-                lasthover = this.getIcon();
-                // alert("Hover Out");
-                var marker_name = this.get("name");
-                marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
-                
-                infowindow.setContent(content_string);
-                this.setOptions({ icon: stop_icon_h });
-                infowindow.open(map, this);
-                hover_status = true;
-            });
-            marker.addListener("click", function () {
-                infowindow.open(map, this);
-                hover_status = false;
-            }); 
+            if (flag) {
+                marker.addListener('mouseover', function () {
+                    lasthover = this.getIcon();
+                    // alert("Hover Out");
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource" >Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div>';
+                    infowindow.setContent(content_string);
+                    this.setOptions({ icon: stop_icon_h });
+                    infowindow.open(map, this);
+                    hover_status = true;
+                });
+                marker.addListener("click", function () {
+                    infowindow.open(map, this);
+                    hover_status = false;
+                });
+            } else {
+                marker.addListener('mouseover', function () {
+                    lasthover = this.getIcon();
+                    // alert("Hover Out");
+                    var marker_name = this.get("name");
+                    marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
+
+                    infowindow.setContent(content_string);
+                    this.setOptions({ icon: stop_icon_h });
+                    infowindow.open(map, this);
+                    hover_status = true;
+                });
+                marker.addListener("click", function () {
+                    infowindow.open(map, this);
+                    hover_status = false;
+                });
+            }
         }
+        
+        
+        
         
 
         markers.push(marker);    
@@ -690,9 +749,13 @@ function deleteMarkers(markers){
 
 // });
 function setValueOnForm(address, stopid, flag) {
+    
     $("#pac-input").val("");
     current_flag = false;
     if (flag=='source'){
+        if ($(window).width() < 650) {
+            $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
+        }
         // If the source button is clicked set the new source value as the concat of the address and the stopid
         var source_new_value = address + ', '+stopid;
         if ($("#source").val()!=""){
@@ -708,6 +771,10 @@ function setValueOnForm(address, stopid, flag) {
         __endStop == "";
         getStops(stopid); // Get the data and the markers now with this stop as the source
     } else {
+        if ($(window).width() < 650) {
+            $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
+            $("#toggle-button").click();
+        }
         var destination_new_value = address + ', ' + stopid;
         if ($("#source").val() != "") {
             __oldStartStop = $("#source").val();
