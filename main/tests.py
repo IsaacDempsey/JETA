@@ -14,15 +14,15 @@ class TestIndex(SimpleTestCase):
 
     def test_redirect_status_code(self):
         response = self.client.get('/')
-        self.assertEquals(response.status_code, 301)
+        self.assertEqual(response.status_code, 301)
 
     def test_index_status_code(self):
         response = self.client.get('/main/')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('main:index'))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'index.html')
 
     def test_index_contains_correct_html(self):
@@ -51,27 +51,27 @@ class TestLines(TestCase):
 
     def test_lines_no_terms_status_code(self):
         response = self.client.get('/main/lines')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_lines_no_source_status_code(self):
         response = self.client.get('/main/lines', {'destination': 770})
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_lines_no_destination_status_code(self):
         response = self.client.get('/main/lines', {'source': 768})
-        self.assertEquals(response.status_code, 400)   
+        self.assertEqual(response.status_code, 400)   
 
     def test_lines_bad_terms_status_code(self):
         response = self.client.get('/main/lines', {'source': '770X', 'destination': '768Y'})
-        self.assertEquals(response.status_code, 400)        
+        self.assertEqual(response.status_code, 400)        
 
     def test_lines_good_terms_status_code(self):
         response = self.client.get('/main/lines', {'source': 768, 'destination': 770})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_lines_contains_correct_json(self):
         response = self.client.get('/main/lines', {'source': 768, 'destination': 770})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, '["39A"]')
 
 
@@ -82,10 +82,10 @@ class TestJourneytime(TestCase):
         cls.routes = Routes.objects.create(routeid='39A_40', lineid='39A', direction=1, stopids=[767, 768, 769, 770, 771])
         cls.coefficients = Coefficients()
         Coefficients.objects.bulk_create([
-            Coefficients(segment="767_768", intercept=123, arrivaltime=0, rain=1, fri=-2, mon=0, sat=-10, sun=-10, thu=-10),
-            Coefficients(segment="769_770", intercept=70, arrivaltime=0, rain=0, fri=-1, mon=-2, sat=-10, sun=-11, thu=-11),
-            Coefficients(segment="768_769", intercept=70, arrivaltime=0, rain=0, fri=0, mon=-4, sat=-12, sun=-19, thu=-19),
-            Coefficients(segment="770_771", intercept=34, arrivaltime=0, rain=0, fri=0, mon=-1, sat=-2, sun=-3, thu=-3)
+            Coefficients(segment="767_768", intercept=123, arrivaltime=0, rain=1, fri=-2, mon=0, sat=-10, sun=-10, thu=-10, tue=-10),
+            Coefficients(segment="769_770", intercept=70, arrivaltime=0, rain=0, fri=-1, mon=-2, sat=-10, sun=-11, thu=-11, tue=-10),
+            Coefficients(segment="768_769", intercept=70, arrivaltime=0, rain=0, fri=0, mon=-4, sat=-12, sun=-19, thu=-19, tue=-10),
+            Coefficients(segment="770_771", intercept=34, arrivaltime=0, rain=0, fri=0, mon=-1, sat=-2, sun=-3, thu=-3, tue=-10)
             ])
 
     def test_creation_of_routes(self):
@@ -103,16 +103,117 @@ class TestJourneytime(TestCase):
 
     def test_journeytime_no_terms_status_code(self):
         response = self.client.get('/main/journeytime')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
-    def test_journeytime_all_terms_status_code(self):
-        response = self.client.get('/main/journeytime?source=767&destination=770&lineid=39A&time=1530008000')
-        self.assertEquals(response.status_code, 200)
+    def test_journeytime_missing_rain_status_code(self):
+        response = self.client.get('/main/journeytime', {"source": 768, "destination": 770, "lineid": "39A", "time": 1530008000})
+        self.assertEqual(response.status_code, 200)
 
-# class TestGet_address(TestCase):
+    def test_journeytime_all_terms_invalid_stopid_status_code(self):
+        response = self.client.get('/main/journeytime', {"source": 1000, "destination": 2000, "lineid": "39A", "time": 1530008000})
+        self.assertEqual(response.status_code, 400) 
+        
+    def test_journeytime_all_terms_invalid_lineid_status_code(self):
+        response = self.client.get('/main/journeytime', {"source": 768, "destination": 770, "lineid": "XXX", "time": 1530008000})
+        self.assertEqual(response.status_code, 400) 
 
+    def test_journeytime_all_terms_valid_status_code(self):
+        response = self.client.get('/main/journeytime', {"source": 768, "destination": 770, "lineid": "39A", "time": 1530008000})
+        self.assertEqual(response.status_code, 200)
 
-# class TestRoutes(TestCase):
+    def test_journeytime_contains_correct_json(self):
+        response = self.client.get('/main/journeytime', {"source": 768, "destination": 770, "lineid": "39A", "time": 1530008000})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['arrivaltime']) 
+        self.assertTrue(response.json()['totaltraveltime'])
+        self.assertTrue(any(segment in ["767_768", "768_769", "769_770", "770_771"] 
+            for segment in list(response.json()['segment_times'].keys())))
+        
+
+class TestGet_address(TestCase):
+    
+    @classmethod
+    def setUpTestData(cls):
+        cls.stops = Stops.objects.create(stopid=767, address='Parnell', lat=53.35224111, lng=-6.26369500, lines=['39A'])
+
+    def test_creation_of_stops(self):
+        self.assertTrue(isinstance(self.stops, Stops))
+
+    def test_data_in_stops_table(self):
+        self.assertEqual(Stops.objects.all().values('stopid')[0]['stopid'], 767)
+
+    def test_get_address_no_term_status_code(self):
+        response = self.client.get('/main/get_address', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_address_bad_term_status_code(self):
+        response = self.client.get('/main/get_address', {'term': 'XYZ'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_address_valid_term_status_code(self):
+        response = self.client.get('/main/get_address', {'term': 'Par'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_address_stop_name_json_content(self):
+        response = self.client.get('/main/get_address', {'term': 'Par'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertTrue(response.json()[0]['label'])
+    
+    def test_get_address_stopid_json_content(self):
+        response = self.client.get('/main/get_address', {'term': 76}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()[0]['label'])
+
+class TestLocations(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.stops = Stops()
+        Stops.objects.bulk_create([
+            Stops(stopid=767, address='Parnell', lat=53.0000, lng=-6.0000, lines=['39A']),
+            Stops(stopid=768, address='Granby', lat=53.0003, lng=-6.0003, lines=['39A']),
+            Stops(stopid=769, address='Rotunda', lat=53.0008, lng=-6.0008, lines=['39A']),
+            Stops(stopid=770, address='Martin', lat=53.0012, lng=-6.0013, lines=['39A']),
+            Stops(stopid=771, address='Hospital', lat=53.0017, lng=-6.0017, lines=['39A'])
+            ])
+    
+    def test_creation_of_stops(self):
+        self.assertTrue(isinstance(self.stops, Stops))
+
+    def test_data_in_stops_table(self):
+        stopid_list = Stops.objects.all().values_list('stopid', flat=True)
+        self.assertTrue(any(stop in [767, 768, 769, 770, 771] for stop in list(stopid_list)))
+
+    def test_locations_no_terms_status_code(self):
+        response = self.client.get('/main/locations')
+        self.assertEqual(response.status_code, 200)
+
+    def test_locations_no_terms_json_results(self):
+        response = self.client.get('/main/locations')
+        self.assertEqual(len(response.json()), 5)
+
+    def test_locations_only_lat_given_json_results(self):
+        response = self.client.get('/main/locations', {'lat': 53.0003})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]['stop_id'], 767)
+        self.assertEqual(len(response.json()), 3)
+
+    def test_locations_only_lng_given_json_results(self):
+        response = self.client.get('/main/locations', {'lng': -6.0003})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]['stop_id'], 767)
+        self.assertEqual(len(response.json()), 3)
+
+    def test_locations_lng_and_lat_given_json_results(self):
+        response = self.client.get('/main/locations', {'lat': 53.0003, 'lng': -6.0003})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]['stop_id'], 767)
+        self.assertEqual(len(response.json()), 3)
+
+    def test_locations_lat_lng_radius_given_json_results(self):
+        response = self.client.get('/main/locations', {'lat': 53.0003, 'lng': -6.0003, 'radius': 0.0010})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]['stop_id'], 767)
+        self.assertEqual(len(response.json()), 4)
 
 
 class TestStops(TestCase):
@@ -144,51 +245,51 @@ class TestStops(TestCase):
 
     def test_stops_no_terms_status_code(self):
         response = self.client.get('/main/stops')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stops_only_source_status_code(self):
         response = self.client.get('/main/stops', {'source': 768})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stops_only_destination_status_code(self):
         response = self.client.get('/main/stops', {'destination': 770})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stops_only_lineid_status_code(self):
         response = self.client.get('/main/stops', {'lineid': '39A'})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stops_source_and_destination_status_code(self):
         response = self.client.get('/main/stops', {'source': 768, 'destination': 770})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stops_source_and_lineid_status_code(self):
         response = self.client.get('/main/stops', {'source': 768, 'lineid': '39A'})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stops_destination_and_lineid_status_code(self):
         response = self.client.get('/main/stops', {'destination': 770, 'lineid': '39A'})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stops_all_terms_status_code(self):
         response = self.client.get('/main/stops', {'source': 768, 'destination': 770, 'lineid': '39A'})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stops_bad_source_status_code(self):
         response = self.client.get('/main/stops', {'source': '2X'})
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_stops_bad_destination_status_code(self):
         response = self.client.get('/main/stops', {'destination': '6Y'})
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_stops_bad_lineid_status_code(self):
         response = self.client.get('/main/stops', {'lineid': 'Hello'})
-        self.assertEquals(response.status_code, 400) 
+        self.assertEqual(response.status_code, 400) 
 
     def test_stops_contains_correct_json(self):
         response = self.client.get('/main/stops', {'source': 767, 'destination': 770, 'lineid': '39A'})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[0]['stop_name'], 'Parnell')
         self.assertEqual(response.json()[1]['coord'], [-6.26378306, 53.35230694])
         self.assertEqual(response.json()[2]['lineid'], {"39A":2})

@@ -15,6 +15,13 @@ import pandas as pd
 from pytz import timezone
 import time
 
+def isfloat(x):
+    try:
+        float(x)
+        return True
+    except:
+        return False
+
 def index(request):
     return render(request, 'index.html')
 
@@ -54,13 +61,15 @@ def journeytime(request):
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
     lineid = request.GET.get('lineid')
-    start_time = request.GET.get('time')
-    rain_str = request.GET.get('rain', '')
+    start_time = request.GET.get('time', '')
+    rain = request.GET.get('rain')
 
-    # rain = 0.5 # Should come from table or API query
-    rain = float(rain_str)
-
-    if not source.isnumeric() or not destination.isnumeric() or not lineid or not start_time:
+    if isfloat(rain): 
+        rain = float(rain)
+    else:
+        rain = 0.0
+        
+    if not source.isnumeric() or not destination.isnumeric() or not lineid or not start_time.isnumeric():
         response = HttpResponse(json.dumps(
             {"error": "Missing query term/query term invalid."}), content_type='application/json')
         response.status_code = 400
@@ -89,6 +98,12 @@ def journeytime(request):
     # Get stop lists associated with query lineid, start stop and end stop
     routes = Routes.objects.filter(lineid=lineid, stopids__contains=[source, destination]).values()
     routes = pd.DataFrame.from_records(routes)
+
+    if routes.empty:
+        response = HttpResponse(json.dumps(
+            {"error": "Cannot find data which fits these terms."}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     if routes.shape[0] > 1:
         print("Error: multiple possible routes.")
@@ -190,13 +205,6 @@ def locations(request):
     lat = request.GET.get('lat', '')
     lng = request.GET.get('lng', '')
     radius = request.GET.get('radius', '')
-
-    def isfloat(x):
-        try:
-            float(x)
-            return True
-        except:
-            return False
 
     if isfloat(radius):
         r = float(radius)
