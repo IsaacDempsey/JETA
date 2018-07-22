@@ -23,12 +23,58 @@ var __oldStartStop = ""; // Old start stop to make the undo feature
 var __oldEndStop = ""; // Old End Stop to make the undo feature
 var autocomplete_data = []; // This a global variable for the data that will be used to select for the destination field in the form
 var startStopAutocompleteData; // A separate variable after the destination is entered by the user in order to plot markers
+var current_flag = false; // This flag is set when the user allows to use the current location
 // Autocomplete Feature when the user enters in the source address
+
+// Window resize add and remove classes and show hide toggle buttons
+function resizeWindow() {
+    // $j(".mobile-form").css('width', $(window).width());
+    if ($(window).width() <= 650) {
+        // //console.log("Width: ",($(window).width()-25));
+        // $("#pac-input").css('width',$(window).width());
+        $("#toggle-button").show();
+        $("#navbarToggleExternalContent").addClass("collapse");
+        
+    } else {
+        $("#toggle-button").hide();
+        $("#navbarToggleExternalContent").removeClass("collapse");
+    }
+}
 
 
 // On Document Ready
 $(document).ready(function () {
     // When the document loads
+    // Window resize add and remove classes and show hide toggle buttons
+    resizeWindow();
+    $(window).resize(function () {
+        resizeWindow();
+    });
+    $("#toggle-button").click(function () {
+        var measure = ($(window).width() - $j("#form").position().left);
+        
+        if (measure>150){
+            //console.log(measure);
+            $("#form").css("paddingRight", "0px");
+            // $j("#form").position({
+            //     my: "center",
+            //     at: "right",
+            //     of: "body"
+            // });
+        } else {
+            $("#form").css("paddingRight", '250px');
+            
+            // $j("#form").position(
+            //     {
+            //         my: "center",
+            //         at: "center",
+            //         of: "body"
+            //     }
+            // );
+        }
+        
+        
+    });
     // Autoload the date and time for the user with the current time
     let today = moment().format("YYYY-MM-DDTHH:mm");
     document.querySelector("#datetime").value = today;
@@ -53,9 +99,11 @@ $(document).ready(function () {
     // Over layer of the entire app when an error occurs **
     $(".overlay").hide();
     $j("#loadingtext").hide();
+    $("#undo").addClass("disabled");
     // Once everything is hidden load the map
     loadMap();
     $j("#form").show("slide", { direction: "right" }, "slow");
+    
     // After the map is loaded plot all the stops
     // loadAllStops();
 });
@@ -84,7 +132,7 @@ function loadMap() {
                 position: google.maps.ControlPosition.LEFT_CENTER
             },
             scaleControl: true,
-            streetViewControl: true,
+            streetViewControl: false,
             streetViewControlOptions: {
                 position: google.maps.ControlPosition.LEFT_TOP
             },
@@ -93,30 +141,110 @@ function loadMap() {
             styles: mapstyle
         });
 
+        $.getJSON('/static/json/routes.json', function(data) {
+            var coordinates_arr = [];
+     
+            //iterates through each key in json
+            $.each(data, function(index, data) {
+            var coordinates = [];
+            for (var i = 0; i < data.length; i++) {
+            var iarr = data[i];
+            coordinates.push({lat: iarr[1], lng: iarr[0]});
+            if (i == data.length - 1) {
+                coordinates_arr.push(coordinates);
+                coordinates = [];
+            }
+            }
+            })
+         for (var i = 0; i < coordinates_arr.length; i++) {
+         var line = coordinates_arr[i];
+         var busroute = new google.maps.Polyline({
+            path: line,
+            geodesic: true,
+            strokeColor: '#b3ccff',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
+     
+          busroute.setMap(map);
+              };
+            });
+
         // Auto complete of generic search to plot bus stops near a paricular location
         // Create the search box and link it to the UI element.
         var input = document.getElementById('pac-input');
         var searchform = document.getElementById('search-form');
         var searchBox = new google.maps.places.SearchBox(input);
+        if ($(window).width() <= 650) {
+            map.controls[google.maps.ControlPosition.LEFT_TOP].push(searchform);
+        }
+        $(window).resize(function () {
+            if ($(window).width() <= 650) {
+                map.controls[google.maps.ControlPosition.LEFT_TOP].push(searchform);
+            }
+        });
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchform);
+        
 
         // Bias the SearchBox results towards current map's viewport.
         map.addListener('bounds_changed', function () {
             searchBox.setBounds(map.getBounds());
         });
-
+        var radius = '1km';
+        var lat = null;
+        var lng = null;
+        var places = [];
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(runCurrentStopLoader);
+        } else {
+            console.log( "Geolocation is not supported by this browser.");
+        }
+        $("input[type=radio][name=switch_3]").change(function () {
+            radius = this.value;
+            if (places.length != 0 || current_flag == true) {
+              runGenericStopLoader(lat, lng, radius);
+            }
+            
+        });
         searchBox.addListener('places_changed', function () {
-            var places = searchBox.getPlaces();
+            places = searchBox.getPlaces();
             if (places.length == 0) {
-                return;
+                is_places_entered = false;
             } else {
-                console.log(places[0].geometry.location.lat());
-                console.log(places[0].geometry.location.lng());
-
+                is_places_entered = true;
+                lat = places[0].geometry.location.lat();
+                lng = places[0].geometry.location.lng();
+                
+                // //console.log(places[0].geometry.location.lat());
+                // //console.log(places[0].geometry.location.lng());
+                runGenericStopLoader(lat,lng,radius);
             }
 
         });
+        function runCurrentStopLoader(position){
+            current_flag = true;
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            if (radius == "500m") {
+              radius = 0.005;
+            } else if (radius == "1km") {
+              radius = 0.01;
+            } else if (radius == "2km") {
+              radius = 0.02;
+            }
+            loadGenericStops(lat, lng, radius);
+        }
+        function runGenericStopLoader(lat,lng,radius){
+            if (radius == '500m') {
+                radius = 0.005
+            } else if (radius == '1km') {
+                radius = 0.01
+            } else if (radius == '2km') {
+                radius = 0.02
+            }
+            loadGenericStops(lat, lng, radius);
+        }
 
         // Finally set the map as a global map variable
         setGlobalMap(map);
@@ -131,11 +259,32 @@ function setGlobalMap(Asyncmap) {
     // end of the load. Hence setting the map globally.
     map = Asyncmap;
 }
-
-
-
+// This function loads all the stops either searched in the generic search bar or from current location
+function loadGenericStops(latitude, longitude,rad){
+    $.ajax({
+      url: localAddress + "/main/locations",
+      data:{
+          lat: latitude,
+          lng: longitude,
+          radius: rad
+      },
+      contentType: "application/json;charset=utf-8",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        //console.log(jqXHR);
+        $("#form").hide();
+        $(".overlay").show();
+        $(".loadingcontent").hide();
+        $j("#error").show("slide", { direction: "down" }, "fast");
+          $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+      },
+      success: function(data) {
+        addMarkers(data);
+      }
+    });
+}
 function loadAllStops(){
-    console.log("Loading all Stops");
+    //console.log("Loading all Stops");
     $(".overlay").show();
     $("#loading").show();
     $j("#loadingtext").show("slide", { direction: "right" }, "fast");
@@ -144,10 +293,11 @@ function loadAllStops(){
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            $("form").hide();
+            $("#form").hide();
             $(".overlay").show();
+            $(".loadingcontent").hide();
             $j("#error").show("slide", { direction: "down" }, "fast");
-            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
         },
         success: function (data) {
             addMarkers(data);
@@ -161,9 +311,7 @@ function loadAllStops(){
 }
 // Autocomplete feature for the UI inputs
 $j(function () {
-    if ($("#source")!=""){
-        __oldStartStop = $("#source").val();
-    }
+    
         // Check for the HTML DOM element who has #source as the id
     $j("#source").autocomplete({
         // Send a ajax request to the below address
@@ -178,17 +326,75 @@ $j(function () {
         dataType: "json",
         // When the user selects the required input ...-->
         select: function (e, ui) {
+            current_flag = false;
+            if (__oldStartStop != "") {
+                $("#undo").removeClass("disabled");
+            }
+            $("#pac-input").val("");
             // Get the stop id for the start
             $("#noSource").hide();
             var start = ui.item.label;
             var stopId = start.split(",");
             var startStop = stopId[stopId.length - 1]; 
+            if (__oldStartStop == "") {
+                __oldStartStop = startStop;
+            }
             $("#destination").val("");
             // ..--> Send an ajax query to the api at the below URL
             getStops(startStop.trim());
         }
     });      
 });
+
+
+
+function getFinalStops() {
+    $.ajax({
+        url: localAddress + "/main/get_route",
+        // Set the start text as the label value
+        data: { 
+            source: __startStop,
+            destination: __endStop,
+            },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+        // On success send this data to the receive data function
+        success: function (data) {
+            finalData = data;
+            var coordinates_arr = [];
+            var coordinates = [];
+            for (var i = 0; i < finalData.length; i++) {
+            var iarr = finalData[i];
+            coordinates.push({lat: iarr.coord[1], lng: iarr.coord[0]});
+            }
+            coordinates_arr.push(coordinates);
+                var line = coordinates_arr[0];
+                var route = new google.maps.Polyline({
+                   path: line,
+                   geodesic: true,
+                   strokeColor: 'yellow',
+                   strokeOpacity: 1.0,
+                   strokeWeight: 8
+                 });
+                 
+                 route.setMap(map);
+                 addMarkers(finalData, __startStop, __endStop);
+        }
+    });
+}
+
+
+
+
+
 function getStops(startstop) {
     __startStop = startstop
     $.ajax({
@@ -198,10 +404,12 @@ function getStops(startstop) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            $j("#form").hide("slide", { direction: "right" }, "slow");
+            //console.log(jqXHR);
+            $("#form").hide();
             $(".overlay").show();
+            $(".loadingcontent").hide();
             $j("#error").show("slide", { direction: "down" }, "fast");
-            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
         },
         // On success send this data to the receive data function
         success: function (data) {
@@ -236,6 +444,7 @@ function getStops(startstop) {
                     var end = ui.item.label;
                     var stopId = end.split(",");
                     var endStop = stopId[stopId.length - 1];
+                    console.log(endStop);
                     __endStop = endStop.trim();
                     addMarkers(startStopAutocompleteData, __startStop, __endStop);
                 }
@@ -325,19 +534,21 @@ $(function onSearchAgain(){
 var markers = [];
 var content_string;
 function addMarkers(data, stopid="None", endstop="None"){
+    //console.log(data);
     deleteMarkers(markers);
     markers=[];
     var infowindow = new google.maps.InfoWindow();
     var coordinates = [];
     var names = [];
-    if (stopid == "None" && endstop == "None"){
-        map.setZoom(11);
-    }
-    else if (endstop == "None" || data.length <= 5){
-        map.setZoom(15);
-    } else  {
-        map.setZoom(13);
-    }
+    // if (stopid == "None" && endstop == "None"){
+    //     map.setZoom(11);
+    // }
+    // else if (endstop == "None" || data.length <= 5){
+    //     map.setZoom(15);
+    // } else  {
+    //     map.setZoom(13);
+    // }
+    // if (data.length<=25){}
     for (var i = 0; i < data.length; i++) {
         // Setting the content string
         
@@ -426,14 +637,38 @@ function addMarkers(data, stopid="None", endstop="None"){
     }
 
     setMarker(map);
+    setMapBounds();
 
-    if (stopid=="None" && endstop == "None"){
-        var markerCluster = new MarkerClusterer(map, markers, {
-          imagePath: "/static/img/markers/clusterer/m"
-        });    
-    }
+    // if (stopid=="None" && endstop == "None"){
+    //     var markerCluster = new MarkerClusterer(map, markers, {
+    //       imagePath: "/static/img/markers/clusterer/m"
+    //     });    
+    // }
 }
 
+function setMapBounds() {
+    var bounds = new google.maps.LatLngBounds();
+    var center_point="";
+    for (var i = 0; i < markers.length; i++) {
+        bounds.extend(markers[i].getPosition());
+        var icon = markers[i].getIcon();
+        //console.log(icon);
+        if (icon =="/static/img/markers/StartStop.png"){
+            center_point = markers[i];
+        }
+    }
+    map.fitBounds(bounds);
+    var listener = google.maps.event.addListener(map, "bounds_changed", function () {
+        if (map.getZoom() > 16){
+            if (center_point != ""){
+                map.setCenter(center_point);
+            }            
+            map.setZoom(16);
+        } 
+        google.maps.event.removeListener(listener);
+    });
+    
+}
 // Set inividual marker on the map
 function setMarker(map) {
     for (var i =0; i < markers.length; i++){
@@ -448,18 +683,20 @@ function clearMarkers(){
 
 // Function to delete markers from the map
 function deleteMarkers(markers){
-    console.log("Deleting all stops");
+    //console.log("Deleting all stops");
     clearMarkers();
     markers = [];
 }
 
 // });
 function setValueOnForm(address, stopid, flag) {
-    console.log(address);
+    $("#pac-input").val("");
+    current_flag = false;
     if (flag=='source'){
         // If the source button is clicked set the new source value as the concat of the address and the stopid
         var source_new_value = address + ', '+stopid;
         if ($("#source").val()!=""){
+            $("#undo").removeClass("disabled");
             __oldStartStop = $("#source").val();
         }
         if ($("#destination").val() != "") {
@@ -487,6 +724,22 @@ function setValueOnForm(address, stopid, flag) {
         $("#goBackSearch").click();
     }
 }
+
+$(function(){
+    $("#undo").click(function () {
+        if (__oldStartStop == "") {
+            return;
+        } else {
+            var newStop = __oldStartStop;
+            __oldStartStop = $("#source").val();
+            $("#source").val(newStop);
+            var stopId = newStop.split(",");
+            var startStop = stopId[stopId.length - 1];
+            getStops(startStop.trim());
+        }
+    });    
+    
+});
 /* ----------------------------------------------------------------------- */
 /*************************** MANIPULATION OF MARKERS ***********************/
 /* ----------------------------------------------------------------------- */
@@ -499,19 +752,44 @@ function getLines(startStop, endStop){
         source: startStop,
         destination: endStop,
       },
+        error: function (jqXHR, textStatus, errorThrown) {
+            //console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
       contentType: "application/json;charset=utf-8",
       dataType: "json",
       success: function (data) {
           $("#lineholder").show();
-          $("#linecontent").html('');
+          $("#line-pills").html('');
           for (var i = 0; i < data.length; i ++){
-              $('<div class= "col-sm-2 col-xs-2 px-3 btn btn-info" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</div>").appendTo("#linecontent");
+              $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</a></li>").appendTo("#line-pills");
           }
       }
     });
 }
 function getTravelTime(content) {
+    
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
+    var rain = "0.5"
+    var busnumber = content.innerHTML;
+    var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
+    var url3 = '&format=json';
+    var live_db = url1.concat(__startStop, url3);
+    var proxy = 'https://cors-anywhere.herokuapp.com/';
+    var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
+    var weather_url = proxy.concat(darksky);
+        $.getJSON(weather_url, function(weather) {
+            var rain = weather.currently.precipIntensity;
+    });
+    var lin = content.innerHTML;
+    startStopAutocompleteData.sort(function (a, b) {
+        return Number(a.lineid[lin]) - Number(b.lineid[lin]);
+    });
+    getRoute(startStopAutocompleteData, lin);
     $.ajax({
         url: localAddress + "/main/journeytime",
         data: {
@@ -519,21 +797,73 @@ function getTravelTime(content) {
             destination: __endStop,
             lineid: content.innerHTML,
             time: datetime,
+            rain: rain,
         },
         contentType: "application/json;charset=utf-8",
-        dataType: "json",
+        dataType: "json", 
+        error: function (jqXHR, textStatus, errorThrown) {
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
         success: function (data) {
+            getFinalStops()
             $("#journeyholder").show();
             $("#journeycontent").html("");
-            $('<div class= "col-sm-6 text-center">Route: </div><div class= "col-sm-6 text-center"><b>' + content.innerHTML + "</b> </div>").appendTo("#journeycontent");
-            $('<div class= "col-sm-6 text-center">Journey Time: </div><div class= "col-sm-6 text-center"><b>' + data.totaltraveltime + "</b> </div>").appendTo("#journeycontent");
-            $('<div class= "col-sm-6 text-center">Arrival Time: </div><div class= "col-sm-6 text-center"><b>' + data.arrivaltime + "</b> </div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Route: </div><div class= "col-xs-6 px-3"><b>' + content.innerHTML + "</b> </div></div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Journey Time: </div><div class= "col-xs-6 px-3"><b>' + data.totaltraveltime + "</b> </div></div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Arrival Time: </div><div class= "col-xs-6 px-3"><b>' + data.arrivaltime + "</b> </div></div>").appendTo("#journeycontent");
+            $.getJSON(live_db, function(bus) {
+                var nextbuses = [];
+                var nextbus = "";
+                for (var i = 0; i < bus.results.length; i++) {
+                    var iarr = bus.results[i];
+                    if (iarr.route == content.innerHTML) {
+                        nextbuses.push(bus.results[i].duetime);
+                    }
+                }
+                if (nextbuses.length = []) {
+                    var nextbus = "No live bus information available.";
+                }
+                else if (nextbuses[0] == "1") {
+                    var nextbus = nextbuses[0] + " min";
+                }
+                else if (nextbuses[0] == "Due") {
+                    var nextbus = nextbuses[0];
+                }
+                else if (nextbuses[0] != "Due") {
+                    var nextbus = nextbuses[0] + " mins";
+                }
+                // console.log(nextbuses.length);
+                $('<div class="row px-3"><div class= "col-xs-6">Next bus arriving in: </div><div class= "col-xs-6 px-3"><b>' + nextbus + "</b> </div></div>").appendTo("#journeycontent");
+            });
         }
     });
+
 
     
 }
 
+function getRoute(data,line) {
+    var routeData = [];
+    var firstStop = 0;
+    var lastStop;
+    for (var i =0 ; i < data.length; i++){
+        if (data[i].stop_id==__endStop){
+            lastStop = Number(data[i].lineid[line]);
+        }
+    }
+    for (var i=0; i<data.length;i++){
+        if (data[i].lineid[line]>= firstStop && data[i].lineid[line] <= lastStop) {
+            routeData.push(data[i]);
+        }
+    }
+    // //console.log(routeData);
+    addMarkers(routeData,__startStop,__endStop);
+    
+}
 function sendErrorReport(){
     $j("#errorcontent").hide("slide", { direction: "right" }, "fast", function () {
         $j("#errorsent").show("slide", { direction: "right" }, "fast");
@@ -549,60 +879,4 @@ $(function () {
       location.reload();
     });
 })
-// This is the major Display Map function
-// function displayMap(data2, startBusStop){
-//         var coordinates2 = [];
-//         var names = [];
-//         for (var i = 0; i < data2.length; i++) {
-//             var iarr = data2[i];
-//             coordinates2.push({ lat: iarr.coord[1], lng: iarr.coord[0] });
-//             names.push(iarr.stop_name);
-//         }
-        
-//         var stop_icon = {
-//             path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
-//             fillColor: '#e6f2ff',
-//             fillOpacity: 0.8,
-//             scale: 1,
-//             strokeColor: '#99ccff',
-//             strokeWeight: 1
-//         };
-//         var stop_icon_h = {
-//             path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
-//             fillColor: 'yellow',
-//             fillOpacity: 0.8,
-//             scale: 1,
-//             strokeColor: 'blue',
-//             strokeWeight: 1
-//         };
-//         for (var i = 0; i < coordinates2.length; i++) {
-//             var stop = coordinates2[i];
-//             var stop_name = names[i];
-
-//             var bus_stop = new google.maps.Marker({
-//                 position: stop,
-//                 icon: stop_icon,
-//                 map: map
-//             });
-
-//             showHideMarker(map, bus_stop, stop_name);
-//         };
-//         bus_stop.setMap(map);
-//         function showHideMarker(map, bus_stop) {
-//             var infowindow = new google.maps.InfoWindow({
-//                 content: stop_name
-//             });
-
-//             bus_stop.addListener('mouseout', function () {
-//                 bus_stop.setOptions({ icon: stop_icon });
-//                 infowindow.close(bus_stop.get('map'), bus_stop);
-//             });
-
-//             bus_stop.addListener('mouseover', function () {
-//                 bus_stop.setOptions({ icon: stop_icon_h });
-//                 infowindow.open(bus_stop.get('map'), bus_stop);
-//             });
-//         };
-// }
-// Display Map Function ------------------------------
 

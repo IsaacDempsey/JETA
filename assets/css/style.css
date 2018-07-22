@@ -38,13 +38,10 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  min-width: 650px !important;
 }
 
-/* Set relative padding for the input boxes */
-.inputRow{
-  padding: 1rem;
-  float: none;
-}
+
 
 
 
@@ -138,6 +135,15 @@ a.nav-link{
   color: #f44336 !important;
 }
 
+/* Set relative padding for the input boxes */
+.inputRow{
+  padding: 1rem;
+  float: none;
+}
+#toggle-button{
+  display: none;
+}
+
 /* CSS For the form when the device is opened in mobile */
 @media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
   .mobile-form { /* Use this class */
@@ -147,18 +153,92 @@ a.nav-link{
     top: 50% !important;
     /* bottom: 50% !important; */
     /* min-height: 100vh !important; Full device height */
-    max-height: 550px !important;
+    /* max-height: 550px !important; */
     left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
     right: 50% !important;
     transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+    height: auto !important;
+    margin: 10px !important;
+    width: 400px !important;
+  }
+  #home1{
+    width: 400px !important;
   }
   .mobile-col-centered{
     float: none;
     margin: 0 auto;
   }
   .mp-5{
-    padding: 5px 5px 5px 5px !important;
+    padding: 0px 8px 8px 8px !important;
   }
+  .mmt-5{
+    margin-top: 5px;
+  }
+  #brand-img{
+    display: none;
+  }
+  #myTab{
+    display: none;
+  }
+  .tab-pane{
+    padding: 0px !important;
+  }
+  #undo{
+    margin-top: 10px;
+  }
+  #form{
+    width: -webkit-max-content !important;
+    width: -moz-max-content !important;
+    width: max-content !important;
+  }
+  #toggle-button{
+    display: block !important;
+  }
+  .navbar{
+    float: left;
+  }
+  li.nav-item{
+  padding: 0.5px !important;
+  }
+  .pac-card {
+  /* margin: 10px 10px 0 0; */
+  border-radius: 2px 0 0 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+  font-family: Roboto;
+}
+
+#pac-container {
+  padding-bottom: 12px;
+  margin-right: 12px;
+}
+
+.pac-controls {
+  display: inline-block;
+  /* padding: 5px 11px; */
+}
+
+.pac-controls label {
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#pac-input {
+  background-color: #fff;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 280px !important;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;
+}
 }
 
 .errorreport{
@@ -336,4 +416,10 @@ a.nav-link{
 
 .gm-style{
   font-size: 1em !important;
+}
+li.nav-item{
+  padding: 1.5px;
+}
+a#lineid.nav-link.active{
+  background-color: red !important;
 }

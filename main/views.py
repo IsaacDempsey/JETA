@@ -55,9 +55,10 @@ def journeytime(request):
     destination = request.GET.get('destination', '')
     lineid = request.GET.get('lineid')
     start_time = request.GET.get('time')
-    #rain = request.GET.get('rain')
+    rain_str = request.GET.get('rain', '')
 
-    rain = 0.5 # Should come from table or API query
+    # rain = 0.5 # Should come from table or API query
+    rain = float(rain_str)
 
     if not source.isnumeric() or not destination.isnumeric() or not lineid or not start_time:
         response = HttpResponse(json.dumps(
@@ -328,3 +329,12 @@ def stops(request):
     combined_df = combined_df.rename(columns={'stopid': 'stop_id', 'address': 'stop_name'})
 
     return HttpResponse(combined_df.to_json(orient='records'), content_type='application/json')
+
+
+
+def get_route(request):
+    source = request.GET.get("source")
+    destination = request.GET.get("destination")
+
+    route1 = Route_result(source, destination).route_json()
+    return JsonResponse(route1, safe=False)
