@@ -39,15 +39,7 @@ class Route_result():
                 finish = i.index(destination_id)
                 final_list = i[start:finish]
                 break
-        # this list is a list of only unique values from final_list
-        # single_list = []
-        # # single list is all bus stops for map plotting on destionation selection
-        # for i in final_list:
-        #     for j in i:
-        #         if j not in single_list:
-        #             single_list.append(j)
 
-        # Finally, take single_list of relevant stops and create JSON of all the info needed by Javascript on front end
         j = 0
         json_data = defaultdict(list)
         for i in final_list:

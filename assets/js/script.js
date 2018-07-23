@@ -333,9 +333,7 @@ $j(function () {
         }
     });      
 });
-
-
-
+// This function draws final user route of their selected bus journey
 function getFinalStops() {
     $.ajax({
         url: localAddress + "/main/get_route",
@@ -368,9 +366,10 @@ function getFinalStops() {
                 var route = new google.maps.Polyline({
                    path: line,
                    geodesic: true,
-                   strokeColor: 'yellow',
+                   strokeColor: '#000099',
                    strokeOpacity: 1.0,
-                   strokeWeight: 8
+                   strokeWeight: 5,
+                   zIndex: 1
                  });
                  
                  route.setMap(map);
@@ -378,11 +377,6 @@ function getFinalStops() {
         }
     });
 }
-
-
-
-
-
 function getStops(startstop) {
     __startStop = startstop
     $.ajax({
@@ -541,9 +535,30 @@ function addMarkers(data, stopid="None", endstop="None"){
         
         var stop = { lat: data[i].coord[1], lng: data[i].coord[0] };
         var stop_name = data[i].stop_name;
-        var start_icon = "/static/img/markers/StartStop.png";
-        var end_icon = "/static/img/markers/EndStop.png";
-        var stop_icon_h = "/static/img/markers/HoverStop.png";
+        var start_icon = {
+            path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+            fillColor: '#00b33c',
+            fillOpacity: 0.4,
+            scale: 1,
+            strokeColor: '#00b33c',
+            strokeWeight: 2
+          };
+        var end_icon = {
+            path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+            fillColor: '#e62e00',
+            fillOpacity: 0.4,
+            scale: 1,
+            strokeColor: '#e62e00',
+            strokeWeight: 2
+        };
+        var stop_icon_h = {
+            path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+            fillColor: '#ff8533',
+            fillOpacity: 0.4,
+            scale: 1,
+            strokeColor: '#ff8533',
+            strokeWeight: 2
+          };
         var lasthover;
         var flag = false;
         if (data[i].stop_id == stopid) {
@@ -551,7 +566,14 @@ function addMarkers(data, stopid="None", endstop="None"){
             map.setCenter(stop);
             flag = true;
         } else {
-            var stop_icon = "/static/img/markers/InterStop.png";
+            var stop_icon = {
+                path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+                fillColor: '#66a3ff',
+                fillOpacity: 0.4,
+                scale: 1,
+                strokeColor: '#0000b3',
+                strokeWeight: 2
+              };
         }
         if (endstop != "None"){
             __endStop = endstop;
