@@ -382,6 +382,7 @@ $j(function () {
         }
     });      
 });
+<<<<<<< HEAD
 
 
 
@@ -414,6 +415,50 @@ $j(function () {
 
 
 
+// This function draws final user route of their selected bus journey
+// function getFinalStops() {
+//     $.ajax({
+//         url: localAddress + "/main/get_route",
+//         // Set the start text as the label value
+//         data: { 
+//             source: __startStop,
+//             destination: __endStop,
+//             },
+//         contentType: "application/json;charset=utf-8",
+//         dataType: "json",
+//         error: function (jqXHR, textStatus, errorThrown) {
+//             console.log(jqXHR);
+//             $("#form").hide();
+//             $(".overlay").show();
+//             $(".loadingcontent").hide();
+//             $j("#error").show("slide", { direction: "down" }, "fast");
+//             $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+//         },
+//         // On success send this data to the receive data function
+//         success: function (data) {
+//             finalData = data;
+//             var coordinates_arr = [];
+//             var coordinates = [];
+//             for (var i = 0; i < finalData.length; i++) {
+//             var iarr = finalData[i];
+//             coordinates.push({lat: iarr.coord[1], lng: iarr.coord[0]});
+//             }
+//             coordinates_arr.push(coordinates);
+//                 var line = coordinates_arr[0];
+//                 var route = new google.maps.Polyline({
+//                    path: line,
+//                    geodesic: true,
+//                    strokeColor: '#000099',
+//                    strokeOpacity: 1.0,
+//                    strokeWeight: 5,
+//                    zIndex: 1
+//                  });
+                 
+//                  route.setMap(map);
+//                  addMarkers(finalData, __startStop, __endStop);
+//         }
+//     });
+// }
 function getStops(startstop) {
     __startStop = startstop
     $.ajax({
@@ -571,9 +616,30 @@ function addMarkers(data, stopid="None", endstop="None"){
         
         var stop = { lat: data[i].coord[1], lng: data[i].coord[0] };
         var stop_name = data[i].stop_name;
-        var start_icon = "/static/img/markers/StartStop.png";
-        var end_icon = "/static/img/markers/EndStop.png";
-        var stop_icon_h = "/static/img/markers/HoverStop.png";
+        var start_icon = {
+            path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+            fillColor: '#00b33c',
+            fillOpacity: 0.4,
+            scale: 1,
+            strokeColor: '#00b33c',
+            strokeWeight: 2
+          };
+        var end_icon = {
+            path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+            fillColor: '#e62e00',
+            fillOpacity: 0.4,
+            scale: 1,
+            strokeColor: '#e62e00',
+            strokeWeight: 2
+        };
+        var stop_icon_h = {
+            path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+            fillColor: '#ff8533',
+            fillOpacity: 0.4,
+            scale: 1,
+            strokeColor: '#ff8533',
+            strokeWeight: 2
+          };
         var lasthover;
         var flag = false;
         if (data[i].stop_id == stopid) {
@@ -581,7 +647,14 @@ function addMarkers(data, stopid="None", endstop="None"){
             map.setCenter(stop);
             flag = true;
         } else {
-            var stop_icon = "/static/img/markers/InterStop.png";
+            var stop_icon = {
+                path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
+                fillColor: '#66a3ff',
+                fillOpacity: 0.4,
+                scale: 1,
+                strokeColor: '#0000b3',
+                strokeWeight: 2
+              };
         }
         if (endstop != "None"){
             __endStop = endstop;
@@ -619,10 +692,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                     $("#markerwindow-content").html("");
                     content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div></div>';
                     $(content_string).appendTo("#markerwindow-content");
-                    content_string2 = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource" >Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div>';
-                    infowindow.setContent(content_string2);
                     this.setOptions({ icon: stop_icon_h });
-                    infowindow.open(map, this);
                 }); 
             } else {
                 marker.addListener("click", function() {
@@ -632,11 +702,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                     marker_name = marker_name.replace(/(['"])/g, "\\$1");
                     content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div>";
                     $(content_string).appendTo("#markerwindow-content");
-                    content_string2 = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
-
-                    infowindow.setContent(content_string2);
                     this.setOptions({ icon: stop_icon_h });
-                    infowindow.open(map, this);
                 }); 
             }
         } else {
@@ -834,7 +900,21 @@ function getTravelTime(content) {
     var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
     var weather_url = proxy.concat(darksky);
         $.getJSON(weather_url, function(weather) {
-            var rain = weather.currently.precipIntensity;
+            var current_time = Math.round((new Date()).getTime() / 1000);
+            // if time with hour of current time, use current rainfall
+            if (datetime <= current_time + 3600 && datetime >= current_time - 3600) {
+                var rain = weather.currently.precipIntensity;
+            }
+            else {
+                for (var i = 0; i < weather.hourly.data.length; i++) {
+                    var iarr = weather.hourly.data[i];
+                    console.log(iarr.precipIntensity);
+                    if (datetime <= iarr.time + 3600 && datetime >= iarr.time - 3600) {
+                    var rain = iarr.precipIntensity;
+                }
+            }
+        }
+            console.log(rain);
     });
     var lin = content.innerHTML;
     startStopAutocompleteData.sort(function (a, b) {
