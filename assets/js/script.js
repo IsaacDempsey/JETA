@@ -382,7 +382,6 @@ $j(function () {
         }
     });      
 });
-<<<<<<< HEAD
 
 
 
@@ -1023,6 +1022,9 @@ function getRoute(data,line) {
             routeData.push(data[i]);
         }
     }
+    routeData.sort(function(a, b) {
+      return Number(a.lineid[line]) - Number(b.lineid[line]);
+    });
     // finalData = data;
     var coordinates = [];
     for (var i = 0; i < routeData.length; i++) {
