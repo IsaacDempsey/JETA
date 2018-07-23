@@ -1055,7 +1055,7 @@ function getRoute(data,line) {
         strokeOpacity: 1.0,
         strokeWeight: 8
     });
-
+    deleteRoute();
     route.setMap(map);
     addMarkers(routeData,__startStop,__endStop);
     
