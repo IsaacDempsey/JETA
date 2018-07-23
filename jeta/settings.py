@@ -83,8 +83,8 @@ DATABASES = {
         'NAME': 'jetaDb',
         'USER': 'postgres',
         'PASSWORD': '00001234',
-        'HOST': 'csi420-02-vm6.ucd.ie',
-        'PORT': '5432',
+        'HOST': 'localhost',
+        'PORT': '5433',
     }
 }
 
