@@ -344,5 +344,5 @@ def get_route(request):
     source = request.GET.get("source")
     destination = request.GET.get("destination")
 
-    route1 = Route_result(source, destination).route_json()
-    return JsonResponse(route1, safe=False)
+    final_route = Route_result(source, destination).route_json()
+    return JsonResponse(final_route, safe=False)
