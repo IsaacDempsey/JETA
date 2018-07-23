@@ -2,6 +2,11 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.test import SimpleTestCase
 from django.urls import reverse
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+
 import unittest
 
 from .models import *
@@ -313,3 +318,59 @@ class TestStops(TestCase):
 # class TestStops(TestCase):
 
 # class TestWeather(TestCase):
+
+
+# Test Front End
+
+
+# Code reference: https://docs.djangoproject.com/en/2.0/topics/testing/tools/
+class SeleniumTests(StaticLiveServerTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.url = "http://localhost:8000"
+        # cls.url = "http://csi420-02-vm6.ucd.ie:8000"
+
+        # Profile setup code:
+        # https://stackoverflow.com/questions/16292634/always-allow-geolocation-in-firefox-using-selenium/32719667
+        cls.profile = FirefoxProfile()
+        cls.profile.set_preference("geo.prompt.testing", True)
+        cls.profile.set_preference("geo.prompt.testing.allow", True)
+
+        cls.browser = WebDriver(firefox_profile=cls.profile)
+        cls.browser.implicitly_wait(10)
+
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.quit()
+        super().tearDownClass()
+
+
+    def test_enter_stopid_in_source_box(self):
+        self.browser.get(self.url + "/main/")
+
+        source_box = self.browser.find_element_by_id("source")
+        source_box.send_keys("768")
+
+        drop_down = self.browser.find_element_by_xpath("//ul[@id='ui-id-1']/li[1]/div")
+
+        self.assertEqual(drop_down.text, "Dublin (UCD Stillorgan Rd Flyover), 768")
+
+
+    def test_enter_address_in_source_box(self):
+        self.browser.get(self.url + "/main/")
+
+        source_box = self.browser.find_element_by_id("source")
+        source_box.send_keys("ucd")
+
+        drop_down = self.browser.find_element_by_xpath("//ul[@id='ui-id-1']/li[1]/div")
+
+        self.assertEqual(drop_down.text, "Dublin (UCD Stillorgan Rd Flyover), 768")
+
+
+
+
+

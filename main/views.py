@@ -340,9 +340,9 @@ def stops(request):
 
 
 
-def get_route(request):
-    source = request.GET.get("source")
-    destination = request.GET.get("destination")
-
-    final_route = Route_result(source, destination).route_json()
-    return JsonResponse(final_route, safe=False)
+# def get_route(request):
+#     source = request.GET.get("source")
+#     destination = request.GET.get("destination")
+# 
+#     final_route = Route_result(source, destination).route_json()
+#     return JsonResponse(final_route, safe=False)
