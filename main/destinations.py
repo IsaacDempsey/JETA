@@ -1,5 +1,4 @@
 import json
-import numpy as np
 from collections import defaultdict
 import pandas as pd
 from .models import Routes, Linked, Stops
@@ -28,6 +27,7 @@ class Destinations():
         for key, value in linked_dict.items():
             if self.start_id in value['linked']:
                 linked.append(value['linked'])
+
         route_stops = []
         for key, value in routes_dict.items():
             for key in value:
@@ -41,9 +41,8 @@ class Destinations():
                     start = i.index(self.start_id)
                     temp_list = i[start:]
                     final_list.append(temp_list)
-
-        # this list will be all the related bus stops to the start bus stop
         else:
+            # this list will be all the bus stops related to the start bus stop
             final_list = []
             for j in linked:
                 for i in route_stops:

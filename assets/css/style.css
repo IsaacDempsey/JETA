@@ -1,8 +1,6 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat|Raleway');
 
-
-#wrapper {
-    position: relative;
-}
+/* The css for the autocomplete selection box that appears for source and destination */
 .ui-autocomplete{
     max-height: 200px !important;
     max-width: 300px;
@@ -10,55 +8,435 @@
     /* prevent horizontal scrollbar */
     overflow-x: hidden;
     /* add padding to account for vertical scrollbar */
-    padding-right: 80px;
+}
+
+.ui-autocomplete li {
+  border-top: 1px #ccc solid!important;
+}
+
+.ui-autocomplete li:first-child { border-top: none !important; padding-top: 0 !important; }
+
+.stopids{
+  background-color: blue;
+  color: white;
 }
  	/* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 
+/* Map division */
 #map {
-  height: 100%;
+  height: 100vh;
 }
 
 /* Optional: Makes the sample page fill the window. */
 
+/* Since we need all the parent of the map to have 100% height. Hence this */
 html,
 body {
-  height: 100%;
+  font-family: 'Raleway', sans-serif !important;
+  height: 100vh;
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  min-width: 650px !important;
 }
 
+
+
+
+
+/* The parent wrapper for both the map and the form */
 .wrapper {
   position: relative;
-  height:88vh;
+  height:100vh;
   margin: 0;
   padding: 0;
+  width: 100vw;
   }
 
-#form {
+.overlay {
+  background-color: rgba(33,37,41,0.9) !important;
+  display: none;
   position: absolute;
+  height:100vh;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  padding: 0;
+  z-index: 98;
+  }
+
+
+/* Positioning the form over the map and on the right of the screen. Parameters are pretty self explanatory */
+#form {
+  display: none;
+  position: absolute;
+  background-color: rgba(33,37,41,0.9) !important;
   margin-top: 0px;
   top: 0px;
   right: 0px;
   z-index: 99;
-  height: 100%;
+  height: 100vh;
   width: 400px;
   z-index: 99;
   border-radius: 5px;
-  background-color: #DFDFDF;
+  background-color: #FFF;
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
   align-content: center;
   justify-content: center;
 }
 
-.inputRow{
-  padding: 1rem;
-}
 
+/* The class which is defined for displaying lines. Only display by jquery */
 #lineholder{
   display: None;
 }
+
+/* The class which is defined for travel time display on the form. Only display by jquery */
 #journeyholder{
   display: None;
 }
 
+/* Home 1 displays the routes after the user clicks get my travel time on the home tab */
+#home1{
+  color: white;
+  display: none;
+}
+
+.col-centered{
+  float: none;
+  margin: 0 auto;
+}
+
+/* Customizing the navigation link */
+a.nav-link.active{
+  background-color: #DFDFDF !important;
+}
+
+a.nav-link{
+  color: white;
+}
+
+#noSource{
+  display: none;
+}
+
+#noDestination{
+  display: none;
+}
+
+#sourceFirst{
+  display: none;
+}
+
+/* Modifying tex-danger class */
+.text-danger{
+  color: #f44336 !important;
+}
+
+/* Set relative padding for the input boxes */
+.inputRow{
+  padding: 1rem;
+  float: none;
+}
+#toggle-button{
+  display: none;
+}
+
+/* CSS For the form when the device is opened in mobile */
+@media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
+    .mobile-form { /* Use this class */
+      background-color: rgba(33,37,41,0.8) !important;
+      border-radius: 10px !important;
+      position: absolute !important; /* Make the position of the form fixed */
+      top: 50% !important;
+      /* bottom: 50% !important; */
+      /* min-height: 100vh !important; Full device height */
+      /* max-height: 550px !important; */
+      left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+      right: 50% !important;
+      transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+      height: auto !important;
+      margin: 10px !important;
+      width: 400px !important;
+    }
+    #home1{
+      width: 400px !important;
+    }
+    .mobile-col-centered{
+      float: none;
+      margin: 0 auto;
+    }
+    .mp-5{
+      padding: 0px 8px 8px 8px !important;
+    }
+    .mmt-5{
+      margin-top: 5px;
+    }
+    #brand-img{
+      display: none;
+    }
+    #myTab{
+      display: none;
+    }
+    .tab-pane{
+      padding: 0px !important;
+    }
+    #undo{
+      margin-top: 10px;
+    }
+    #form{
+      width: -webkit-max-content !important;
+      width: -moz-max-content !important;
+      width: max-content !important;
+    }
+    #toggle-button{
+      display: block !important;
+    }
+    .navbar{
+      float: left;
+    }
+    li.nav-item{
+    padding: 0.5px !important;
+    }
+    .pac-card {
+    /* margin: 10px 10px 0 0; */
+    border-radius: 2px 0 0 2px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    background-color: #fff;
+    font-family: Roboto;
+  }
+
+  #pac-container {
+    padding-bottom: 12px;
+    margin-right: 12px;
+  }
+
+  .pac-controls {
+    display: inline-block;
+    /* padding: 5px 11px; */
+  }
+
+  .pac-controls label {
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  #pac-input {
+    background-color: #fff;
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 12px;
+    padding: 0 11px 0 13px;
+    text-overflow: ellipsis;
+    width: 280px !important;
+  }
+
+  #pac-input:focus {
+    border-color: #4d90fe;
+  }
+  .mobile-markerwindow{
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 200px;
+    z-index: 50;
+    background-color: rgba(33,37,41,0.9) !important;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  }
+  .close{
+    color: white;
+    font-size: 1.6em;
+  }
+}
+
+.errorreport{
+  color: white;
+  position: fixed !important; /* Make the position of the form fixed */
+  top: 50% !important;
+  left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+  right: 50% !important;
+  height: auto;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+  z-index:99;
+}
+
+.loadingcontent{
+  color: white;
+  position: fixed !important; /* Make the position of the form fixed */
+  top: 50% !important;
+  left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+  right: 50% !important;
+  transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+  z-index:99;
+  height: auto;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+}
+
+#loading {  
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.iWindow{
+  overflow: hidden;
+  height: auto;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+}
+.gm-style-iw{
+  text-align: center !important;
+}
+#stopName{
+  font-size: 1.2em;
+}
+
+.pac-card {
+  /* margin: 10px 10px 0 0; */
+  border-radius: 2px 0 0 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+  font-family: Roboto;
+}
+
+#pac-container {
+  padding-bottom: 12px;
+  margin-right: 12px;
+}
+
+.pac-controls {
+  display: inline-block;
+  padding: 5px 11px;
+}
+
+.pac-controls label {
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#pac-input {
+  background-color: #fff;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 400px;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;
+}
+
+#title {
+  color: #fff;
+  background-color: #4d90fe;
+  font-size: 25px;
+  font-weight: 500;
+  padding: 6px 12px;
+}
+#target {
+  width: 345px;
+}
+
+.switch-field {
+  overflow: hidden;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+}
+
+
+
+.switch-field input {
+    position: absolute !important;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    width: 1px;
+    border: 0;
+    overflow: hidden;
+}
+
+.switch-field label {
+  float: left;
+}
+
+.switch-field label {
+  display: inline-block;
+  width: 60px;
+  background-color: #e4e4e4;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+  font-weight: normal;
+  text-align: center;
+  text-shadow: none;
+  padding: 6px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition:    all 0.3s ease-in-out;
+  -ms-transition:     all 0.3s ease-in-out;
+  -o-transition:      all 0.3s ease-in-out;
+  transition:         all 0.3s ease-in-out;
+}
+
+.switch-field label:hover {
+	cursor: pointer;
+}
+
+.switch-field input:checked + label {
+  background-color: #007bff;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.switch-field label:first-of-type {
+  border-radius: 4px 0 0 4px;
+}
+
+.switch-field label:last-of-type {
+  border-radius: 0 4px 4px 0;
+}
+
+.gm-style{
+  font-size: 1em !important;
+}
+li.nav-item{
+  padding: 1.5px;
+}
+a#lineid.nav-link.active{
+  background-color: red !important;
+}

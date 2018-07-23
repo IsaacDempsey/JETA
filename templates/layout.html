@@ -6,11 +6,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <!-- Map API LINKS -->
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_5XUkLLoj_Xe6gyIreayAcrlP21_Nh88" async
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_5XUkLLoj_Xe6gyIreayAcrlP21_Nh88&libraries=places" async
             defer></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"> </script>
         <!-- MAP Clusterer -->
         <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+         
         <!-- Jquery -->
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         
@@ -32,53 +33,6 @@
     </head>
     
     <!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
-    <header>
-        <!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
-        <nav class="navbar navbar-expand-lg navbar-toggleable-md navbar-dark bg-dark">
-            <div class="collapse navbar-collapse" id="nav-left">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Home
-                            <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Latest News</a>
-                    </li>
-                </ul>
-            </div>
-            <a class="navbar-brand mx-auto" href="#">
-                <img src='{% static "img/Logo11.png" %}' alt="My Jeta Logo" />
-            </a>
-            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarMobile" aria-controls="navbarMobile"
-                aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" >
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About Us</a>
-                    </li>
-                </ul>
-            </div>
-            <!-- Mobile -->
-            <div class="collapse" id="navbarMobile">
-                <ul class="nav navbar-nav p-3">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Home
-                            <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About Us</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Latest News</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
     <body>
          {% block content %}
          {% endblock %}
