@@ -187,11 +187,11 @@ def get_address(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-def routes(request):
-    routes = Routes.objects.all().values()
-    routesJson = [dict(i) for i in routes]
-
-    return JsonResponse(routesJson, safe=False)
+# def routes(request):
+#     routes = Routes.objects.all().values()
+#     routesJson = [dict(i) for i in routes]
+# 
+#     return JsonResponse(routesJson, safe=False)
 
 
 def locations(request):
@@ -340,9 +340,9 @@ def stops(request):
 
 
 
-def get_route(request):
-    source = request.GET.get("source")
-    destination = request.GET.get("destination")
-
-    final_route = Route_result(source, destination).route_json()
-    return JsonResponse(final_route, safe=False)
+# def get_route(request):
+#     source = request.GET.get("source")
+#     destination = request.GET.get("destination")
+# 
+#     final_route = Route_result(source, destination).route_json()
+#     return JsonResponse(final_route, safe=False)
