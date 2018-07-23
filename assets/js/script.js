@@ -864,7 +864,6 @@ function getTravelTime(content) {
     
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
     var rain = "0.5"
-    var busnumber = content.innerHTML;
     var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
     var url3 = '&format=json';
     var live_db = url1.concat(__startStop, url3);
@@ -913,7 +912,7 @@ function getTravelTime(content) {
                         nextbuses.push(bus.results[i].duetime);
                     }
                 }
-                if (nextbuses.length = []) {
+                if (nextbuses.length == 0) {
                     var nextbus = "No live bus information available.";
                 }
                 else if (nextbuses[0] == "1") {
@@ -925,6 +924,7 @@ function getTravelTime(content) {
                 else if (nextbuses[0] != "Due") {
                     var nextbus = nextbuses[0] + " mins";
                 }
+                console.log(live_db);
                 // console.log(nextbuses.length);
                 $('<div class="row px-3"><div class= "col-xs-6">Next bus arriving in: </div><div class= "col-xs-6 px-3"><b>' + nextbus + "</b> </div></div>").appendTo("#journeycontent");
             });
