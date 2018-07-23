@@ -920,13 +920,13 @@ function getTravelTime(content) {
             else {
                 for (var i = 0; i < weather.hourly.data.length; i++) {
                     var iarr = weather.hourly.data[i];
-                    console.log(iarr.precipIntensity);
+                    //console.log(iarr.precipIntensity);
                     if (datetime <= iarr.time + 3600 && datetime >= iarr.time - 3600) {
                     var rain = iarr.precipIntensity;
                 }
             }
         }
-            console.log(rain);
+           // console.log(rain);
     });
     var lin = content.innerHTML;
     startStopAutocompleteData.sort(function (a, b) {
@@ -965,7 +965,7 @@ function getTravelTime(content) {
 
                 return D(mins % (24 * 60) / 60 | 0) + ':' + D(mins % 60);
             }
-            console.log(nextbus);
+            //console.log(nextbus);
             
             $('<div class="row px-3"><div class= "col-xs-6">Route: </div><div class= "col-xs-6 px-3"><b>' + lin + "</b> </div></div>").appendTo("#journeycontent");
             $('<div class="row px-3"><div class= "col-xs-6">Journey Time: </div><div class= "col-xs-6 px-3"><b>' + totaltraveltime + "</b> </div></div>").appendTo("#journeycontent");
@@ -1019,7 +1019,7 @@ function getRTPIArrivalTIme(lineid){
             return D(mins % (24 * 60) / 60 | 0) + ':' + D(mins % 60);
         }
     });
-    console.log("Next Bus: ",nextBus);
+    // console.log("Next Bus: ",nextBus);
 }
 var route = "";
 function getRoute(data,line) {
