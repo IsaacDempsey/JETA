@@ -24,6 +24,6 @@ urlpatterns = [
     path('main/', include('main.urls')),
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/main/', permanent=True)),
-] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
+] 
 
-# urlpatterns += staticfiles_urlpatterns()
+urlpatterns += staticfiles_urlpatterns()
