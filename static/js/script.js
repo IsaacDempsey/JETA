@@ -80,9 +80,9 @@ $(document).ready(function () {
         
         
     });
-    // Autoload the date and time for the user with the current time
-    let today = moment().format("YYYY-MM-DDTHH:mm");
-    document.querySelector("#datetime").value = today;
+    // Autoload the date for the user with the current date
+    let today = moment().format("YYYY-MM-DD");
+    document.querySelector("#date").value = today;
     // deactivate the destination field which will only be activated when the user enters a source
     deactivateDestination(autocomplete_data); 
     // Hide the various elements which will only be visible as and when required
@@ -904,10 +904,39 @@ function getLines(startStop, endStop){
       }
     });
 }
+
+function leaveNow() {
+    var today = moment().format("YYYY-MM-DDTHH:mm");
+    var hour_slice = today.slice(11, 13);
+    var mins_slice = today.slice(14, 16);
+
+    var new_hour = document.getElementById("hour");
+    var new_option1 = document.createElement("option");
+    new_option1.value = hour_slice;
+    new_hour.add(new_option1);
+    var new_mins = document.getElementById("mins");
+    var new_option2 = document.createElement("option");
+    new_option2.text = mins_slice;
+    new_option2.value = mins_slice;
+    new_mins.add(new_option2);
+
+    document.getElementById('hour').value = hour_slice;
+    document.getElementById('mins').value = mins_slice;
+}
+
+
 function getTravelTime(content) {
     deleteRoute();
     $("#journeyholder").show();
-    var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
+
+    var hour1 = document.getElementById("hour");
+    var hour = hour1[hour1.selectedIndex].value
+    var mins1 = document.getElementById("mins");
+    var mins = mins1[mins1.selectedIndex].value
+    var datetime_future_str = $("#date").val().concat("T", hour, mins);
+    var datetime = (moment(datetime_future_str, "YYYY-MM-DDTHH:mm").valueOf())/1000;
+
+    // var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
     var rain = "0.5";
     var proxy = 'https://cors-anywhere.herokuapp.com/';
     var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
