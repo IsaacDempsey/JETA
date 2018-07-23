@@ -363,6 +363,7 @@ $j(function () {
         dataType: "json",
         // When the user selects the required input ...-->
         select: function (e, ui) {
+            deleteRoute();
             current_flag = false;
             if (__oldStartStop != "") {
                 $("#undo").removeClass("disabled");
@@ -502,6 +503,7 @@ function getStops(startstop) {
                 source: autocomplete_data,
                 minLength: 1,
                 select: function (e, ui) {
+                    deleteRoute();
                     // alert("Selecting Destination");
                     $("#noDestination").hide();
                     var end = ui.item.label;
@@ -558,6 +560,7 @@ $(function () {
 $(function onGetTravelTime() {
     
     $("#getTime").click(function () {
+        
         if (__startStop == "" && __endStop == ""){
             $("#noSource").show();
             $("#sourceDiv").addClass("has-error has-feedback");
@@ -584,6 +587,7 @@ $(function onGetTravelTime() {
 $(function onSearchAgain(){
     // If go back to search button is clicked
     $("#goBackSearch").click(function () {
+        $("#journeyholder").hide();
         $j("#home1").hide("slide", { direction: "left" }, "fast", function () {
             $j("#home").show("slide", { direction: "right" }, "fast");
         });
@@ -800,9 +804,18 @@ function deleteMarkers(markers){
     markers = [];
 }
 
+function deleteRoute(){
+    if (route!=""){
+        //Delete the routes
+        route.setMap(null);
+        return;
+    } else {
+        return;
+    }
+}
 // });
 function setValueOnForm(address, stopid, flag) {
-    
+    deleteRoute();
     $("#pac-input").val("");
     current_flag = false;
     if (flag=='source'){
@@ -892,7 +905,7 @@ function getLines(startStop, endStop){
     });
 }
 function getTravelTime(content) {
-    
+    $("#journeyholder").show();
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
     var rain = "0.5";
     var proxy = 'https://cors-anywhere.herokuapp.com/';
@@ -1008,10 +1021,12 @@ function getRTPIArrivalTIme(lineid){
     });
     console.log("Next Bus: ",nextBus);
 }
+var route = "";
 function getRoute(data,line) {
     var routeData = [];
     var firstStop = 0;
     var lastStop;
+    
     for (var i =0 ; i < data.length; i++){
         if (data[i].stop_id==__endStop){
             lastStop = Number(data[i].lineid[line]);
@@ -1033,7 +1048,7 @@ function getRoute(data,line) {
           lng: routeData[i].coord[0]
         });
     }
-    var route = new google.maps.Polyline({
+    route = new google.maps.Polyline({
         path: coordinates,
         geodesic: true,
         strokeColor: 'yellow',
