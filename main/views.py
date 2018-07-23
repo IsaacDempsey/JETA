@@ -15,6 +15,13 @@ import pandas as pd
 from pytz import timezone
 import time
 
+def isfloat(x):
+    try:
+        float(x)
+        return True
+    except:
+        return False
+
 def index(request):
     return render(request, 'index.html')
 
@@ -53,12 +60,20 @@ def journeytime(request):
 
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
-    lineid = request.GET.get('lineid', '')
+    lineid = request.GET.get('lineid')
     start_time = request.GET.get('time', '')
-    rain_str = request.GET.get('rain', '')
+    rain = request.GET.get('rain')
 
-    # rain = 0.5 # Should come from table or API query
-    rain = float(rain_str)
+    if isfloat(rain): 
+        rain = float(rain)
+    else:
+        rain = 0.0
+        
+    if not source.isnumeric() or not destination.isnumeric() or not lineid or not start_time.isnumeric():
+        response = HttpResponse(json.dumps(
+            {"error": "Missing query term/query term invalid."}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     # Get Irish timezone (utc + daylight saving time (DST))
     irish_time = timezone('Europe/Dublin')
@@ -83,6 +98,12 @@ def journeytime(request):
     # Get stop lists associated with query lineid, start stop and end stop
     routes = Routes.objects.filter(lineid=lineid, stopids__contains=[source, destination]).values()
     routes = pd.DataFrame.from_records(routes)
+
+    if routes.empty:
+        response = HttpResponse(json.dumps(
+            {"error": "Cannot find data which fits these terms."}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     if routes.shape[0] > 1:
         print("Error: multiple possible routes.")
@@ -185,13 +206,6 @@ def locations(request):
     lng = request.GET.get('lng', '')
     radius = request.GET.get('radius', '')
 
-    def isfloat(x):
-        try:
-            float(x)
-            return True
-        except:
-            return False
-
     if isfloat(radius):
         r = float(radius)
     else:
@@ -238,12 +252,18 @@ def stops(request):
         - stop_id
         - stop_name = address of stop
         - lineid = dictionary or form {lineid: order of stop on route}. E.g. {"46A":14,"46E":13,"7B":13}
-        - coord = list of coordinations [lat, lng].
+        - coord = list of coordinations [lng, lat].
     """
 
-    source = request.GET.get("source")
-    destination = request.GET.get("destination")
-    lineid = request.GET.get("lineid")
+    source = request.GET.get('source')
+    destination = request.GET.get('destination')
+    lineid = request.GET.get('lineid')
+
+    if (source and not source.isnumeric()) or (destination and not destination.isnumeric()):
+        response = HttpResponse(json.dumps(
+            {"error": "Source/Destination query terms not numeric."}), content_type='application/json')
+        response.status_code = 400
+        return response
 
     routes_qs = Routes.objects.all()
         

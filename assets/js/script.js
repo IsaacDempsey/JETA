@@ -28,9 +28,17 @@ var current_flag = false; // This flag is set when the user allows to use the cu
 
 // Window resize add and remove classes and show hide toggle buttons
 function resizeWindow() {
+    // $j(".mobile-form").css('width', $(window).width());
     if ($(window).width() <= 650) {
+        // //console.log("Width: ",($(window).width()-25));
+        // $("#pac-input").css('width',$(window).width());
         $("#toggle-button").show();
         $("#navbarToggleExternalContent").addClass("collapse");
+        $j("#form").position({
+                my: "right center",
+                at: "right",
+                of: ".wrapper"
+            });
         
     } else {
         $("#toggle-button").hide();
@@ -50,8 +58,8 @@ $(document).ready(function () {
     $("#toggle-button").click(function () {
         var measure = ($(window).width() - $j("#form").position().left);
         
-        if (measure>100){
-            console.log(measure);
+        if (measure>150){
+            //console.log(measure);
             $("#form").css("paddingRight", "0px");
             // $j("#form").position({
             //     my: "center",
@@ -103,6 +111,10 @@ $(document).ready(function () {
     
     // After the map is loaded plot all the stops
     // loadAllStops();
+    //close marker window on phone
+    $('.close').click(function () {
+        $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
+    });
 });
 
 // Separate Function to render the map
@@ -129,7 +141,7 @@ function loadMap() {
                 position: google.maps.ControlPosition.LEFT_CENTER
             },
             scaleControl: true,
-            streetViewControl: true,
+            streetViewControl: false,
             streetViewControlOptions: {
                 position: google.maps.ControlPosition.LEFT_TOP
             },
@@ -169,11 +181,22 @@ function loadMap() {
 
         // Auto complete of generic search to plot bus stops near a paricular location
         // Create the search box and link it to the UI element.
+        var infowindow = new google.maps.InfoWindow();
         var input = document.getElementById('pac-input');
         var searchform = document.getElementById('search-form');
         var searchBox = new google.maps.places.SearchBox(input);
+        var marker = "";
+        if ($(window).width() <= 650) {
+            map.controls[google.maps.ControlPosition.LEFT_TOP].push(searchform);
+        }
+        $(window).resize(function () {
+            if ($(window).width() <= 650) {
+                map.controls[google.maps.ControlPosition.LEFT_TOP].push(searchform);
+            }
+        });
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchform);
+        
 
         // Bias the SearchBox results towards current map's viewport.
         map.addListener('bounds_changed', function () {
@@ -200,12 +223,26 @@ function loadMap() {
             if (places.length == 0) {
                 is_places_entered = false;
             } else {
+                console.log(places);
                 is_places_entered = true;
                 lat = places[0].geometry.location.lat();
                 lng = places[0].geometry.location.lng();
+                var myLatLng = { lat: places[0].geometry.location.lat(), lng: places[0].geometry.location.lng() };
+                if(marker != ""){
+                    if (map
+                        .getBounds()
+                        .contains(marker.getPosition())){
+                            marker.setMap(null);
+                        }
+                }
                 
-                // console.log(places[0].geometry.location.lat());
-                // console.log(places[0].geometry.location.lng());
+                marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map: map
+                });
+                map.setCenter(marker);
+                // //console.log(places[0].geometry.location.lat());
+                // //console.log(places[0].geometry.location.lng());
                 runGenericStopLoader(lat,lng,radius);
             }
 
@@ -214,6 +251,19 @@ function loadMap() {
             current_flag = true;
             lat = position.coords.latitude;
             lng = position.coords.longitude;
+            var myLatLng = { lat: position.coords.latitude, lng: position.coords.longitude };
+            if (marker != "") {
+                if (map
+                    .getBounds()
+                    .contains(marker.getPosition())) {
+                    marker.setMap(null);
+                }
+            }
+
+            marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map
+            });
             if (radius == "500m") {
               radius = 0.005;
             } else if (radius == "1km") {
@@ -259,7 +309,7 @@ function loadGenericStops(latitude, longitude,rad){
       contentType: "application/json;charset=utf-8",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR);
+        //console.log(jqXHR);
         $("#form").hide();
         $(".overlay").show();
         $(".loadingcontent").hide();
@@ -272,7 +322,7 @@ function loadGenericStops(latitude, longitude,rad){
     });
 }
 function loadAllStops(){
-    console.log("Loading all Stops");
+    //console.log("Loading all Stops");
     $(".overlay").show();
     $("#loading").show();
     $j("#loadingtext").show("slide", { direction: "right" }, "fast");
@@ -386,7 +436,7 @@ function getStops(startstop) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
+            //console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -516,6 +566,7 @@ $(function onSearchAgain(){
 var markers = [];
 var content_string;
 function addMarkers(data, stopid="None", endstop="None"){
+    //console.log(data);
     deleteMarkers(markers);
     markers=[];
     var infowindow = new google.maps.InfoWindow();
@@ -604,40 +655,61 @@ function addMarkers(data, stopid="None", endstop="None"){
             }
             
         });
-        
-        
-        if (flag){
-            marker.addListener('mouseover', function () {
-                lasthover = this.getIcon();
-                // alert("Hover Out");
-                content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div>';
-                infowindow.setContent(content_string);
-                this.setOptions({ icon: stop_icon_h });
-                infowindow.open(map, this);
-                hover_status = true;
-            }); 
-            marker.addListener("click", function() {
-              infowindow.open(map, this);
-              hover_status = false;
-            }); 
+        if ($(window).width() < 650) {
+            if(flag){
+                marker.addListener("click", function () {
+                    $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
+                    $("#markerwindow-content").html("");
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div></div>';
+                    $(content_string).appendTo("#markerwindow-content");
+                }); 
+            } else {
+                marker.addListener("click", function() {
+                    $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
+                    $("#markerwindow-content").html("");
+                    var marker_name = this.get("name");
+                    marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div>";
+                    $(content_string).appendTo("#markerwindow-content");
+                }); 
+            }
         } else {
-            marker.addListener('mouseover', function () {
-                lasthover = this.getIcon();
-                // alert("Hover Out");
-                var marker_name = this.get("name");
-                marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
-                
-                infowindow.setContent(content_string);
-                this.setOptions({ icon: stop_icon_h });
-                infowindow.open(map, this);
-                hover_status = true;
-            });
-            marker.addListener("click", function () {
-                infowindow.open(map, this);
-                hover_status = false;
-            }); 
+            if (flag) {
+                marker.addListener('mouseover', function () {
+                    lasthover = this.getIcon();
+                    // alert("Hover Out");
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource" >Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div>';
+                    infowindow.setContent(content_string);
+                    this.setOptions({ icon: stop_icon_h });
+                    infowindow.open(map, this);
+                    hover_status = true;
+                });
+                marker.addListener("click", function () {
+                    infowindow.open(map, this);
+                    hover_status = false;
+                });
+            } else {
+                marker.addListener('mouseover', function () {
+                    lasthover = this.getIcon();
+                    // alert("Hover Out");
+                    var marker_name = this.get("name");
+                    marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
+
+                    infowindow.setContent(content_string);
+                    this.setOptions({ icon: stop_icon_h });
+                    infowindow.open(map, this);
+                    hover_status = true;
+                });
+                marker.addListener("click", function () {
+                    infowindow.open(map, this);
+                    hover_status = false;
+                });
+            }
         }
+        
+        
+        
         
 
         markers.push(marker);    
@@ -657,17 +729,23 @@ function addMarkers(data, stopid="None", endstop="None"){
 
 function setMapBounds() {
     var bounds = new google.maps.LatLngBounds();
+    var center_point="";
     for (var i = 0; i < markers.length; i++) {
         bounds.extend(markers[i].getPosition());
         var icon = markers[i].getIcon();
-        console.log(icon);
+        //console.log(icon);
         if (icon =="/static/img/markers/StartStop.png"){
-            map.setCenter(markers[i]);
+            center_point = markers[i];
         }
     }
     map.fitBounds(bounds);
     var listener = google.maps.event.addListener(map, "bounds_changed", function () {
-        if (map.getZoom() > 16) map.setZoom(16);
+        if (map.getZoom() > 16){
+            if (center_point != ""){
+                map.setCenter(center_point);
+            }            
+            map.setZoom(16);
+        } 
         google.maps.event.removeListener(listener);
     });
     
@@ -686,16 +764,20 @@ function clearMarkers(){
 
 // Function to delete markers from the map
 function deleteMarkers(markers){
-    console.log("Deleting all stops");
+    //console.log("Deleting all stops");
     clearMarkers();
     markers = [];
 }
 
 // });
 function setValueOnForm(address, stopid, flag) {
+    
     $("#pac-input").val("");
     current_flag = false;
     if (flag=='source'){
+        if ($(window).width() < 650) {
+            $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
+        }
         // If the source button is clicked set the new source value as the concat of the address and the stopid
         var source_new_value = address + ', '+stopid;
         if ($("#source").val()!=""){
@@ -711,6 +793,10 @@ function setValueOnForm(address, stopid, flag) {
         __endStop == "";
         getStops(stopid); // Get the data and the markers now with this stop as the source
     } else {
+        if ($(window).width() < 650) {
+            $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
+            $("#toggle-button").click();
+        }
         var destination_new_value = address + ', ' + stopid;
         if ($("#source").val() != "") {
             __oldStartStop = $("#source").val();
@@ -756,7 +842,7 @@ function getLines(startStop, endStop){
         destination: endStop,
       },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
+            //console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -767,14 +853,15 @@ function getLines(startStop, endStop){
       dataType: "json",
       success: function (data) {
           $("#lineholder").show();
-          $("#linecontent").html('');
+          $("#line-pills").html('');
           for (var i = 0; i < data.length; i ++){
-              $('<div class= "col-sm-2 col-xs-2 px-3 btn btn-info" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</div>").appendTo("#linecontent");
+              $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</a></li>").appendTo("#line-pills");
           }
       }
     });
 }
 function getTravelTime(content) {
+    
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
     var rain = "0.5"
     var busnumber = content.innerHTML;
@@ -787,6 +874,11 @@ function getTravelTime(content) {
         $.getJSON(weather_url, function(weather) {
             var rain = weather.currently.precipIntensity;
     });
+    var lin = content.innerHTML;
+    startStopAutocompleteData.sort(function (a, b) {
+        return Number(a.lineid[lin]) - Number(b.lineid[lin]);
+    });
+    getRoute(startStopAutocompleteData, lin);
     $.ajax({
         url: localAddress + "/main/journeytime",
         data: {
@@ -799,7 +891,6 @@ function getTravelTime(content) {
         contentType: "application/json;charset=utf-8",
         dataType: "json", 
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -810,9 +901,9 @@ function getTravelTime(content) {
             getFinalStops()
             $("#journeyholder").show();
             $("#journeycontent").html("");
-            $('<div class= "col-sm-6 text-center">Route: </div><div class= "col-sm-6 text-center"><b>' + content.innerHTML + "</b> </div>").appendTo("#journeycontent");
-            $('<div class= "col-sm-6 text-center">Journey Time: </div><div class= "col-sm-6 text-center"><b>' + data.totaltraveltime + "</b> </div>").appendTo("#journeycontent");
-            $('<div class= "col-sm-6 text-center">Arrival Time: </div><div class= "col-sm-6 text-center"><b>' + data.arrivaltime + "</b> </div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Route: </div><div class= "col-xs-6 px-3"><b>' + content.innerHTML + "</b> </div></div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Journey Time: </div><div class= "col-xs-6 px-3"><b>' + data.totaltraveltime + "</b> </div></div>").appendTo("#journeycontent");
+            $('<div class="row px-3"><div class= "col-xs-6">Arrival Time: </div><div class= "col-xs-6 px-3"><b>' + data.arrivaltime + "</b> </div></div>").appendTo("#journeycontent");
             $.getJSON(live_db, function(bus) {
                 var nextbuses = [];
                 var nextbus = "";
@@ -834,8 +925,8 @@ function getTravelTime(content) {
                 else if (nextbuses[0] != "Due") {
                     var nextbus = nextbuses[0] + " mins";
                 }
-                console.log(nextbuses.length);
-                $('<div class= "col-sm-6 text-center">Next bus arriving in: </div><div class= "col-sm-6 text-center"><b>' + nextbus + "</b> </div>").appendTo("#journeycontent");
+                // console.log(nextbuses.length);
+                $('<div class="row px-3"><div class= "col-xs-6">Next bus arriving in: </div><div class= "col-xs-6 px-3"><b>' + nextbus + "</b> </div></div>").appendTo("#journeycontent");
             });
         }
     });
@@ -844,6 +935,24 @@ function getTravelTime(content) {
     
 }
 
+function getRoute(data,line) {
+    var routeData = [];
+    var firstStop = 0;
+    var lastStop;
+    for (var i =0 ; i < data.length; i++){
+        if (data[i].stop_id==__endStop){
+            lastStop = Number(data[i].lineid[line]);
+        }
+    }
+    for (var i=0; i<data.length;i++){
+        if (data[i].lineid[line]>= firstStop && data[i].lineid[line] <= lastStop) {
+            routeData.push(data[i]);
+        }
+    }
+    // //console.log(routeData);
+    addMarkers(routeData,__startStop,__endStop);
+    
+}
 function sendErrorReport(){
     $j("#errorcontent").hide("slide", { direction: "right" }, "fast", function () {
         $j("#errorsent").show("slide", { direction: "right" }, "fast");
@@ -859,60 +968,4 @@ $(function () {
       location.reload();
     });
 })
-// This is the major Display Map function
-// function displayMap(data2, startBusStop){
-//         var coordinates2 = [];
-//         var names = [];
-//         for (var i = 0; i < data2.length; i++) {
-//             var iarr = data2[i];
-//             coordinates2.push({ lat: iarr.coord[1], lng: iarr.coord[0] });
-//             names.push(iarr.stop_name);
-//         }
-        
-//         var stop_icon = {
-//             path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
-//             fillColor: '#e6f2ff',
-//             fillOpacity: 0.8,
-//             scale: 1,
-//             strokeColor: '#99ccff',
-//             strokeWeight: 1
-//         };
-//         var stop_icon_h = {
-//             path: 'M0,0a8,8 0 1,0 16,0a8,8 0 1,0 -16,0',
-//             fillColor: 'yellow',
-//             fillOpacity: 0.8,
-//             scale: 1,
-//             strokeColor: 'blue',
-//             strokeWeight: 1
-//         };
-//         for (var i = 0; i < coordinates2.length; i++) {
-//             var stop = coordinates2[i];
-//             var stop_name = names[i];
-
-//             var bus_stop = new google.maps.Marker({
-//                 position: stop,
-//                 icon: stop_icon,
-//                 map: map
-//             });
-
-//             showHideMarker(map, bus_stop, stop_name);
-//         };
-//         bus_stop.setMap(map);
-//         function showHideMarker(map, bus_stop) {
-//             var infowindow = new google.maps.InfoWindow({
-//                 content: stop_name
-//             });
-
-//             bus_stop.addListener('mouseout', function () {
-//                 bus_stop.setOptions({ icon: stop_icon });
-//                 infowindow.close(bus_stop.get('map'), bus_stop);
-//             });
-
-//             bus_stop.addListener('mouseover', function () {
-//                 bus_stop.setOptions({ icon: stop_icon_h });
-//                 infowindow.open(bus_stop.get('map'), bus_stop);
-//             });
-//         };
-// }
-// Display Map Function ------------------------------
 
