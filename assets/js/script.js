@@ -905,6 +905,7 @@ function getLines(startStop, endStop){
     });
 }
 function getTravelTime(content) {
+    deleteRoute();
     $("#journeyholder").show();
     var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
     var rain = "0.5";
