@@ -183,7 +183,7 @@ a.nav-link{
       width: 400px !important;
     }
     #home1{
-      width: 400px !important;
+      width: inherit;
     }
     .mobile-col-centered{
       float: none;
@@ -459,4 +459,27 @@ li.nav-item{
 }
 a#lineid.nav-link.active{
   background-color: red !important;
+}
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: auto;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 500;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    z-index: 500;
 }

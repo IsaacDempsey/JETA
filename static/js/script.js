@@ -68,22 +68,13 @@ $(document).ready(function () {
         console.log($j("#form").position().right);
         var measure = ($(window).width() - $j("#form").position().left);
         if (measure>150){
-            // $("#form").css("right",0);
-            // $("#form").css("left", old_left);
-            // old_left = "";
-            // resizeWindow();
-            //console.log(measure);
-            // $("").css("paddingRight", "50px");
             $j("#form").position({
               my: "center",
               at: "right",
               of: ".wrapper"
             });
             
-        } else {
-            // resizeWindow();
-            // $("#form").css("paddingRight", '250px');
-            
+        } else {            
             $j("#form").position({
               my: "center",
               at: "center",
@@ -721,27 +712,40 @@ function addMarkers(data, stopid="None", endstop="None"){
                 marker.addListener("click", function () {
                     $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
                     $("#markerwindow-content").html("");
-                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div></div>';
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setSource">Set Source<div class="tooltiptext">This is a source stop</div></button></div><div class="col-xs-6 mobile-col-centered"><div class="tooltip""><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest">Set Destination</button><div class="tooltiptext">Set another source first</div></div></div></div></div>';
                     $(content_string).appendTo("#markerwindow-content");
                     this.setOptions({ icon: stop_icon_h });
                 }); 
             } else {
-                marker.addListener("click", function() {
-                    $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
-                    $("#markerwindow-content").html("");
-                    var marker_name = this.get("name");
-                    marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div>";
-                    $(content_string).appendTo("#markerwindow-content");
-                    this.setOptions({ icon: stop_icon_h });
-                }); 
+                if (__startStop!=""){
+                    marker.addListener("click", function () {
+                        $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
+                        $("#markerwindow-content").html("");
+                        var marker_name = this.get("name");
+                        marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div>";
+                        $(content_string).appendTo("#markerwindow-content");
+                        this.setOptions({ icon: stop_icon_h });
+                    }); 
+                } else {
+                    marker.addListener("click", function () {
+                        $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
+                        $("#markerwindow-content").html("");
+                        var marker_name = this.get("name");
+                        marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled tooltip" id="setDest" onclick="#">Set Destination<div class="tooltiptext">Set a source first</div></button></div></div></div>';
+                        $(content_string).appendTo("#markerwindow-content");
+                        this.setOptions({ icon: stop_icon_h });
+                    }); 
+                }
+                
             }
         } else {
             if (flag) {
                 marker.addListener('mouseover', function () {
                     lasthover = this.getIcon();
                     // alert("Hover Out");
-                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource" >Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest">Set Destination</button></div></div>';
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setSource" >Set Source<div class="tooltiptext">This is a source stop</div></button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest">Set Destination<div class="tooltiptext">Set another source first</div></button></div></div>';
                     infowindow.setContent(content_string);
                     this.setOptions({ icon: stop_icon_h });
                     infowindow.open(map, this);
@@ -752,22 +756,42 @@ function addMarkers(data, stopid="None", endstop="None"){
                     hover_status = false;
                 });
             } else {
-                marker.addListener('mouseover', function () {
-                    lasthover = this.getIcon();
-                    // alert("Hover Out");
-                    var marker_name = this.get("name");
-                    marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
+                if (__startStop != ""){
+                    marker.addListener('mouseover', function () {
+                        lasthover = this.getIcon();
+                        // alert("Hover Out");
+                        var marker_name = this.get("name");
+                        marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
 
-                    infowindow.setContent(content_string);
-                    this.setOptions({ icon: stop_icon_h });
-                    infowindow.open(map, this);
-                    hover_status = true;
-                });
-                marker.addListener("click", function () {
-                    infowindow.open(map, this);
-                    hover_status = false;
-                });
+                        infowindow.setContent(content_string);
+                        this.setOptions({ icon: stop_icon_h });
+                        infowindow.open(map, this);
+                        hover_status = true;
+                    });
+                    marker.addListener("click", function () {
+                        infowindow.open(map, this);
+                        hover_status = false;
+                    });
+                } else {
+                    marker.addListener('mouseover', function () {
+                        lasthover = this.getIcon();
+                        // alert("Hover Out");
+                        var marker_name = this.get("name");
+                        marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled tooltip" id="setDest" onclick="#">Set Destination<div class="tooltiptext">Set a source first</div></button></div></div>';
+
+                        infowindow.setContent(content_string);
+                        this.setOptions({ icon: stop_icon_h });
+                        infowindow.open(map, this);
+                        hover_status = true;
+                    });
+                    marker.addListener("click", function () {
+                        infowindow.open(map, this);
+                        hover_status = false;
+                    });
+                }
+                
             }
         }
         
@@ -994,8 +1018,6 @@ function getTravelTime(content) {
             totaltraveltime = totaltraveltime.split(":");
             var arrivaltime = data.arrivaltime;
             var journeytime;
-            console.log(totaltraveltime);
-            console.log(typeof totaltraveltime);
             if (Number(totaltraveltime[2])>30){
                 journeytime = Number(totaltraveltime[1]) + 1;
                 arrivaltime = addMinutes(arrivaltime,1);
@@ -1004,7 +1026,7 @@ function getTravelTime(content) {
             }
             
             $("#journeyholder").show();
-            // $("#journeycontent").show();
+            $("#journeycontent").show();
             var url1 = "https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=";
             var url3 = "&format=json";
             var live_db = url1.concat(__startStop, url3);
@@ -1013,21 +1035,18 @@ function getTravelTime(content) {
             $("#totaltraveltime-id").text(journeytime + " mins");
             $.getJSON(live_db, function (bus) {
                 var nextbuses = [];
-                console.log(bus);
                 for (var i = 0; i < bus.results.length; i++) {
                     var iarr = bus.results[i];
                     if (iarr.route == lin) {
                         nextbuses.push(bus.results[i].duetime);
                     }
                 }
-                console.log(nextbuses);
                 setTime(nextbuses)
                 // console.log(nextbuses.length);
             });
             setInterval(function () {
                 $.getJSON(live_db, function (bus) {
                     var nextbuses = [];
-                    console.log(bus);
                     for (var i = 0; i < bus.results.length; i++) {
                         var iarr = bus.results[i];
                         if (iarr.route == lin) {
@@ -1039,11 +1058,17 @@ function getTravelTime(content) {
                     // console.log(nextbuses.length);
                 });
             },30000);
-            
+            var count=0;
             function setTime(nextbuses) {
+                count++;
                 var newarrivaltime;
                 if (nextbuses.length == 0) {
-                    nextbus = "No live bus information available.";
+                    if ($(window).width()<650){
+                        nextbus = "--";
+                    } else {
+                        nextbus = "No live bus information available.";
+                    }
+                    
                     newarrivaltime = "--:--:--";
                 } else {
                     if (nextbuses[0]=='Due'){
@@ -1062,7 +1087,10 @@ function getTravelTime(content) {
                     }
                     
                 }
-                $("#eta-id").text(newarrivaltime);
+                console.log(newarrivaltime);
+                if (count == 1){
+                    $("#eta-id").text(newarrivaltime);
+                }
                 $("#nextbus-id").text(nextbus);
             }
             
@@ -1082,29 +1110,6 @@ function getTravelTime(content) {
 
 
     
-}
-var nextBus = "";
-function getRTPIArrivalTIme(lineid){
-    
-
-    var jqXHR = $.getJSON(live_db);
-    console.log(jqXHR.readyState);
-    console.log(typeof jqXHR);
-    // var timers = $.getJSON(live_db, function (bus) {
-    //     var nextbuses = [];
-    //     for (var i = 0; i < bus.results.length; i++) {
-    //         var iarr = bus.results[i];
-    //         if (iarr.route == lineid) {
-    //           nextbuses.push(bus.results[i].duetime);
-    //         }
-    //     }
-    //     console.log(nextbuses);
-    //     return nextbuses;
-    //     // console.log(nextbuses.length);
-    // });
-    // console.log(timers);
-    // console.log(timers["responseText"]);
-    // console.log(timers[responseJSON].results[0]);
 }
 var route = "";
 function getRoute(data,line) {
