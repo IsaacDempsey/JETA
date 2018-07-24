@@ -43,6 +43,11 @@ function resizeWindow() {
     } else {
         $("#toggle-button").hide();
         $("#navbarToggleExternalContent").removeClass("collapse");
+        $j("#form").position({
+            my: "right center",
+            at: "right",
+            of: ".wrapper"
+        });
     }
 }
 
@@ -63,17 +68,17 @@ $(document).ready(function () {
         console.log($j("#form").position().right);
         var measure = ($(window).width() - $j("#form").position().left);
         if (measure>150){
-            
-            $("#form").css("left", old_left);
-            old_left = "";
+            // $("#form").css("right",0);
+            // $("#form").css("left", old_left);
+            // old_left = "";
             // resizeWindow();
             //console.log(measure);
             // $("").css("paddingRight", "50px");
-            // $j("#form").position({
-            //   my: "right",
-            //   at: "right",
-            //   of: ".wrapper"
-            // });
+            $j("#form").position({
+              my: "center",
+              at: "right",
+              of: ".wrapper"
+            });
             
         } else {
             // resizeWindow();
@@ -91,6 +96,21 @@ $(document).ready(function () {
     // Autoload the date for the user with the current date
     let today = moment().format("YYYY-MM-DD");
     document.querySelector("#date").value = today;
+    // Autofill hour and mins with current time
+    var today_time = moment().format("YYYY-MM-DDTHH:mm");
+    var hour_slice = today_time.slice(11, 13);
+    var mins_slice = today_time.slice(14, 16);
+    var new_hour = document.getElementById("hour");
+    var new_option1 = document.createElement("option");
+    new_option1.value = hour_slice;
+    new_hour.add(new_option1);
+    var new_mins = document.getElementById("mins");
+    var new_option2 = document.createElement("option");
+    new_option2.text = mins_slice;
+    new_option2.value = mins_slice;
+    new_mins.add(new_option2);
+    document.getElementById('hour').value = hour_slice;
+    document.getElementById('mins').value = mins_slice;
     // deactivate the destination field which will only be activated when the user enters a source
     deactivateDestination(autocomplete_data); 
     // Hide the various elements which will only be visible as and when required
@@ -912,27 +932,6 @@ function getLines(startStop, endStop){
       }
     });
 }
-
-function leaveNow() {
-    var today = moment().format("YYYY-MM-DDTHH:mm");
-    var hour_slice = today.slice(11, 13);
-    var mins_slice = today.slice(14, 16);
-
-    var new_hour = document.getElementById("hour");
-    var new_option1 = document.createElement("option");
-    new_option1.value = hour_slice;
-    new_hour.add(new_option1);
-    var new_mins = document.getElementById("mins");
-    var new_option2 = document.createElement("option");
-    new_option2.text = mins_slice;
-    new_option2.value = mins_slice;
-    new_mins.add(new_option2);
-
-    document.getElementById('hour').value = hour_slice;
-    document.getElementById('mins').value = mins_slice;
-}
-
-
 function getTravelTime(content) {
     deleteRoute();
     $("#journeyholder").show();
