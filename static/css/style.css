@@ -41,13 +41,29 @@ body {
   min-width: 650px !important;
 }
 
-#date{
+#date, #hour, #mins{
   width: -webkit-max-content !important;
   width: -moz-max-content !important;
   width: max-content !important;
 }
 
+#hour, #mins{
+  margin: 0 !important;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  padding: 0.2rem !important;
+  background-clip: padding-box;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  margin-left: 0.5rem !important;
+}
 
+#hour-holder{
+  padding-right: 0 !important;
+}
+
+.timers{
+  width: auto;
+}
 
 /* The parent wrapper for both the map and the form */
 .wrapper {
