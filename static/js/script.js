@@ -46,7 +46,7 @@ function resizeWindow() {
     }
 }
 
-
+var old_left="";
 // On Document Ready
 $(document).ready(function () {
     // When the document loads
@@ -56,26 +56,34 @@ $(document).ready(function () {
         resizeWindow();
     });
     $("#toggle-button").click(function () {
+        if (old_left==""){
+            old_left = $j("#form").position().left;
+        }
+        console.log(old_left);
+        console.log($j("#form").position().right);
         var measure = ($(window).width() - $j("#form").position().left);
-        
         if (measure>150){
-            //console.log(measure);
-            $("#form").css("paddingRight", "0px");
-            // $j("#form").position({
-            //     my: "center",
-            //     at: "right",
-            //     of: "body"
-            // });
-        } else {
-            $("#form").css("paddingRight", '250px');
             
-            // $j("#form").position(
-            //     {
-            //         my: "center",
-            //         at: "center",
-            //         of: "body"
-            //     }
-            // );
+            $("#form").css("left", old_left);
+            old_left = "";
+            // resizeWindow();
+            //console.log(measure);
+            // $("").css("paddingRight", "50px");
+            // $j("#form").position({
+            //   my: "right",
+            //   at: "right",
+            //   of: ".wrapper"
+            // });
+            
+        } else {
+            // resizeWindow();
+            // $("#form").css("paddingRight", '250px');
+            
+            $j("#form").position({
+              my: "center",
+              at: "center",
+              of: ".wrapper"
+            });
         }
         
         

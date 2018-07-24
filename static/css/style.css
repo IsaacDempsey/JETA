@@ -41,7 +41,11 @@ body {
   min-width: 650px !important;
 }
 
-
+#date{
+  width: -webkit-max-content !important;
+  width: -moz-max-content !important;
+  width: max-content !important;
+}
 
 
 
