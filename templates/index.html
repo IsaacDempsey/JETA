@@ -38,7 +38,7 @@
 	
 	<div id="map"></div>
 	
-	<div class="col-xs-6 mobile-form" id="form">
+	<div class="col-xs-6 mobile-form form-main" id="form">
 		<div class="col-xs-12 col-centered py-3" id="brand-img">
 			<a class="mx-auto" href="#">
 				<img class="mx-auto d-block" src='{% static "img/Logo11.png" %}' alt="My Jeta Logo" />
@@ -48,7 +48,7 @@
 		<div class="col-xs-12 py-3" id="navbarToggleExternalContent">
 			<ul class="nav nav-tabs px-3" id="myTab" role="tablist">
 				<li class="nav-item">
-					<a class="nav-link active" id="homeTab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
+					<a class="nav-link active" id="homeTab" data-toggle="tab" href="#homeMain" role="tab" aria-controls="home" aria-selected="true">Home</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" id="newsTab" data-toggle="tab" href="#latestNews" role="tab" aria-controls="news" aria-selected="false">News</a>
@@ -59,32 +59,33 @@
 			</ul>
 			
 			<div class="tab-content" id="myTabContet">
-				<div class="tab-pane fade show active p-3" id="home" role="tabpanel" aria-labelledby="homeTab">
-					<div class="row px-3 pt-3">
-						<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
-							Get your Journey Time
+				<div class="tab-pane fade show active p-3" id="homeMain" role="tabpanel" aria-labelledby="homeTab">
+					<div id="home">
+						<div class="row px-3 pt-3">
+							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
+								Get your Journey Time
+							</div>
 						</div>
-					</div>
-					<div class="row px-3 pt-3">
-						<div class="col-sm-12 col-xs-12 mobile-col-centered" id="sourceDiv">
-							<input class="form-control inputRow px-3 mp-5" id="source" placeholder="Enter Source" type="text"></input>
-							<span class="text-danger" id="noSource">! Please select a source</span>
+						<div class="row px-3 pt-3">
+							<div class="col-sm-12 col-xs-12 mobile-col-centered" id="sourceDiv">
+								<input class="form-control inputRow px-3 mp-5" id="source" placeholder="Enter Source" type="text"></input>
+								<span class="text-danger" id="noSource">! Please select a source</span>
+							</div>
 						</div>
-					</div>
-					<div class="row px-3 pt-3">
-						<div class="col-sm-12 col-xs-12 mobile-col-centered">
-							<input class="form-control inputRow px-3 mp-5" id="destination" placeholder="Enter Destination" type="text">
-							<span class="text-danger" id="noDestination">! Please select a destination</span>
+						<div class="row px-3 pt-3">
+							<div class="col-sm-12 col-xs-12 mobile-col-centered">
+								<input class="form-control inputRow px-3 mp-5" id="destination" placeholder="Enter Destination" type="text">
+								<span class="text-danger" id="noDestination">! Please select a destination</span>
+							</div>
 						</div>
-					</div>
-					<div class="row px-3 pt-3">
+						<div class="row px-3 pt-3">
 							<div class="col-sm-12 col-xs-12 mobile-col-centered">
 								<input class="form-control inputRow px-3 mp-5" type="date" id="date" placeholder="Select Date and Time">
 							</div>
 						</div>
-					<div class="row px-3 pt-3">
-							<div class="col-sm-6 col-xs-6 mobile-col-centered text-left display-5 mp-5" style="color: #fff;">
-								Set hour
+						<div class="row px-3 pt-3">
+							<div class="col-sm-5 col-xs-5 mobile-col-centered col-centered display-5 text-left mp-5 timers" style="color: #fff;" id="hour-holder">
+								Set Hour:
 								<select id="hour">
 									<option value="05">05</option>
 									<option value="06">06</option>
@@ -106,58 +107,95 @@
 									<option value="22">22</option>
 									<option value="23">23</option>
 									<option value="00">00</option>
-								</select>						
+								</select>
 							</div>
-						
-							<div class="col-sm-6 col-xs-6 mobile-col-centered text-left display-5 mp-5" style="color: #fff;">
-									Set minutes
-									<select id="mins">
-										<option value="00">00</option>
-										<option value="15">15</option>
-										<option value="30">30</option>
-										<option value="45">45</option>
-									</select>						
+					
+							<div class="col-sm-6 col-xs-6 mobile-col-centered  col-centered text-left display-5 mp-5 timers" style="color: #fff;" id="mins-holder">
+								Set Minutes:
+								<select id="mins">
+									<option value="00">00</option>
+									<option value="15">15</option>
+									<option value="30">30</option>
+									<option value="45">45</option>
+								</select>
 							</div>
-					</div>
+						</div>
 					
-					<div class="row px-3 pt-3">
-						<div class="col-sm-8 col-xs-8">
-							<button type="button" class="btn btn-outline-success px-3 mp-5 form-control inputRow" id="getTime">Get My Travel Time</button>
+						<div class="row px-3 pt-3">
+							<div class="col-sm-8 col-xs-8">
+								<button type="button" class="btn btn-outline-success px-3 mp-5 form-control inputRow" id="getTime">Get My Travel Time</button>
+							</div>
+							<div class="col-sm-4 col-xs-4">
+								<button type="button" class="btn btn-outline-light px-3 mp-5 form-control inputRow" id="undo">Undo</button>
+							</div>
 						</div>
-						<div class="col-sm-4 col-xs-4">
-							<button type="button" class="btn btn-outline-light px-3 mp-5 form-control inputRow" id="undo">Undo</button>
+					</div>
+					<div class="home1" id="home1">
+						<div class="row px-3 pt-3" id="lineholder">
+							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
+								Routes for your Journey
+							</div>
 						</div>
-					</div>					
+						<div class="row px-3 pt-3">
+							<div class="col-sm-12 col-xs-12 mobile-col-centered" id="linecontent">
+								<ul class="nav nav-pills" id="line-pills">
+					
+								</ul>
+							</div>
+						</div>
+					
+						<div class="row px-3 pt-3" id="journeyholder">
+							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
+								Total Journey Time
+							</div>
+							<div class="px-3 col-centered" id="journeycontent">
+								<div class="row px-3">
+									<div class="col-xs-6">Route: </div>
+									<div class="col-xs-6 px-3">
+										<b id="route-id"></b>
+									</div>
+								</div>
+					
+								<div class="row px-3">
+					
+									<div class="col-xs-6">Journey Time: </div>
+					
+									<div class="col-xs-6 px-3">
+					
+										<b id="totaltraveltime-id"></b>
+									</div>
+								</div>
+					
+								<div class="row px-3">
+					
+									<div class="col-xs-6">ETA at Destination: </div>
+					
+									<div class="col-xs-6 px-3">
+					
+										<b id="eta-id"></b>
+									</div>
+								</div>
+					
+								<div class="row px-3">
+					
+									<div class="col-xs-6">Next bus arriving in: </div>
+					
+									<div class="col-xs-6 px-3">
+					
+										<b id="nextbus-id"></b>
+									</div>
+								</div>
+							</div>
+						</div>
+					
+						<div class="row px-3 pt-3">
+							<div class="px-3 mobile-col-centered col-centered">
+								<button type="button" class="btn btn-outline-danger px-3 inputRow" id="goBackSearch">Go Back to Search</button>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div class="p-3" id="home1">
-					<div class="row px-3 pt-3" id="lineholder">
-						<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
-							Routes for your Journey
-						</div>
-					</div>
-					<div class="row px-3 pt-3">
-						<div class="col-sm-12 col-xs-12 mobile-col-centered"  id="linecontent">
-							<ul class="nav nav-pills" id="line-pills">
-
-							</ul>
-						</div>
-					</div>
-					
-					<div class="row px-3 pt-3" id="journeyholder">
-						<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
-							Total Journey Time
-						</div>
-						<div class="px-3 col-centered" id="journeycontent">
-						
-						</div>
-					</div>
-					
-					<div class="row px-3 pt-3">
-						<div class="px-3 mobile-col-centered col-centered">
-							<button type="button" class="btn btn-outline-danger px-3 inputRow" id="goBackSearch">Go Back to Search</button>
-						</div>
-					</div>
-				</div>
+				
 				<div class="tab-pane fade" id="latestNews" role="tabpanel" aria-labelledby="newsTab">
 					<span class="display-4">LATEST NEWS COMING SOON!</span>
 				</div>

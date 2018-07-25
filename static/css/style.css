@@ -41,13 +41,29 @@ body {
   min-width: 650px !important;
 }
 
-#date{
+#date, #hour, #mins{
   width: -webkit-max-content !important;
   width: -moz-max-content !important;
   width: max-content !important;
 }
 
+#hour, #mins{
+  margin: 0 !important;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  padding: 0.2rem !important;
+  background-clip: padding-box;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  margin-left: 0.5rem !important;
+}
 
+#hour-holder{
+  padding-right: 0 !important;
+}
+
+.timers{
+  width: auto;
+}
 
 /* The parent wrapper for both the map and the form */
 .wrapper {
@@ -83,7 +99,7 @@ body {
   right: 0px;
   z-index: 99;
   height: 100vh;
-  width: 400px;
+  width: max-content !important;
   z-index: 99;
   border-radius: 5px;
   background-color: #FFF;
@@ -148,6 +164,9 @@ a.nav-link{
 #toggle-button{
   display: none;
 }
+#home1{
+  width: 350px !important;
+}
 
 /* CSS For the form when the device is opened in mobile */
 @media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
@@ -164,10 +183,10 @@ a.nav-link{
       transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
       height: auto !important;
       margin: 10px !important;
-      width: 400px !important;
+      width: inherit !important;
     }
-    #home1{
-      width: 400px !important;
+    .home1{
+      width: inherit !important;
     }
     .mobile-col-centered{
       float: none;
@@ -191,11 +210,11 @@ a.nav-link{
     #undo{
       margin-top: 10px;
     }
-    #form{
+    /* .form-main{
       width: -webkit-max-content !important;
       width: -moz-max-content !important;
       width: max-content !important;
-    }
+    } */
     #toggle-button{
       display: block !important;
     }
@@ -443,4 +462,27 @@ li.nav-item{
 }
 a#lineid.nav-link.active{
   background-color: red !important;
+}
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: auto;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 500;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    z-index: 500;
 }
