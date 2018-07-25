@@ -956,7 +956,13 @@ function getLines(startStop, endStop){
       }
     });
 }
+var old_nextbus = 0;
+var count;
+var rtpi_interval;;
 function getTravelTime(content) {
+    clearInterval(rtpi_interval);
+    console.log(rtpi_interval);
+    count=0;
     deleteRoute();
     $("#journeyholder").show();
 
@@ -976,14 +982,14 @@ function getTravelTime(content) {
             var current_time = Math.round((new Date()).getTime() / 1000);
             // if time with hour of current time, use current rainfall
             if (datetime <= current_time + 3600 && datetime >= current_time - 3600) {
-                var rain = weather.currently.precipIntensity;
+                rain = weather.currently.precipIntensity;
             }
             else {
                 for (var i = 0; i < weather.hourly.data.length; i++) {
                     var iarr = weather.hourly.data[i];
                     //console.log(iarr.precipIntensity);
                     if (datetime <= iarr.time + 3600 && datetime >= iarr.time - 3600) {
-                    var rain = iarr.precipIntensity;
+                    rain = iarr.precipIntensity;
                 }
             }
         }
@@ -1013,7 +1019,8 @@ function getTravelTime(content) {
             $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
         },
         success: function (data) {
-            var nextbus = "";
+            var nextbus;
+            var new_nextbus;
             var totaltraveltime = data.totaltraveltime;
             totaltraveltime = totaltraveltime.split(":");
             var arrivaltime = data.arrivaltime;
@@ -1024,7 +1031,6 @@ function getTravelTime(content) {
             } else {
                 journeytime = Number(totaltraveltime[1]);
             }
-            
             $("#journeyholder").show();
             $("#journeycontent").show();
             var url1 = "https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=";
@@ -1033,18 +1039,8 @@ function getTravelTime(content) {
             $("#route-id").text(lin);
             $(journeytime + " mins").appendTo("#totaltraveltime-id");
             $("#totaltraveltime-id").text(journeytime + " mins");
-            $.getJSON(live_db, function (bus) {
-                var nextbuses = [];
-                for (var i = 0; i < bus.results.length; i++) {
-                    var iarr = bus.results[i];
-                    if (iarr.route == lin) {
-                        nextbuses.push(bus.results[i].duetime);
-                    }
-                }
-                setTime(nextbuses)
-                // console.log(nextbuses.length);
-            });
-            setInterval(function () {
+            getRTPI();
+            function getRTPI() {
                 $.getJSON(live_db, function (bus) {
                     var nextbuses = [];
                     for (var i = 0; i < bus.results.length; i++) {
@@ -1053,13 +1049,19 @@ function getTravelTime(content) {
                             nextbuses.push(bus.results[i].duetime);
                         }
                     }
-                    console.log(nextbuses);
                     setTime(nextbuses)
                     // console.log(nextbuses.length);
                 });
-            },30000);
-            var count=0;
+            }
+            rtpi_interval = setInterval(getRTPI,5000);
+            
             function setTime(nextbuses) {
+                // console.log(count);
+                if (nextbuses.length == 0){
+                    console.log("stopped 2 for line: ",lin);
+                    clearInterval(rtpi_interval);
+                    line = lin;
+                }
                 count++;
                 var newarrivaltime;
                 if (nextbuses.length == 0) {
@@ -1068,30 +1070,41 @@ function getTravelTime(content) {
                     } else {
                         nextbus = "No live bus information available.";
                     }
-                    
+                    new_nextbus = nextbus;
                     newarrivaltime = "--:--:--";
                 } else {
                     if (nextbuses[0]=='Due'){
                         nextbus = nextbuses[0]
+                        new_nextbus = nextbus;
                         newarrivaltime = addMinutes(arrivaltime, 0);
                     } else {
                         nextbus = Math.min(...nextbuses);
                         if (nextbus == 1) {
                             newarrivaltime = addMinutes(arrivaltime, nextbus);
-                            nextbus = String(nextbus) + " min";
+                            new_nextbus = String(nextbus) + " min";
 
                         } else {
                             newarrivaltime = addMinutes(arrivaltime, nextbus);
-                            nextbus = String(nextbus) + " mins";
+                            new_nextbus = String(nextbus) + " mins";
                         }
                     }
                     
                 }
-                console.log(newarrivaltime);
-                if (count == 1){
+                // console.log("OB",old_nextbus);
+                // console.log("NB",nextbus);
+                // if (nextbus != "--" || nextbus != "Due") {
+                //     old_nextbus = nextbus;
+                //     if (old_nextbus != 0 && old_nextbus < Number(nextbus) && nextbuses != []){
+                //         // console.log('in here');
+                //         $("#eta-id").text(newarrivaltime);
+                //     }
+                // }
+                // // console.log(newarrivaltime);
+                if (count == 1 && nextbuses !=[]){
                     $("#eta-id").text(newarrivaltime);
                 }
-                $("#nextbus-id").text(nextbus);
+                
+                $("#nextbus-id").text(new_nextbus);
             }
             
             function addMinutes(time, minsToAdd) {

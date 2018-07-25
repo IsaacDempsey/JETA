@@ -99,7 +99,7 @@ body {
   right: 0px;
   z-index: 99;
   height: 100vh;
-  width: 400px;
+  width: max-content !important;
   z-index: 99;
   border-radius: 5px;
   background-color: #FFF;
@@ -164,6 +164,9 @@ a.nav-link{
 #toggle-button{
   display: none;
 }
+#home1{
+  width: 350px !important;
+}
 
 /* CSS For the form when the device is opened in mobile */
 @media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
@@ -180,10 +183,10 @@ a.nav-link{
       transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
       height: auto !important;
       margin: 10px !important;
-      width: 400px !important;
+      width: inherit !important;
     }
-    #home1{
-      width: inherit;
+    .home1{
+      width: inherit !important;
     }
     .mobile-col-centered{
       float: none;
@@ -207,11 +210,11 @@ a.nav-link{
     #undo{
       margin-top: 10px;
     }
-    #form{
+    /* .form-main{
       width: -webkit-max-content !important;
       width: -moz-max-content !important;
       width: max-content !important;
-    }
+    } */
     #toggle-button{
       display: block !important;
     }
