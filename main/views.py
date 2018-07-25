@@ -264,12 +264,22 @@ def stops(request):
             {"error": "Source/Destination query terms not numeric."}), content_type='application/json')
         response.status_code = 400
         return response
-
+    
     routes_qs = Routes.objects.all()
         
     if source:
         source = int(source)
-        routes_qs = routes_qs.filter(stopids__contains=[source])
+
+        # Get linked stops if there are any.
+        linked_qs = Linked.objects.filter(linked__contains=[source]).values_list('linked', flat=True)
+
+        try:
+            source_stops = list(linked_qs)[0]
+        except:
+            source_stops = [source]
+
+        routes_qs = routes_qs.filter(stopids__overlap=source_stops)
+
 
     if destination:
         destination = int(destination)
@@ -277,7 +287,6 @@ def stops(request):
 
     if lineid:
         routes_qs = routes_qs.filter(lineid=lineid)
-    
 
     routes = pd.DataFrame.from_records(routes_qs.values('lineid', 'stopids'))
 
@@ -287,10 +296,18 @@ def stops(request):
         response.status_code = 400
         return response
 
-    # Slice stopids to left of start_stop to remove stops previous to the start stop
+    # Slice stopids to left of start_stop to remove stops previous to the start stop   
     if source:
-        routes['stopids'] = routes['stopids'].apply(lambda x: x[x.index(source):])
+        # Because the start stopid could be any of the linked stops, we need to use a function.
+        def tryslice(x, source_stops):
+            for i in source_stops:
+                try:
+                    return x[x.index(i):]
+                except:
+                    continue 
 
+        routes['stopids'] = routes['stopids'].apply(lambda x: tryslice(x, source_stops))
+                
     # Slice stopids by destination if it was given.
     if destination:
         routes['stopids'] = routes['stopids'].apply(lambda x: x[:(x.index(destination)+1)])
