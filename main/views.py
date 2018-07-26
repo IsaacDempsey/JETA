@@ -296,7 +296,7 @@ def stops(request):
     if lineid:
         routes_qs = routes_qs.filter(lineid=lineid)
 
-    routes = pd.DataFrame.from_records(routes_qs.values('lineid', 'stopids'))
+    routes = pd.DataFrame.from_records(routes_qs.values('lineid', 'stopids', 'direction'))
 
     if routes.empty:
         response = HttpResponse(json.dumps(
@@ -325,16 +325,16 @@ def stops(request):
 
     # Remove routes with identical lineids. Favour routes with more stops.
     routes['stopids_len'] = routes['stopids'].apply(lambda x: len(x))
-    routes = routes.sort_values('stopids_len').groupby('lineid').last()
+    routes = routes.sort_values('stopids_len').groupby(['lineid', 'direction']).last()
     routes = pd.DataFrame(routes).reset_index()
-    routes = routes[['lineid', 'stopids']]
+    routes = routes[['lineid', 'stopids', 'direction']]
 
     # Unstack stopids column.
-    routes_unstacked = routes.set_index('lineid').stopids.apply(pd.Series).stack().reset_index(level=-1, drop=True).astype(int).reset_index()
+    routes_unstacked = routes.set_index(['lineid', 'direction']).stopids.apply(pd.Series).stack().reset_index(level=-1, drop=True).astype(int).reset_index()
     routes_unstacked = routes_unstacked.rename(columns={0:'stopid'})
 
     # Create a column indicating the order (program number) of each stop in each route.
-    routes_unstacked['program'] = routes_unstacked.groupby('lineid').cumcount()
+    routes_unstacked['program'] = routes_unstacked.groupby(['lineid', 'direction']).cumcount()
 
     # Group lineid and program number into column containing a dict for each stopid. E.g. {'84X': 9, '46A': 15 ...}
     routes = routes_unstacked.groupby(['stopid']).apply(lambda x: dict(x[['lineid','program']].values))
