@@ -24,6 +24,7 @@ class Destinations():
         df3['lng'] = df3['lng'].astype(float)
 
         linked = []
+        print(linked)
         for key, value in linked_dict.items():
             if self.start_id in value['linked']:
                 linked.append(value['linked'])

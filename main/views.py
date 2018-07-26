@@ -7,6 +7,7 @@ from django.urls import reverse
 from .models import Coefficients, Lines, Linked, Routes, Stops
 from .destinations import Destinations
 from .route_result import Route_result
+from .switch import Switch_start
 
 from datetime import datetime, timedelta
 import json
@@ -259,6 +260,12 @@ def stops(request):
     destination = request.GET.get('destination')
     lineid = request.GET.get('lineid')
 
+    # if source and destination:
+    #     print("Inn ere")
+    #     switch = Switch_start(source, destination).switch_check()
+    #     if switch[0] == True:
+    #         destination = switch[1]
+
     if (source and not source.isnumeric()) or (destination and not destination.isnumeric()):
         response = HttpResponse(json.dumps(
             {"error": "Source/Destination query terms not numeric."}), content_type='application/json')
@@ -357,9 +364,16 @@ def stops(request):
 
 
 
-# def get_route(request):
-#     source = request.GET.get("source")
-#     destination = request.GET.get("destination")
-# 
-#     final_route = Route_result(source, destination).route_json()
-#     return JsonResponse(final_route, safe=False)
+def get_route(request):
+    source = request.GET.get("source")
+    destination = request.GET.get("destination")
+    source = int(source)
+    destination = int(destination)
+
+    switch = Switch_start(source, destination).switch_check()
+    switch = int(switch)
+    # If switch is 0, the means theres no linked stops, so no switching will happen
+    if switch == 0:
+        return HttpResponse(source)
+    else:
+        return HttpResponse(switch)

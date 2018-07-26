@@ -9,8 +9,8 @@ class Switch_start():
         self.routes = Routes.objects.all().values()
         self.linked = Linked.objects.all().values()
 
-    # Returns True if start and destination are not linked.
-    # If True, also returns stopid of station with same name which IS linked.
+    # Returns 0 if start and destination are linked.
+    # Else, returns stopid of station with same name which IS linked and should be switched.
     def switch_check(self):
         df1 = pd.DataFrame.from_records(self.linked)
         linked_dict = df1.to_dict('index')
@@ -27,27 +27,26 @@ class Switch_start():
         linked = []
 
         for key, value in linked_dict.items():
-            if str(self.start_id) in value['linked']:
+            if self.start_id in value['linked']:
                 linked.append(value['linked'])
-        linked = [ int(i) for i in linked ]
-
+        # linked = [ int(i) for i in linked ]
         for j in route_stops:
             if self.start_id in j:
                 mid = j.index(self.start_id)
                 slic = j[mid:]
                 if self.start_id and self.destination_id in slic:
                     linked_start = False
-                    return False
+                    return 0
                     break
                     # Start and destination linked by single route
 
         if linked_start == True:      
-            for k in linked:
+            for k in linked[0]:
                 for j in route_stops:
                     if k in j:
                         mid = j.index(k)
                         slic = j[mid:]
                         if self.start_id and self.destination_id in slic:
-                            return True, k
+                            return k
                             break
                             # Start and destination NOT linked, returns new start stop id

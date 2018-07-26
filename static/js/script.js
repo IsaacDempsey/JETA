@@ -430,9 +430,41 @@ $j(function () {
 //     });
 // }
 
-
-
-
+function getswitch(selected_dest){
+    $.ajax({
+        url: localAddress + "/main/get_route",
+        // Set the start text as the label value
+        data: { 
+            source: __startStop,
+            destination: selected_dest,
+            },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+        // On success send this data to the receive data function
+        success: function (data) {
+            new_source = data.toString();
+            data_str = data.toString();
+            // Tell the user we are switching their source stop
+            if (data != __startStop) {
+            document.getElementById('SwitchText').innerHTML = "Your bus will leave from bus stop number: " + data;
+            $(".switch_note").show();
+            }
+            // Change the source
+            __startStop = new_source;
+            }
+    });
+}
+function closeSwitchNote() {
+    $(".switch_note").hide();
+}
 
 // This function draws final user route of their selected bus journey
 // function getFinalStops() {
@@ -712,7 +744,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                 marker.addListener("click", function () {
                     $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
                     $("#markerwindow-content").html("");
-                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setSource">Set Source<div class="tooltiptext">This is a source stop</div></button></div><div class="col-xs-6 mobile-col-centered"><div class="tooltip""><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest">Set Destination</button><div class="tooltiptext">Set another source first</div></div></div></div></div>';
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setSource">Set Source<div class="tooltiptext">This is a source stop</div></button></div><div class="col-xs-6 mobile-col-centered"><div class="tooltip""><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest" >Set Destination</button><div class="tooltiptext">Set another source first</div></div></div></div></div>';
                     $(content_string).appendTo("#markerwindow-content");
                     this.setOptions({ icon: stop_icon_h });
                 }); 
@@ -723,7 +755,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                         $("#markerwindow-content").html("");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div>";
+                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ');setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div>";
                         $(content_string).appendTo("#markerwindow-content");
                         this.setOptions({ icon: stop_icon_h });
                     }); 
@@ -745,7 +777,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                 marker.addListener('mouseover', function () {
                     lasthover = this.getIcon();
                     // alert("Hover Out");
-                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setSource" >Set Source<div class="tooltiptext">This is a source stop</div></button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest">Set Destination<div class="tooltiptext">Set another source first</div></button></div></div>';
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setSource" >Set Source<div class="tooltiptext">This is a source stop</div></button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest" >Set Destination<div class="tooltiptext">Set another source first</div></button></div></div>';
                     infowindow.setContent(content_string);
                     this.setOptions({ icon: stop_icon_h });
                     infowindow.open(map, this);
@@ -762,7 +794,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                         // alert("Hover Out");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
+                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ');setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
 
                         infowindow.setContent(content_string);
                         this.setOptions({ icon: stop_icon_h });

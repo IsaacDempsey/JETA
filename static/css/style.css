@@ -295,6 +295,48 @@ a.nav-link{
   z-index:99;
 }
 
+.switch_note {
+  background-color: rgba(33,37,41,0.9) !important;
+  display: none;
+  position: absolute;
+  height:100vh;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  padding: 0;
+  z-index: 98;
+}
+
+.switch_note_content {
+  color: white;
+  position: fixed !important; /* Make the position of the form fixed */
+  top: 50% !important;
+  left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+  right: 50% !important;
+  height: auto;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+  z-index:99;
+}
+
+.close {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: grey;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .loadingcontent{
   color: white;
   position: fixed !important; /* Make the position of the form fixed */
