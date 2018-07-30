@@ -460,6 +460,7 @@ function getswitch(selected_dest){
             if (data != __startStop) {
                 var newSource_address = $("#source").val();
                 var pieces = newSource_address.split(',');
+                pieces.splice(-1,1);
                 document.getElementById('SwitchText').innerHTML = "Your bus will leave from bus stop number: " + data;
                 $("#form").hide();
                 $(".overlay").show();
@@ -760,7 +761,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                 marker.addListener("click", function () {
                     $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
                     $("#markerwindow-content").html("");
-                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setSource">Set Source<div class="tooltiptext">This is a source stop</div></button></div><div class="col-xs-6 mobile-col-centered"><div class="tooltip""><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest" >Set Destination</button><div class="tooltiptext">Set another source first</div></div></div></div></div>';
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest" >Set Destination</button></div></div></div></div>';
                     $(content_string).appendTo("#markerwindow-content");
                     this.setOptions({ icon: stop_icon_h });
                 }); 
@@ -781,7 +782,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                         $("#markerwindow-content").html("");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled tooltip" id="setDest" onclick="#">Set Destination<div class="tooltiptext">Set a source first</div></button></div></div></div>';
+                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="#">Set Destination</button></div></div></div>';
                         $(content_string).appendTo("#markerwindow-content");
                         this.setOptions({ icon: stop_icon_h });
                     }); 
@@ -793,7 +794,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                 marker.addListener('mouseover', function () {
                     lasthover = this.getIcon();
                     // alert("Hover Out");
-                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setSource" >Set Source<div class="tooltiptext">This is a source stop</div></button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest" >Set Destination<div class="tooltiptext">Set another source first</div></button></div></div>';
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource" >Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest" >Set Destination</button></div></div>';
                     infowindow.setContent(content_string);
                     this.setOptions({ icon: stop_icon_h });
                     infowindow.open(map, this);
@@ -827,7 +828,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                         // alert("Hover Out");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled tooltip" id="setDest" onclick="#">Set Destination<div class="tooltiptext">Set a source first</div></button></div></div>';
+                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="#">Set Destination</button></div></div>';
 
                         infowindow.setContent(content_string);
                         this.setOptions({ icon: stop_icon_h });
@@ -1081,11 +1082,11 @@ function getTravelTime(content) {
             var new_nextbus;
             var totaltraveltime = data.totaltraveltime;
             totaltraveltime = totaltraveltime.split(":");
-            var arrivaltime = data.arrivaltime;
+            var currentTime = moment().format('HH:mm');
+            var arrivaltime;
             var journeytime;
             if (Number(totaltraveltime[2])>30){
                 journeytime = Number(totaltraveltime[1]) + 1;
-                arrivaltime = addMinutes(arrivaltime,1);
             } else {
                 journeytime = Number(totaltraveltime[1]);
             }
@@ -1112,54 +1113,42 @@ function getTravelTime(content) {
                 });
             }
             rtpi_interval = setInterval(getRTPI,5000);
-            
+
             function setTime(nextbuses) {
-                // console.log(count);
-                if (nextbuses.length == 0){
-                    console.log("stopped 2 for line: ",lin);
+                count++;
+                var nextbustime;
+                if (nextbuses.length==0){
+                    arrivaltime = "--:--";
+                    nextbustime = "No Information";
                     clearInterval(rtpi_interval);
                     line = lin;
-                }
-                count++;
-                var newarrivaltime;
-                if (nextbuses.length == 0) {
-                    nextbus = "--";
-                    new_nextbus = nextbus;
-                    newarrivaltime = "--:--:--";
                 } else {
-                    if (nextbuses[0]=='Due'){
-                        nextbus = nextbuses[0]
-                        new_nextbus = nextbus;
-                        newarrivaltime = addMinutes(arrivaltime, 0);
+                    var rtpiArrivalTime = nextbuses[0]
+                    
+                    if (rtpiArrivalTime == 'Due') {
+                        if (count == 1) {
+                            arrivaltime = addMinutes(currentTime, journeytime);
+                        }
+                        nextbustime = rtpiArrivalTime;
+                        count = 0;
                     } else {
                         nextbus = Math.min(...nextbuses);
+                        if (count == 1) {
+                            arrivaltime = addMinutes(currentTime, journeytime);
+                            arrivaltime = addMinutes(arrivaltime, nextbus);
+                        }
                         if (nextbus == 1) {
-                            newarrivaltime = addMinutes(arrivaltime, nextbus);
-                            new_nextbus = String(nextbus) + " min";
-
+                            nextbustime = String(nextbus) + " min";
                         } else {
-                            newarrivaltime = addMinutes(arrivaltime, nextbus);
-                            new_nextbus = String(nextbus) + " mins";
+                            nextbustime = String(nextbus) + " mins";
                         }
                     }
-                    
-                }
-                // console.log("OB",old_nextbus);
-                // console.log("NB",nextbus);
-                // if (nextbus != "--" || nextbus != "Due") {
-                //     old_nextbus = nextbus;
-                //     if (old_nextbus != 0 && old_nextbus < Number(nextbus) && nextbuses != []){
-                //         // console.log('in here');
-                //         $("#eta-id").text(newarrivaltime);
-                //     }
-                // }
-                // // console.log(newarrivaltime);
-                if (count == 1 && nextbuses !=[]){
-                    $("#eta-id").text(newarrivaltime);
                 }
                 
-                $("#nextbus-id").text(new_nextbus);
+                $("#eta-id").text(arrivaltime);
+                $("#nextbus-id").text(nextbustime);
             }
+            
             
             function addMinutes(time, minsToAdd) {
                 function D(J) { return (J < 10 ? '0' : '') + J; };
@@ -1215,6 +1204,7 @@ function getRoute(data,line) {
     deleteRoute();
     route.setMap(map);
     addMarkers(routeData,__startStop,__endStop);
+    setMapBounds(__startStop)
     
 }
 function sendErrorReport(){
