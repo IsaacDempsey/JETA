@@ -79,6 +79,7 @@ body {
   display: none;
   position: absolute;
   height:100vh;
+  width: 100vw;
   margin: 0;
   top: 0;
   bottom: 0;
@@ -87,6 +88,20 @@ body {
   padding: 0;
   z-index: 98;
   }
+
+  .switch_note {
+  background-color: rgba(33,37,41,0.9) !important;
+  display: none;
+  position: absolute;
+  height:100vh;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  padding: 0;
+  z-index: 98;
+}
 
 
 /* Positioning the form over the map and on the right of the screen. Parameters are pretty self explanatory */
@@ -195,17 +210,24 @@ a.nav-link{
     .mobile-form { /* Use this class */
       background-color: rgba(33,37,41,0.8) !important;
       border-radius: 10px !important;
-      position: absolute !important; /* Make the position of the form fixed */
+      position: absolute !important; /* Make the position of the form */
       top: 50% !important;
-      /* bottom: 50% !important; */
-      /* min-height: 100vh !important; Full device height */
-      /* max-height: 550px !important; */
       left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
       right: 50% !important;
       transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
       height: auto !important;
       margin: 10px !important;
       width: inherit !important;
+    }
+    .mobile-overlay{
+      position: absolute !important; /* Make the position of the form */
+      top: 50% !important;
+      left:0% !important; /* Since we need the form to hover over the map we will shift the form 50% from left */
+      right: 0% !important;
+      height: auto !important;
+      width: inherit !important;
+      transform: translate(0%, 0%) !important;
+      z-index: 500;
     }
     .home1{
       width: inherit !important;
@@ -305,7 +327,7 @@ a.nav-link{
 
 .errorreport{
   color: white;
-  position: fixed !important; /* Make the position of the form fixed */
+  position: absolute !important; /* Make the position of the form fixed */
   top: 50% !important;
   left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
   right: 50% !important;
@@ -317,23 +339,11 @@ a.nav-link{
   z-index:99;
 }
 
-.switch_note {
-  background-color: rgba(33,37,41,0.9) !important;
-  display: none;
-  position: absolute;
-  height:100vh;
-  margin: 0;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  padding: 0;
-  z-index: 98;
-}
+
 
 .switch_note_content {
   color: white;
-  position: fixed !important; /* Make the position of the form fixed */
+  position: absolute !important; /* Make the position of the form fixed */
   top: 50% !important;
   left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
   right: 50% !important;

@@ -1,7 +1,7 @@
 {% extends "layout.html" %} {% block content %}
 
 <div class="overlay text-center">
-	<div class="errorreport mobile-col-centered" id="error">
+	<div class="errorreport mobile-col-centered mobile-overlay" id="error">
 		<div class="mobile-col-centered" id="errorcontent"></div>
 		<div id="errorsent">
 			<div class="text-center display-5 mobile-col-centered mp-5 p-3">
@@ -15,6 +15,11 @@
 			<div class="col-xs-6 loader mobile-col-centered" id="loading"></div>
 			<div class="col-xs-6 text-center display-4 mobile-col-centered mp-5 p-3">Getting all stops</div>
 		</div>
+	</div>
+	<div class="switch_note_content mobile-overlay">
+		<p id="SwitchText"></p>
+		<p>Please note: this is different from the stop you selected.</p>
+		<button type="button" class="btn btn-primary mx-3 px-3 mp-5" onclick="closeSwitchNote()">OK</button>
 	</div>
 </div>
 
@@ -249,13 +254,6 @@
 		<div class="mobile-col-centered" id="markerwindow-content">
 		</div>
 	</div>	
-</div>
-<div class="switch_note">
-	<div class="switch_note_content">
-		<p id="SwitchText"></p>
-		<p>Please note: this is different from the stop you selected.</p>
-		<button type="button" class="btn btn-primary mx-3 px-3 mp-5" onclick="closeSwitchNote()">OK</button>
-	</div>
 </div>
 
 
