@@ -183,9 +183,12 @@ a.nav-link{
 #toggle-button{
   display: none;
 }
-#myTabContet{
+@media screen and (min-width: 650px){
+  #myTabContet{
   min-width: 400px;
 }
+}
+
 
 /* CSS For the form when the device is opened in mobile */
 @media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */

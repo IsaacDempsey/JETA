@@ -138,3 +138,21 @@ class Weather(models.Model):
             models.Index(fields=['time']),
             models.Index(fields=['date','time']),
         ]
+
+class Timetable(models.Model):
+    stopid = models.IntegerField(null=True)
+    lineid = models.CharField(max_length=10)
+    dayofservice = models.CharField(max_length=10)
+    schedule = ArrayField(models.CharField(max_length=5))
+
+    def __str__(self):
+        return self.stopid
+    
+    class Meta:
+        verbose_name_plural = "Time Table"
+        indexes = [
+            models.Index(fields=['stopid']),
+            models.Index(fields=['lineid']),
+            models.Index(fields=['dayofservice']),
+            models.Index(fields=['stopid', 'lineid', 'dayofservice']),
+        ]
