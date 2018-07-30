@@ -22,8 +22,7 @@
 	<div class="form" id="search-form">
 		<div class="row">
 			<input id="pac-input" class="controls form-control inputRow mt-3 p-3 " type="text" placeholder="Search around Dublin">
-			<div class="switch-field col-xs-6 p-3 ml-3 mp-5" id="sForm">
-				<div class="display-5">Select Span</div>
+			<div class="switch-field col-xs-6 pt-1 ml-3 mp-5" id="sForm">
 				<input type="radio" id="switch_3_left" name="switch_3" value="500m"/>
 				<label for="switch_3_left">500m</label>
 				<input type="radio" id="switch_3_center" name="switch_3" value="1km" checked/>
@@ -39,9 +38,9 @@
 	<div id="map"></div>
 	
 	<div class="col-xs-6 mobile-form form-main" id="form">
-		<div class="col-xs-12 col-centered py-3" id="brand-img">
+		<div class="col-xs-12 col-centered py-3 text-center" id="brand-img">
 			<a class="mx-auto" href="#">
-				<img class="mx-auto d-block" src='{% static "img/Logo11.png" %}' alt="My Jeta Logo" />
+				<img class="mx-auto" src='{% static "img/Logo11.png" %}' alt="My Jeta Logo" />
 			</a>
 		</div>
 		
@@ -51,10 +50,11 @@
 					<a class="nav-link active" id="homeTab" data-toggle="tab" href="#homeMain" role="tab" aria-controls="home" aria-selected="true">Home</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="newsTab" data-toggle="tab" href="#latestNews" role="tab" aria-controls="news" aria-selected="false">News</a>
+					<a class="nav-link" id="ttTab" data-toggle="tab" href="#timetable" role="tab" aria-controls="contact" aria-selected="false">Time Table</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="contactTab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+					<a class="nav-link" id="newsTab" data-toggle="tab" href="#latestNews" role="tab" aria-controls="news" aria-selected="false">News</a>
+					
 				</li>
 			</ul>
 			
@@ -196,14 +196,29 @@
 					</div>
 				</div>
 				
+				
 				<div class="tab-pane fade" id="latestNews" role="tabpanel" aria-labelledby="newsTab">
-					<span class="display-4">LATEST NEWS COMING SOON!</span>
 				</div>
-				<div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contactTab">
-					<span class="display-4">COMING SOON!</span>
+				<div class="tab-pane fade" id="timetable" role="tabpanel" aria-labelledby="ttTab">
+					<div class="col-sm-6 col-centered p-3">
+						<div class="timetable">
+							<input type="text" class="form-control searchTT" placeholder="Location or Stop id">
+							<button type="button" class="timetablebutton">
+								<i class="fas fa-search"></i>
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
+		<!-- <div class="row p-3 mp-5">
+			<div class="col-sm-6">
+				<input type="text" class="form-control" placeholder="Location or Stop id">
+			</div>
+			<div class="col-sm-3">
+				<input type="text" class="form-control" placeholder="Route">
+			</div>
+		</div> -->
 		<!-- <div class="collapse" id- "navbarToggleExternalContent">
 			<ul class="nav nav-tabs px-3 collapse" id="myTab" role="tablist">
 				<li class="nav-item">

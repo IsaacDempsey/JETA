@@ -1097,11 +1097,7 @@ function getTravelTime(content) {
                 count++;
                 var newarrivaltime;
                 if (nextbuses.length == 0) {
-                    if ($(window).width()<650){
-                        nextbus = "--";
-                    } else {
-                        nextbus = "No live bus information available.";
-                    }
+                    nextbus = "--";
                     new_nextbus = nextbus;
                     newarrivaltime = "--:--:--";
                 } else {

@@ -123,8 +123,27 @@ body {
 #home1{
   color: white;
   display: none;
+  max-width: 350px;
 }
-
+.searchTT{
+  border-radius: 10px !important;
+  padding: 1rem !important;
+  width: -webkit-max-content !important;
+  width: -moz-max-content !important;
+  width: max-content !important;
+  background-color: transparent !important;
+  border: none !important;
+  display: inline-block;
+  margin-right: 10px;
+}
+.timetable{
+  border: 1px solid rgb(33,37,41);
+  background-color: white;
+  border-radius: 20px;
+}
+.timetablebutton{
+  display: inline-block;
+}
 .col-centered{
   float: none;
   margin: 0 auto;
@@ -164,8 +183,8 @@ a.nav-link{
 #toggle-button{
   display: none;
 }
-#home1{
-  width: 350px !important;
+#myTabContet{
+  min-width: 400px;
 }
 
 /* CSS For the form when the device is opened in mobile */
