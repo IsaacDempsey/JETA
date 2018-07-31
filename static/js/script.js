@@ -32,7 +32,7 @@ function resizeWindow() {
         $("#toggle-button").show();
         $("#navbarToggleExternalContent").addClass("collapse");
         $j("#form").position({
-                my: "right center",
+                my: "center",
                 at: "right",
                 of: ".wrapper"
             });
@@ -121,7 +121,7 @@ $(document).ready(function () {
     $("#undo").addClass("disabled");
     // Once everything is hidden load the map
     loadMap();
-    $j("#form").show("slide", { direction: "right" }, "slow");
+    $j("#form").show("slide", { direction: "left" }, "slow");
     
     // After the map is loaded plot all the stops
     // loadAllStops();
@@ -129,10 +129,7 @@ $(document).ready(function () {
     $('.close').click(function () {
         $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
     });
-    // Open date box as soon as the user clicks on it
-    $("#date").focus(function () {
-        console.log('focused');
-    });
+    
 });
 
 // Separate Function to render the map
@@ -154,7 +151,7 @@ function loadMap() {
                 style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
                 position: google.maps.ControlPosition.TOP_CENTER
             },
-            zoomControl: false,
+            zoomControl: true,
             zoomControlOptions: {
                 position: google.maps.ControlPosition.LEFT_CENTER
             },
@@ -262,6 +259,7 @@ function loadMap() {
 
         });
         function runCurrentStopLoader(position){
+            deleteRoute();
             current_flag = true;
             lat = position.coords.latitude;
             lng = position.coords.longitude;
@@ -291,6 +289,7 @@ function loadMap() {
             loadGenericStops(lat, lng, radius);
         }
         function runGenericStopLoader(lat,lng,radius){
+            deleteRoute();
             if (radius == '500m') {
                 radius = 0.005
             } else if (radius == '1km') {
@@ -576,6 +575,7 @@ function deactivateDestination(val) {
 
 $(function () {
    $("#source").keyup(function () {
+       deleteRoute();
        var val = $.trim($('#source').val());
        deactivateDestination(val);
        if (val.length==0){
@@ -686,7 +686,6 @@ function addMarkers(data, stopid="None", endstop="None"){
         var flag = false;
         if (data[i].stop_id == stopid) {
             var stop_icon = start_icon;
-            map.setZoom(18);
             map.setCenter(stop);
             flag = true;
         } else {
@@ -826,9 +825,8 @@ function addMarkers(data, stopid="None", endstop="None"){
     }
 
     setMarker(map);
-    if (stopid=="None" && endstop=="None"){
-        setMapBounds(stopid);
-    }
+    setMapBounds(stopid);
+    
     
 
     // if (stopid=="None" && endstop == "None"){
@@ -941,6 +939,7 @@ function setValueOnForm(address, stopid, flag) {
 
 $(function(){
     $("#undo").click(function () {
+        deleteRoute();
         if (__oldStartStop == "") {
             return;
         } else {
