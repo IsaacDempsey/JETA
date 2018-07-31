@@ -45,6 +45,8 @@ body {
   width: -webkit-max-content !important;
   width: -moz-max-content !important;
   width: max-content !important;
+  width: -ms-max-content !important;
+  width: -o-max-content !important;
 }
 
 #hour, #mins{

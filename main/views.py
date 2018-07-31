@@ -328,19 +328,19 @@ def stops(request):
     routes = routes.sort_values('stopids_len').groupby(['lineid', 'direction']).last()
     routes = pd.DataFrame(routes).reset_index()
     routes = routes[['lineid', 'stopids', 'direction']]
-
+    
     # Unstack stopids column.
     routes_unstacked = routes.set_index(['lineid', 'direction']).stopids.apply(pd.Series).stack().reset_index(level=-1, drop=True).astype(int).reset_index()
     routes_unstacked = routes_unstacked.rename(columns={0:'stopid'})
-
+    
     # Create a column indicating the order (program number) of each stop in each route.
     routes_unstacked['program'] = routes_unstacked.groupby(['lineid', 'direction']).cumcount()
 
     # Group lineid and program number into column containing a dict for each stopid. E.g. {'84X': 9, '46A': 15 ...}
-    routes = routes_unstacked.groupby(['stopid']).apply(lambda x: dict(x[['lineid','program']].values))
+    routes = routes_unstacked.groupby(['stopid','direction']).apply(lambda x: dict(x[['lineid','program']].values))
     routes = pd.DataFrame(routes).reset_index()
     routes = routes.rename(columns={0: 'lineid'})
-
+    
     # Get set of stops visted by the routes.
     stops_list = list(set(routes['stopid'].tolist()))
 
@@ -356,7 +356,8 @@ def stops(request):
 
     # Merge stops and routes to combine lineid info with coordinate and address.
     combined_df = pd.merge(stops, routes, on='stopid',sort=False)
-    combined_df = combined_df[['stopid', 'address', 'lineid', 'coord']]
+    combined_df = combined_df[[
+        'stopid', 'address', 'lineid', 'direction','coord']]
 
     # Rename to suit front end conventions
     combined_df = combined_df.rename(columns={'stopid': 'stop_id', 'address': 'stop_name'})

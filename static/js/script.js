@@ -854,7 +854,7 @@ function addMarkers(data, stopid="None", endstop="None"){
     }
 
     setMarker(map);
-    if (stop=="None" && endstop=="None"){
+    if (stopid=="None" && endstop=="None"){
         setMapBounds(stopid);
     }
     
@@ -1057,7 +1057,7 @@ function getTravelTime(content) {
     startStopAutocompleteData.sort(function (a, b) {
         return Number(a.lineid[lin]) - Number(b.lineid[lin]);
     });
-    getRoute(startStopAutocompleteData, lin);
+    getRoute(lin);
     $.ajax({
         url: localAddress + "/main/journeytime",
         data: {
@@ -1168,43 +1168,54 @@ function getTravelTime(content) {
     
 }
 var route = "";
-function getRoute(data,line) {
-    var routeData = [];
-    var firstStop = 0;
-    var lastStop;
+function getRoute(line) {
     
-    for (var i =0 ; i < data.length; i++){
-        if (data[i].stop_id==__endStop){
-            lastStop = Number(data[i].lineid[line]);
+    $.ajax({
+        url: localAddress + "/main/stops",
+        // Set the start text as the label value
+        data: { 
+            source: __startStop,
+            destination: __endStop,
+            lineid: line
+            },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+        // On success send this data to the receive data function
+        success: function (data) {
+            var coordinates = [];
+            data.sort(function(a, b) {
+              return Number(a.lineid[line]) - Number(b.lineid[line]);
+            });
+            for (var i = 0; i < data.length; i++) {
+                coordinates.push({
+                    lat: data[i].coord[1],
+                    lng: data[i].coord[0]
+                });
+            }
+            route = new google.maps.Polyline({
+                path: coordinates,
+                geodesic: true,
+                strokeColor: 'yellow',
+                strokeOpacity: 1.0,
+                strokeWeight: 8
+            });
+
+            deleteRoute();
+            route.setMap(map);
+            addMarkers(data, __startStop, __endStop);
+            setMapBounds(__startStop);
         }
-    }
-    for (var i=0; i<data.length;i++){
-        if (data[i].lineid[line]>= firstStop && data[i].lineid[line] <= lastStop) {
-            routeData.push(data[i]);
-        }
-    }
-    routeData.sort(function(a, b) {
-      return Number(a.lineid[line]) - Number(b.lineid[line]);
-    });
-    // finalData = data;
-    var coordinates = [];
-    for (var i = 0; i < routeData.length; i++) {
-        coordinates.push({
-          lat: routeData[i].coord[1],
-          lng: routeData[i].coord[0]
-        });
-    }
-    route = new google.maps.Polyline({
-        path: coordinates,
-        geodesic: true,
-        strokeColor: 'yellow',
-        strokeOpacity: 1.0,
-        strokeWeight: 8
-    });
-    deleteRoute();
-    route.setMap(map);
-    addMarkers(routeData,__startStop,__endStop);
-    setMapBounds(__startStop)
+
+    }); 
+    
     
 }
 function sendErrorReport(){
