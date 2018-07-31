@@ -143,6 +143,10 @@ body {
   display: none;
   max-width: 350px;
 }
+
+#timetable{
+  max-width: 350px;
+}
 .col-centered{
   float: none;
   margin: 0 auto;
@@ -524,6 +528,9 @@ li.nav-item{
 }
 a#lineid.nav-link.active{
   background-color: red !important;
+}
+a#timetableline.nav-link.active{
+  background-color: #4CAF50 !important;
 }
 .tooltip {
     position: relative;

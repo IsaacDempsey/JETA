@@ -473,8 +473,9 @@ function getTimeTable(stopid){
             console.log(uniqueRoutes);
             $(uniqueRoutes[0]).appendTo("#timetable-content");
             for (var i = 0; i< uniqueRoutes.length; i++){
-                routes_served = '<div class="col-sm-12 mb-2 display-5 col-centerd">'+uniqueRoutes[i]+'</div>';
-                $(routes_served).appendTo("#timetable-content");
+                $('<li class="nav-item"><a class="nav-link active" id="timetableline" href="#">' + uniqueRoutes[i] + "</a></li>").appendTo("#tt-pills");
+                // routes_served = '<div class="mb-2 display-5 col-centerd"><button type="button" class="btn btn-success" >' + uniqueRoutes[i] + "</button></div>";
+                // $(routes_served).appendTo("#timetable-content");
             }
         }
 
