@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Coefficients, Lines, Linked, Routes, Stops
+from .models import Coefficients, Lines, Linked, Routes, Stops, Timetable
 from .destinations import Destinations
 from .route_result import Route_result
 from .switch import Switch_start
@@ -379,3 +379,16 @@ def get_route(request):
         return HttpResponse(source)
     else:
         return HttpResponse(switch)
+
+def get_timetable(request):
+    """This function returns the timetable of a selected stop id"""
+    stop = request.GET.get("stopid")
+    timetable_qs = Timetable.objects.filter(stopid=stop)
+    timetable = pd.DataFrame.from_records(timetable_qs.values())
+    if timetable.empty:
+        response = HttpResponse(json.dumps(
+            {"error": "Please select a stop id"}), content_type='application/json')
+        response.status_code = 400
+        return response
+    return HttpResponse(timetable.to_json(orient='records'), content_type='application/json')
+
