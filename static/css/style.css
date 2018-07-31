@@ -109,11 +109,13 @@ body {
 /* Positioning the form over the map and on the right of the screen. Parameters are pretty self explanatory */
 #form {
   display: none;
-  position: absolute;
+  position: fixed;
   background-color: rgba(33,37,41,0.9) !important;
   margin-top: 0px;
   top: 0px;
-  right: 0px;
+  left: auto !important;
+  right: 0px !important;
+  transform: translate(0%,0%) !important;
   z-index: 99;
   height: 100vh;
   width: max-content !important;
@@ -203,6 +205,10 @@ a.nav-link{
 @media screen and (min-width: 650px){
   #myTabContet{
   min-width: 400px;
+}
+#form{
+  left: auto !important;
+  right: 0px !important;
 }
 }
 
