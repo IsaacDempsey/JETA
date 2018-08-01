@@ -113,7 +113,6 @@ body {
   background-color: rgba(33,37,41,0.9) !important;
   margin-top: 0px;
   top: 0px;
-  left: auto;
   right: 0px;
   z-index: 99;
   height: 100vh;
@@ -191,8 +190,7 @@ a.nav-link{
   min-width: 400px;
 }
 #form{
-  left: auto !important;
-  right: 0px !important;
+  left: auto;
 }
 }
 
@@ -204,9 +202,9 @@ a.nav-link{
       border-radius: 10px !important;
       position: absolute !important; /* Make the position of the form */
       top: 50% !important;
-      /* left: 50% !important; Since we need the form to hover over the map we will shift the form 50% from left */
+      /* left: 50% !important;  */
       right: 50% !important;
-      transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+      transform: translate(-50%, -50%); 
       height: auto !important;
       margin: 10px !important;
       width: inherit !important;

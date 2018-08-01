@@ -383,11 +383,17 @@ def get_route(request):
 def get_timetable(request):
     """This function returns the timetable of a selected stop id"""
     stop = request.GET.get("stopid")
-    timetable_qs = Timetable.objects.filter(stopid=stop)
+    line = request.GET.get("line")
+    timetable_qs = Timetable.objects.all()
+    if stop:
+        stop = int(stop)
+        timetable_qs = timetable_qs.filter(stopid=stop)
+    if line:
+        timetable_qs = timetable_qs.filter(lineid=line)
     timetable = pd.DataFrame.from_records(timetable_qs.values())
     if timetable.empty:
         response = HttpResponse(json.dumps(
-            {"error": "Please select a stop id"}), content_type='application/json')
+            {"error": "No Data fits the Criteria"}), content_type='application/json')
         response.status_code = 400
         return response
     return HttpResponse(timetable.to_json(orient='records'), content_type='application/json')

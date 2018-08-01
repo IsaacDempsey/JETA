@@ -126,7 +126,7 @@ $(document).ready(function () {
     // Once everything is hidden load the map
     loadMap();
     $("#timetable-holder").hide();
-    $j("#form").show("slide", { direction: "left" }, "fast");
+    $j("#form").show("slide", { direction: "right" }, "fast");
     
     // After the map is loaded plot all the stops
     // loadAllStops();
@@ -134,18 +134,6 @@ $(document).ready(function () {
     $('.close').click(function () {
         $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
     });
-    // $(".collapse").on('show.bs.collapse', function () {
-    //     alert('The collapsible content is about to be shown.');
-    // });
-    // $(".collapse").on('shown.bs.collapse', function () {
-    //     alert('The collapsible content is now fully shown.');
-    // });
-    // $(".collapse").on('hide.bs.collapse', function () {
-    //     alert('The collapsible content is about to be hidden.');
-    // });
-    // $(".collapse").on('hidden.bs.collapse', function () {
-    //     alert('The collapsible content is now hidden.');
-    // });
     
     
 });
@@ -420,6 +408,7 @@ $j(function () {
         }
     });      
 });
+var __timeTableStop;
 // Get the timetable values here
 $j(function(){
     $j("#timetable-search").autocomplete({
@@ -435,6 +424,7 @@ $j(function(){
             var start = ui.item.label;
             var pieces = start.split(",");
             var stopid = pieces[pieces.length - 1];
+            __timeTableStop = stopid;
             // ..--> Send an ajax query to the api at the below URL
             getStops(stopid.trim());
             getTimeTable(stopid);
@@ -473,13 +463,41 @@ function getTimeTable(stopid){
             console.log(uniqueRoutes);
             $(uniqueRoutes[0]).appendTo("#timetable-content");
             for (var i = 0; i< uniqueRoutes.length; i++){
-                $('<li class="nav-item"><a class="nav-link active" id="timetableline" href="#">' + uniqueRoutes[i] + "</a></li>").appendTo("#tt-pills");
+                $('<li class="nav-item"><a class="nav-link active" id="timetableline" href="#" onclick=getSchedule(this.innerHTML)>' + uniqueRoutes[i] + "</a></li>").appendTo("#tt-pills");
                 // routes_served = '<div class="mb-2 display-5 col-centerd"><button type="button" class="btn btn-success" >' + uniqueRoutes[i] + "</button></div>";
                 // $(routes_served).appendTo("#timetable-content");
             }
         }
 
     })
+}
+
+function getSchedule(line){
+    var stopid;
+    if (__timeTableStop){
+        stopid=__timeTableStop;
+    }
+    $.ajax({
+        url: localAddress + "/main/get_timetable",
+        data:{
+            stopid: stopid,
+            line: line
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function (jqXHR, textStatus, errorThrown) {
+            //console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $(".switch_note_content").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+        success: function (data) {
+            console.log(data);
+        }
+    });
 }
 function getswitch(selected_dest){
     $.ajax({
