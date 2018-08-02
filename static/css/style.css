@@ -144,7 +144,7 @@ body {
 }
 
 #timetable{
-  max-width: 350px;
+  max-width: 400px;
 }
 .col-centered{
   float: none;
@@ -193,7 +193,14 @@ a.nav-link{
   left: auto;
 }
 }
-
+#tt{
+  border: 1px solid;
+  border-color: #4CAF50;
+}
+#dayofservice{
+  border: 1px solid;
+  border-color: #4d90fe;
+}
 
 /* CSS For the form when the device is opened in mobile */
 @media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
@@ -602,3 +609,44 @@ a#timetableline.nav-link.active{
   overflow-x: hidden;
   overflow-y: auto;
 }
+#timetable-content{
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.schedule{
+  position: absolute !important; /* Make the position of the form fixed */
+  top: 50% !important;  
+  right: 50% !important;
+  transform: translate(-30%, -50%); /* Same reasons from above [To position the form] */
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  background-color: rgba(233, 233, 233, 0.85) !important;
+  border: 1px solid black;
+  border-radius: 10px;
+  width: max-content;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  z-index:99;
+}
+.bac-info-holder{
+  color: white;
+  background-color: #3498db;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.stop-icon{
+  padding: 0px !important;
+}
+/* .schedule{
+  color: white;
+  
+  
+  max-width: -webkit-max-content;
+  max-width: -moz-max-content;
+  max-width: max-content;
+  
+  z-index:99;
+  border: 1px solid;
+  border-color: #f44336;
+  background-color: rgba(233, 233, 233, 0.9) !important;
+} */

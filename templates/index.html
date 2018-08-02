@@ -216,10 +216,52 @@
 							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
 								Routes Serviced
 							</div>
-							<div class="col-sm-12 col-xs-12 mobile-col-centered" id="timetable-content">
-								<ul class="nav nav-pills" id="tt-pills">
+							<div class="row col-centered mobile-col-centered mt-2" id="timetable-content">
+								<div class="col-sm-12 col-centered mobile-col-centered pt-1">
+									<div class="row p-2" id="tt">
+										<div class="col-sm">
+											84X
+										</div>
+										<div class="col-sm text-right">
+											<a data-toggle="collapse" href="#dayofservice" role="button" aria-expanded="false" aria-controls="dayofservice" style="color: white">
+												<i class="fas fa-caret-down"></i>
+											</a>
+										</div>
+									</div>
+									<div class="collapse mt-2" id="dayofservice">
+										<div class="row p-2">
+											<div class="col-sm">
+												 Weekday
+											</div>
+											<div class="col-sm text-right">
+												<i class="fas fa-eye"></i>
+											</div>
+										</div>
+										<div class="row p-2">
+											<div class="col-sm">
+												Sunday
+											</div>
+											<div class="col-sm text-right">
+												<i class="fas fa-eye"></i>
+											</div>
+										</div>
+										<div class="row p-2">
+											<div class="col-sm">
+												Saturday
+											</div>
+											<div class="col-sm text-right">
+												<i class="fas fa-eye"></i>
+											</div>
+										</div>
+									</div>
+								</div>
 								
-								</ul>
+								
+								
+								
+								<!-- <ul class="nav nav-pills" id="tt-pills">
+								
+								</ul> -->
 							</div>
 							
 						</div>
@@ -227,7 +269,7 @@
 				</div>
 			</div>
 		</div>
-		<nav class="navbar navbar-dark bg-dark" role="navigation">
+		<nav class="navbar	" role="navigation">
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-parent="#form" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
 			 aria-expanded="false" aria-label="Toggle navigation" id="toggle-button">
 				<span class="navbar-toggler-icon"></span>
@@ -245,6 +287,109 @@
 		</div>
 	</div>	
 </div>
-
+<div class="schedule">
+	<div class="bac-info-holder px-5 py-2">
+		<div class="row">
+			<div class="col-sm-4">
+				<div class="row">
+					<div class="col-sm stop-icon text-right">
+						<i class="fab fa-periscope"></i>
+					</div>
+					<div class="col-sm stop-icon text-center">
+						400
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="row">
+					<div class="col-sm stop-icon text-right">
+						<i class="fas fa-bus"></i>
+					</div>
+					<div class="col-sm stop-icon text-center">
+						39A
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="row">
+					<div class="col-sm stop-icon text-right">
+						<i class="fas fa-flag"></i>
+					</div>
+					<div class="col-sm stop-icon text-center">
+						Ongar
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="schedule-holder p-5">
+		<div id="schedule-day">
+			<div class="row">
+				<div class="col-sm-12 text-center">
+					SUNDAY
+				</div>
+			</div>	
+		</div>
+		<div class="col-centered" id="schedule-time">
+			<div class="row p-3 mp-5">
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+			</div>
+			<div class="row p-3 mp-5">
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+			</div>
+			<div class="row p-3 mp-5">
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+			</div>
+			<div class="row p-3 mp-5">
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+				<div class="col-sm-3">
+					08:30
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</div>
 
 {% endblock %}
