@@ -460,10 +460,11 @@ function getTimeTable(stopid){
             $.each(routes, function (i, el) {
                 if ($.inArray(el, uniqueRoutes) === -1) uniqueRoutes.push(el);
             });
-            console.log(uniqueRoutes);
             $(uniqueRoutes[0]).appendTo("#timetable-content");
             for (var i = 0; i< uniqueRoutes.length; i++){
-                $('<li class="nav-item"><a class="nav-link active" id="timetableline" href="#" onclick=getSchedule(this.innerHTML)>' + uniqueRoutes[i] + "</a></li>").appendTo("#tt-pills");
+                var line_num = uniqueRoutes[i];
+                var collapse_id = 'dayofservice'+line_num;
+                $('<div class="col-sm-12 col-centered mobile-col-centered pt-1"><div class="row p-2" id="tt"><div class="col-sm">' + line_num + '</div><div class="col-sm text-right"><a data-toggle="collapse" href="#' + collapse_id + '" role="button" aria-expanded="false" aria-controls="' + collapse_id + '" style="color: white" id="open-tt"><i class="fas fa-caret-down"></i></a></div></div><div class="collapse dayofservice" id="' + collapse_id + '"><div class="row p-2"><div class="col-sm">Weekdays</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(3)"><i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Sunday </div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(1)"> <i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Saturday</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(2)"><i class="fas fa-eye"></i></a></div></div></div></div>').appendTo("#timetable-content");
                 // routes_served = '<div class="mb-2 display-5 col-centerd"><button type="button" class="btn btn-success" >' + uniqueRoutes[i] + "</button></div>";
                 // $(routes_served).appendTo("#timetable-content");
             }
@@ -1377,4 +1378,29 @@ $(function () {
       location.reload();
     });
 })
+var dayIndex = 1;
+function plusTimeTable(n){
+    openTimeTable(dayIndex += n);
+}
 
+function currentTimeTable(n){
+    openTimeTable(dayIndex = n);
+}
+
+function openTimeTable(n) {
+    $(".schedule").fadeIn("fast");
+    var days = document.getElementsByClassName("schedule-holder");
+    if (n > days.length){dayIndex = 1};
+    if (n < 1){dayIndex = days.length};
+    for (var i = 0; i < days.length; i++){
+        days[i].style.display = "none";
+    }
+    days[dayIndex-1].style.display = "block";
+}
+
+$(function () {
+    $("#close-tt").click(function () {
+        $("#open-tt").click();
+        $(".schedule").fadeOut("fast");
+    })
+})

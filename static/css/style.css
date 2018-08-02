@@ -187,20 +187,13 @@ a.nav-link{
 }
 @media screen and (min-width: 650px){
   #myTabContet{
-  min-width: 400px;
+    min-width: 400px;
+  }
+  #form{
+    left: auto;
+  }
 }
-#form{
-  left: auto;
-}
-}
-#tt{
-  border: 1px solid;
-  border-color: #4CAF50;
-}
-#dayofservice{
-  border: 1px solid;
-  border-color: #4d90fe;
-}
+
 
 /* CSS For the form when the device is opened in mobile */
 @media screen and (max-width: 650px){ /* When the device screen widht decreases below 650 px */
@@ -615,6 +608,7 @@ a#timetableline.nav-link.active{
 }
 
 .schedule{
+  display: none;
   position: absolute !important; /* Make the position of the form fixed */
   top: 50% !important;  
   right: 50% !important;
@@ -634,8 +628,106 @@ a#timetableline.nav-link.active{
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+.bac-info-holder-close{
+  color: white;
+  background-color:#c62828;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
 .stop-icon{
   padding: 0px !important;
+}
+#tt{
+  border: 1px solid;
+  border-color: #4CAF50;
+}
+.dayofservice{
+  border-top: 0px solid;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+  border-right: 1px solid;
+  border-color: #4d90fe;
+}
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  margin-top: -22px;
+  padding: 16px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation-timing-function: ease-in-out;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+}
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover {
+  /* background-color: rgba(0,0,0,0.8); */
+  /* box-shadow: 0 14px 28px rgba(0,0,0,0.25), 10px 10px 10px rgba(0,0,0,0.22); */
+  animation-name: bounce;
+  -moz-animation-name: bounce;
+  
+}
+.next:hover{
+  animation-name: bounce2;
+  -moz-animation-name: bounce2;
+}
+.schedule-holder{
+  display: none;
+}
+.show-tt{
+  cursor: pointer;
+}
+#close-tt:hover{
+  cursor: pointer;
+}
+@keyframes bounce {
+	0%, 100%, 20%, 50%, 80% {
+		-webkit-transform: translateX(0);
+		-ms-transform:     translateX(0);
+		transform:         translateX(0)
+	}
+	40% {
+		-webkit-transform: translateX(-15px);
+		-ms-transform:     translateX(-15px);
+		transform:         translateX(-15px)
+	}
+	60% {
+		-webkit-transform: translateX(-8px);
+		-ms-transform:     translateX(-8px);
+		transform:         translateX(-8px)
+	}
+}
+@keyframes bounce2 {
+	0%, 100%, 20%, 50%, 80% {
+		-webkit-transform: translateX(0);
+		-ms-transform:     translateX(0);
+		transform:         translateX(0)
+	}
+	40% {
+		-webkit-transform: translateX(+15px);
+		-ms-transform:     translateX(+15px);
+		transform:         translateX(+15px)
+	}
+	60% {
+		-webkit-transform: translateX(+8px);
+		-ms-transform:     translateX(+8px);
+		transform:         translateX(+8px)
+	}
 }
 /* .schedule{
   color: white;
