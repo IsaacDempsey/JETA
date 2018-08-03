@@ -428,7 +428,7 @@ $j(function(){
             var stopid = pieces[pieces.length - 1];
             __timeTableStop = stopid;
             // ..--> Send an ajax query to the api at the below URL
-            getStops(stopid.trim());
+            // getStops(stopid.trim());
             getTimeTable(stopid);
         }
     });
@@ -466,7 +466,7 @@ function getTimeTable(stopid){
             for (var i = 0; i< uniqueRoutes.length; i++){
                 var line_num = uniqueRoutes[i];
                 var collapse_id = 'dayofservice'+line_num;
-                $('<div class="col-sm-12 col-centered mobile-col-centered pt-1"><div class="row p-2" id="tt"><div class="col-sm">' + line_num + '</div><div class="col-sm text-right"><a data-toggle="collapse" href="#' + collapse_id + '" role="button" aria-expanded="false" aria-controls="' + collapse_id + '" style="color: white" id="open-tt"><i class="fas fa-caret-down"></i></a></div></div><div class="collapse dayofservice" id="' + collapse_id + '"><div class="row p-2"><div class="col-sm">Weekdays</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(3)"><i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Sunday </div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(1)"> <i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Saturday</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(2)"><i class="fas fa-eye"></i></a></div></div></div></div>').appendTo("#timetable-content");
+                $('<div class="col-sm-12 col-centered mobile-col-centered pt-1"><div class="row p-2" id="tt"><div class="col-sm-6" id="tt-line">' + line_num + '</div><div class="col-sm text-right" id="tt-caret"><a data-toggle="collapse" href="#' + collapse_id + '" role="button" aria-expanded="false" aria-controls="' + collapse_id + '" style="color: white" id="open-tt"><i class="fas fa-caret-down"></i></a></div></div><div class="collapse dayofservice" id="' + collapse_id + '"><div class="row p-2"><div class="col-sm">Weekdays</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(3)"><i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Sunday </div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(1)"> <i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Saturday</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(2)"><i class="fas fa-eye"></i></a></div></div></div></div>').appendTo("#timetable-content");
                 // routes_served = '<div class="mb-2 display-5 col-centerd"><button type="button" class="btn btn-success" >' + uniqueRoutes[i] + "</button></div>";
                 // $(routes_served).appendTo("#timetable-content");
             }
@@ -1388,9 +1388,21 @@ function plusTimeTable(n){
 function currentTimeTable(n){
     openTimeTable(dayIndex = n);
 }
-
+var count=0;
 function openTimeTable(n) {
+    count++;
     $(".schedule").fadeIn("fast");
+    if (count==1){
+        $('#schedule-container').css('position', 'absolute');
+        $('#schedule-container').css("left", ($(window).width() / 2 - $('#schedule-container').width() / 2) + "px");
+        $('#schedule-container').css("top", ($(window).height() / 2 - $('#schedule-container').height() / 2) + "px");
+    }
+    
+    // $j("#schedule-container").position({
+    //   my: "center",
+    //   at: "center",
+    //   of: ".wrapper"
+    // });
     var days = document.getElementsByClassName("schedule-holder");
     if (n > days.length){dayIndex = 1};
     if (n < 1){dayIndex = days.length};
