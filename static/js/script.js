@@ -31,20 +31,22 @@ function resizeWindow() {
     if ($(window).width() <= 650) {
         $("#toggle-button").show();
         $("#navbarToggleExternalContent").addClass("collapse");
+        // $("#mobile-container").addClass("mobile-form-container");
         $j("#form").position({
-                my: "center",
-                at: "right",
-                of: ".wrapper"
-            });
+          my: "right center",
+          at: "right",
+          of: ".mobile-form-container"
+        });
         
     } else {
         $("#toggle-button").hide();
         $("#navbarToggleExternalContent").removeClass("collapse");
-        $j("#form").position({
-            my: "right center",
-            at: "right",
-            of: ".wrapper"
-        });
+        // $("#mobile-container").removeClass("mobile-form-container");
+        // $j("#form").position({
+        //   my: "right center",
+        //   at: "right",
+        //   of: ".mobile-form-container"
+        // });
     }
 }
 
@@ -61,13 +63,13 @@ $(function () {
             $j("#form").position({
                 my: "center",
                 at: "right",
-                of: ".wrapper"
+                of: ".mobile-form-container"
             });
         } else {
             $j("#form").position({
                 my: "center",
                 at: "center",
-                of: ".wrapper"
+                of: ".mobile-form-container"
             });
         }
 

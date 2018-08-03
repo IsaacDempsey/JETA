@@ -24,265 +24,268 @@
 </div>
 
 <div class="wrapper" id="targetElement">
-	<div class="form" id="search-form">
-		<div class="row">
-			<input id="pac-input" class="controls form-control inputRow mt-3 p-3 " type="text" placeholder="Search around Dublin">
-			<div class="switch-field col-xs-6 pt-1 ml-3 mp-5" id="sForm">
-				<input type="radio" id="switch_3_left" name="switch_3" value="500m"/>
-				<label for="switch_3_left">500m</label>
-				<input type="radio" id="switch_3_center" name="switch_3" value="1km" checked/>
-				<label for="switch_3_center">1km</label>
-				<input type="radio" id="switch_3_right" name="switch_3" value="2km" />
-				<label for="switch_3_right">2km</label>
-			</div>
-		</div>
-		
-		<!-- <button type="button" class="col-xs-6 btn btn-outline-success form-control" id="getTime">Get My Travel Time</button> -->
-	</div>	
-	
 	<div id="map"></div>
-	
-	<div class="col-xs-6 mobile-form form-main" id="form">
-		<div class="col-xs-12 col-centered py-3 text-center" id="brand-img">
-			<a class="mx-auto" href="#">
-				<img class="mx-auto" src='{% static "img/Logo11.png" %}' alt="My Jeta Logo" />
-			</a>
-		</div>
-		
-		<div class="col-xs-12 py-3" id="navbarToggleExternalContent">
-			<ul class="nav nav-tabs px-3" id="myTab" role="tablist">
-				<li class="nav-item">
-					<a class="nav-link active" id="homeTab" data-toggle="tab" href="#homeMain" role="tab" aria-controls="home" aria-selected="true">Home</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" id="ttTab" data-toggle="tab" href="#timetable" role="tab" aria-controls="contact" aria-selected="false">Time Table</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" id="newsTab" data-toggle="tab" href="#latestNews" role="tab" aria-controls="news" aria-selected="false">News</a>
-					
-				</li>
-			</ul>
-			
-			<div class="tab-content" id="myTabContet">
-				<div class="tab-pane fade show active p-3" id="homeMain" role="tabpanel" aria-labelledby="homeTab">
-					<div id="home">
-						<div class="row px-3 pt-3">
-							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
-								Get your Journey Time
-							</div>
-						</div>
-						<div class="row px-3 pt-3">
-							<div class="col-sm-12 col-xs-12 mobile-col-centered" id="sourceDiv">
-								<input class="form-control inputRow px-3 mp-5" id="source" placeholder="Enter Source" type="text"></input>
-								<span class="text-danger" id="noSource">! Please select a source</span>
-							</div>
-						</div>
-						<div class="row px-3 pt-3">
-							<div class="col-sm-12 col-xs-12 mobile-col-centered">
-								<input class="form-control inputRow px-3 mp-5" id="destination" placeholder="Enter Destination" type="text">
-								<span class="text-danger" id="noDestination">! Please select a destination</span>
-							</div>
-						</div>
-						<div class="row px-3 pt-3">
-							<div class="col-sm-12 col-xs-12 mobile-col-centered">
-								<input class="form-control inputRow px-3 mp-5" type="date" id="date" placeholder="Select Date">
-							</div>
-						</div>
-						<div class="row px-3 pt-3">
-							<div class="col-sm-5 col-xs-5 mobile-col-centered col-centered display-5 text-left mp-5 timers" style="color: #fff;" id="hour-holder">
-								Set Hour:
-								<select id="hour">
-									<option value="05">05</option>
-									<option value="06">06</option>
-									<option value="07">07</option>
-									<option value="08">08</option>
-									<option value="09">09</option>
-									<option value="10">10</option>
-									<option value="11">11</option>
-									<option value="12">12</option>
-									<option value="13">13</option>
-									<option value="14">14</option>
-									<option value="15">15</option>
-									<option value="16">16</option>
-									<option value="17">17</option>
-									<option value="18">18</option>
-									<option value="19">19</option>
-									<option value="20">20</option>
-									<option value="21">21</option>
-									<option value="22">22</option>
-									<option value="23">23</option>
-									<option value="00">00</option>
-								</select>
-							</div>
-					
-							<div class="col-sm-6 col-xs-6 mobile-col-centered  col-centered text-left display-5 mp-5 timers" style="color: #fff;" id="mins-holder">
-								Set Minutes:
-								<select id="mins">
-									<option value="00">00</option>
-									<option value="15">15</option>
-									<option value="30">30</option>
-									<option value="45">45</option>
-								</select>
-							</div>
-						</div>
-					
-						<div class="row px-3 pt-3">
-							<div class="col-sm-8 col-xs-8">
-								<button type="button" class="btn btn-outline-success px-3 mp-5 form-control inputRow" id="getTime">Get My Travel Time</button>
-							</div>
-							<div class="col-sm-4 col-xs-4">
-								<button type="button" class="btn btn-outline-light px-3 mp-5 form-control inputRow" id="undo">Undo</button>
-							</div>
-						</div>
-					</div>
-					<div class="home1" id="home1">
-						<div class="row px-3 pt-3" id="lineholder">
-							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
-								Routes for your Journey
-							</div>
-						</div>
-						<div class="row px-3 pt-3">
-							<div class="col-sm-12 col-xs-12 mobile-col-centered" id="linecontent">
-								<ul class="nav nav-pills" id="line-pills">
-					
-								</ul>
-							</div>
-						</div>
-					
-						<div class="row px-3 pt-3" id="journeyholder">
-							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
-								Total Journey Time
-							</div>
-							<div class="px-3 col-centered" id="journeycontent">
-								<div class="row px-3">
-									<div class="col-xs-6">Route: </div>
-									<div class="col-xs-6 px-3">
-										<b id="route-id"></b>
-									</div>
-								</div>
-					
-								<div class="row px-3">
-					
-									<div class="col-xs-6">Journey Time: </div>
-					
-									<div class="col-xs-6 px-3">
-					
-										<b id="totaltraveltime-id"></b>
-									</div>
-								</div>
-					
-								<div class="row px-3">
-					
-									<div class="col-xs-6">ETA at Destination: </div>
-					
-									<div class="col-xs-6 px-3">
-					
-										<b id="eta-id"></b>
-									</div>
-								</div>
-					
-								<div class="row px-3">
-					
-									<div class="col-xs-6">Next bus arriving in: </div>
-					
-									<div class="col-xs-6 px-3">
-					
-										<b id="nextbus-id"></b>
-									</div>
-								</div>
-							</div>
-						</div>
-					
-						<div class="row px-3 pt-3">
-							<div class="px-3 mobile-col-centered col-centered">
-								<button type="button" class="btn btn-outline-danger px-3 inputRow" id="goBackSearch">Go Back to Search</button>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="tab-pane fade" id="latestNews" role="tabpanel" aria-labelledby="newsTab">
-				</div>
-				<div class="tab-pane fade" id="timetable" role="tabpanel" aria-labelledby="ttTab">
-					
-						<div class="row col-centered p-3 m-3 search">
-							<div class="col-sm-2 text-center pr-0">
-								<i class="fas fa-search" aria-hidden="true"></i>
-							</div>
-							<div class="col-sm-10 p-0">
-								<input type="text" class="form-control" placeholder="Search by Location or Stop id" id="timetable-search">
-							</div>
-						</div>
-						<div class="row col-centered p-3 m-3" id="timetable-holder">
-							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
-								Routes Serviced
-							</div>
-							<div class="row col-centered mobile-col-centered mt-2" id="timetable-content">
-								
-								<!-- <div class="col-sm-12 col-centered mobile-col-centered pt-1">
-									<div class="row p-2" id="tt">
-										<div class="col-sm">
-											84
-										</div>
-										<div class="col-sm text-right">
-											<a data-toggle="collapse" href="#dayofservice84" role="button" aria-expanded="false" aria-controls="dayofservice84" style="color: white"
-											 id="open-tt">
-												<i class="fas fa-caret-down"></i>
-											</a>
-										</div>
-									</div>
-									<div class="collapse dayofservice" id="dayofservice84">
-										<div class="row p-2">
-											<div class="col-sm">
-												Weekday
-											</div>
-											<div class="col-sm text-right">
-												<a class="show-tt" onclick="currentTimeTable(3)">
-													<i class="fas fa-eye"></i>
-												</a>
-											</div>
-										</div>
-										<div class="row p-2">
-											<div class="col-sm">
-												Sunday
-											</div>
-											<div class="col-sm text-right">
-												<a class="show-tt" onclick="currentTimeTable(1)">
-													<i class="fas fa-eye"></i>
-												</a>
-											</div>
-										</div>
-										<div class="row p-2">
-											<div class="col-sm">
-												Saturday
-											</div>
-											<div class="col-sm text-right">
-												<a class="show-tt" onclick="currentTimeTable(2)">
-													<i class="fas fa-eye"></i>
-												</a>
-											</div>
-										</div>
-									</div>
-								</div> -->
-								
-								
-								
-								
-								<!-- <ul class="nav nav-pills" id="tt-pills">
-								
-								</ul> -->
-							</div>
-							
-						</div>
-					
+	<div class="mobile-form-container" id="mobile-container">
+		<div class="form" id="search-form">
+			<div class="row">
+				<input id="pac-input" class="controls form-control inputRow mt-3 p-3 " type="text" placeholder="Search around Dublin">
+				<div class="switch-field col-xs-6 pt-1 ml-3 mp-5" id="sForm">
+					<input type="radio" id="switch_3_left" name="switch_3" value="500m"/>
+					<label for="switch_3_left">500m</label>
+					<input type="radio" id="switch_3_center" name="switch_3" value="1km" checked/>
+					<label for="switch_3_center">1km</label>
+					<input type="radio" id="switch_3_right" name="switch_3" value="2km" />
+					<label for="switch_3_right">2km</label>
 				</div>
 			</div>
+			
+			<!-- <button type="button" class="col-xs-6 btn btn-outline-success form-control" id="getTime">Get My Travel Time</button> -->
+		</div>	
+		
+		
+		
+		<div class="col-xs-6 mobile-form form-main" id="form">
+			<div class="col-xs-12 col-centered py-3 text-center" id="brand-img">
+				<a class="mx-auto" href="#">
+					<img class="mx-auto" src='{% static "img/Logo11.png" %}' alt="My Jeta Logo" />
+				</a>
+			</div>
+			
+			<div class="col-xs-12 py-3" id="navbarToggleExternalContent">
+				<ul class="nav nav-tabs px-3" id="myTab" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link active" id="homeTab" data-toggle="tab" href="#homeMain" role="tab" aria-controls="home" aria-selected="true">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="ttTab" data-toggle="tab" href="#timetable" role="tab" aria-controls="contact" aria-selected="false">Time Table</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="newsTab" data-toggle="tab" href="#latestNews" role="tab" aria-controls="news" aria-selected="false">News</a>
+						
+					</li>
+				</ul>
+				
+				<div class="tab-content" id="myTabContet">
+					<div class="tab-pane fade show active p-3" id="homeMain" role="tabpanel" aria-labelledby="homeTab">
+						<div id="home">
+							<div class="row px-3 pt-3">
+								<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
+									Get your Journey Time
+								</div>
+							</div>
+							<div class="row px-3 pt-3">
+								<div class="col-sm-12 col-xs-12 mobile-col-centered" id="sourceDiv">
+									<input class="form-control inputRow px-3 mp-5" id="source" placeholder="Enter Source" type="text"></input>
+									<span class="text-danger" id="noSource">! Please select a source</span>
+								</div>
+							</div>
+							<div class="row px-3 pt-3">
+								<div class="col-sm-12 col-xs-12 mobile-col-centered">
+									<input class="form-control inputRow px-3 mp-5" id="destination" placeholder="Enter Destination" type="text">
+									<span class="text-danger" id="noDestination">! Please select a destination</span>
+								</div>
+							</div>
+							<div class="row px-3 pt-3">
+								<div class="col-sm-12 col-xs-12 mobile-col-centered">
+									<input class="form-control inputRow px-3 mp-5" type="date" id="date" placeholder="Select Date">
+								</div>
+							</div>
+							<div class="row px-3 pt-3">
+								<div class="col-sm-5 col-xs-5 mobile-col-centered col-centered display-5 text-left mp-5 timers" style="color: #fff;" id="hour-holder">
+									Set Hour:
+									<select id="hour">
+										<option value="05">05</option>
+										<option value="06">06</option>
+										<option value="07">07</option>
+										<option value="08">08</option>
+										<option value="09">09</option>
+										<option value="10">10</option>
+										<option value="11">11</option>
+										<option value="12">12</option>
+										<option value="13">13</option>
+										<option value="14">14</option>
+										<option value="15">15</option>
+										<option value="16">16</option>
+										<option value="17">17</option>
+										<option value="18">18</option>
+										<option value="19">19</option>
+										<option value="20">20</option>
+										<option value="21">21</option>
+										<option value="22">22</option>
+										<option value="23">23</option>
+										<option value="00">00</option>
+									</select>
+								</div>
+						
+								<div class="col-sm-6 col-xs-6 mobile-col-centered  col-centered text-left display-5 mp-5 timers" style="color: #fff;" id="mins-holder">
+									Set Minutes:
+									<select id="mins">
+										<option value="00">00</option>
+										<option value="15">15</option>
+										<option value="30">30</option>
+										<option value="45">45</option>
+									</select>
+								</div>
+							</div>
+						
+							<div class="row px-3 pt-3">
+								<div class="col-sm-8 col-xs-8">
+									<button type="button" class="btn btn-outline-success px-3 mp-5 form-control inputRow" id="getTime">Get My Travel Time</button>
+								</div>
+								<div class="col-sm-4 col-xs-4">
+									<button type="button" class="btn btn-outline-light px-3 mp-5 form-control inputRow" id="undo">Undo</button>
+								</div>
+							</div>
+						</div>
+						<div class="home1" id="home1">
+							<div class="row px-3 pt-3" id="lineholder">
+								<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
+									Routes for your Journey
+								</div>
+							</div>
+							<div class="row px-3 pt-3">
+								<div class="col-sm-12 col-xs-12 mobile-col-centered" id="linecontent">
+									<ul class="nav nav-pills" id="line-pills">
+						
+									</ul>
+								</div>
+							</div>
+						
+							<div class="row px-3 pt-3" id="journeyholder">
+								<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
+									Total Journey Time
+								</div>
+								<div class="px-3 col-centered" id="journeycontent">
+									<div class="row px-3">
+										<div class="col-xs-6">Route: </div>
+										<div class="col-xs-6 px-3">
+											<b id="route-id"></b>
+										</div>
+									</div>
+						
+									<div class="row px-3">
+						
+										<div class="col-xs-6">Journey Time: </div>
+						
+										<div class="col-xs-6 px-3">
+						
+											<b id="totaltraveltime-id"></b>
+										</div>
+									</div>
+						
+									<div class="row px-3">
+						
+										<div class="col-xs-6">ETA at Destination: </div>
+						
+										<div class="col-xs-6 px-3">
+						
+											<b id="eta-id"></b>
+										</div>
+									</div>
+						
+									<div class="row px-3">
+						
+										<div class="col-xs-6">Next bus arriving in: </div>
+						
+										<div class="col-xs-6 px-3">
+						
+											<b id="nextbus-id"></b>
+										</div>
+									</div>
+								</div>
+							</div>
+						
+							<div class="row px-3 pt-3">
+								<div class="px-3 mobile-col-centered col-centered">
+									<button type="button" class="btn btn-outline-danger px-3 inputRow" id="goBackSearch">Go Back to Search</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade" id="latestNews" role="tabpanel" aria-labelledby="newsTab">
+					</div>
+					<div class="tab-pane fade" id="timetable" role="tabpanel" aria-labelledby="ttTab">
+						
+							<div class="row col-centered p-3 m-3 search">
+								<div class="col-sm-2 text-center pr-0">
+									<i class="fas fa-search" aria-hidden="true"></i>
+								</div>
+								<div class="col-sm-10 p-0">
+									<input type="text" class="form-control" placeholder="Search by Location or Stop id" id="timetable-search">
+								</div>
+							</div>
+							<div class="row col-centered p-3 m-3" id="timetable-holder">
+								<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
+									Routes Serviced
+								</div>
+								<div class="row col-centered mobile-col-centered mt-2" id="timetable-content">
+									
+									<!-- <div class="col-sm-12 col-centered mobile-col-centered pt-1">
+										<div class="row p-2" id="tt">
+											<div class="col-sm">
+												84
+											</div>
+											<div class="col-sm text-right">
+												<a data-toggle="collapse" href="#dayofservice84" role="button" aria-expanded="false" aria-controls="dayofservice84" style="color: white"
+												id="open-tt">
+													<i class="fas fa-caret-down"></i>
+												</a>
+											</div>
+										</div>
+										<div class="collapse dayofservice" id="dayofservice84">
+											<div class="row p-2">
+												<div class="col-sm">
+													Weekday
+												</div>
+												<div class="col-sm text-right">
+													<a class="show-tt" onclick="currentTimeTable(3)">
+														<i class="fas fa-eye"></i>
+													</a>
+												</div>
+											</div>
+											<div class="row p-2">
+												<div class="col-sm">
+													Sunday
+												</div>
+												<div class="col-sm text-right">
+													<a class="show-tt" onclick="currentTimeTable(1)">
+														<i class="fas fa-eye"></i>
+													</a>
+												</div>
+											</div>
+											<div class="row p-2">
+												<div class="col-sm">
+													Saturday
+												</div>
+												<div class="col-sm text-right">
+													<a class="show-tt" onclick="currentTimeTable(2)">
+														<i class="fas fa-eye"></i>
+													</a>
+												</div>
+											</div>
+										</div>
+									</div> -->
+									
+									
+									
+									
+									<!-- <ul class="nav nav-pills" id="tt-pills">
+									
+									</ul> -->
+								</div>
+								
+							</div>
+						
+					</div>
+				</div>
+			</div>
+			<nav class="navbar navbar-dark bg-dark" role="navigation">
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-parent="#form" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
+				aria-expanded="false" aria-label="Toggle navigation" id="toggle-button">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+			</nav>
 		</div>
-		<nav class="navbar	" role="navigation">
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-parent="#form" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
-			 aria-expanded="false" aria-label="Toggle navigation" id="toggle-button">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-		</nav>
 	</div>
 </div>
 <div class="mobile-markerwindow">

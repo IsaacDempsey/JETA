@@ -75,7 +75,11 @@ body {
   padding: 0;
   width: 100vw;
   }
-
+.mobile-form-container{
+  width: 90vw;
+  margin: 15px;
+  background: transparent;
+}
 .overlay {
   background-color: rgba(33,37,41,0.9) !important;
   display: none;
@@ -202,12 +206,12 @@ a.nav-link{
       border-radius: 10px !important;
       position: absolute !important; /* Make the position of the form */
       top: 50% !important;
-      /* left: 50% !important;  */
+      left: 50%; 
       right: 50% !important;
       transform: translate(-50%, -50%); 
       height: auto !important;
       margin: 10px !important;
-      width: inherit !important;
+      /* width: inherit !important; */
     }
     .mobile-overlay{
       position: absolute !important; /* Make the position of the form */
