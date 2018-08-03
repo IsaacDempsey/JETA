@@ -113,9 +113,7 @@ body {
   background-color: rgba(33,37,41,0.9) !important;
   margin-top: 0px;
   top: 0px;
-  left: auto !important;
-  right: 0px !important;
-  transform: translate(0%,0%) !important;
+  right: 0px;
   z-index: 99;
   height: 100vh;
   width: max-content !important;
@@ -144,24 +142,9 @@ body {
   display: none;
   max-width: 350px;
 }
-.searchTT{
-  border-radius: 10px !important;
-  padding: 1rem !important;
-  width: -webkit-max-content !important;
-  width: -moz-max-content !important;
-  width: max-content !important;
-  background-color: transparent !important;
-  border: none !important;
-  display: inline-block;
-  margin-right: 10px;
-}
-.timetable{
-  border: 1px solid rgb(33,37,41);
-  background-color: white;
-  border-radius: 20px;
-}
-.timetablebutton{
-  display: inline-block;
+
+#timetable{
+  max-width: 350px;
 }
 .col-centered{
   float: none;
@@ -207,8 +190,7 @@ a.nav-link{
   min-width: 400px;
 }
 #form{
-  left: auto !important;
-  right: 0px !important;
+  left: auto;
 }
 }
 
@@ -220,9 +202,9 @@ a.nav-link{
       border-radius: 10px !important;
       position: absolute !important; /* Make the position of the form */
       top: 50% !important;
-      left: 50%; /* Since we need the form to hover over the map we will shift the form 50% from left */
+      /* left: 50% !important;  */
       right: 50% !important;
-      transform: translate(-50%, -50%); /* Same reasons from above [To position the form] */
+      transform: translate(-50%, -50%); 
       height: auto !important;
       margin: 10px !important;
       width: inherit !important;
@@ -545,6 +527,9 @@ li.nav-item{
 a#lineid.nav-link.active{
   background-color: red !important;
 }
+a#timetableline.nav-link.active{
+  background-color: #4CAF50 !important;
+}
 .tooltip {
     position: relative;
     display: inline-block;
@@ -567,4 +552,53 @@ a#lineid.nav-link.active{
 .tooltip:hover .tooltiptext {
     visibility: visible;
     z-index: 500;
+}
+
+@import url("//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css");
+.search { 
+  margin-top: 1em;
+  position: relative;
+  background-color: transparent !important;
+  border: none;
+  border-bottom: 1px solid #007bff;
+ }
+.search input {
+  border-radius: 25px;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  padding: 0px !important;
+  color: white;
+
+}
+.search:focus-within{
+  border-bottom: 2px solid #007bff;
+}
+.search input:focus{
+  outline: none !important;
+  box-shadow: 0 0 0 0rem rgba(255,244,255,255) !important;
+  color: white !important;
+}
+
+.search input::placeholder{
+  color: rgba(255, 255, 255, 0.692);
+}
+.search input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: rgba(255, 255, 255, 0.692);
+}
+
+.search input::-ms-input-placeholder { /*EDGE */
+  color: rgba(255, 255, 255, 0.692);
+}
+
+
+.search .fa-search{
+  padding-right: 0px !important;
+  color: rgba(255, 255, 255, 0.692);
+}
+
+#timetable-holder{
+  display: none;
+  color: white;
+  overflow-x: hidden;
+  overflow-y: auto;
 }

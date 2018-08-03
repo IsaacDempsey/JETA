@@ -200,45 +200,35 @@
 						</div>
 					</div>
 				</div>
-				
-				
 				<div class="tab-pane fade" id="latestNews" role="tabpanel" aria-labelledby="newsTab">
 				</div>
 				<div class="tab-pane fade" id="timetable" role="tabpanel" aria-labelledby="ttTab">
-					<div class="col-sm-6 col-centered p-3">
-						<div class="timetable">
-							<input type="text" class="form-control searchTT" placeholder="Location or Stop id">
-							<button type="button" class="timetablebutton">
-								<i class="fas fa-search"></i>
-							</button>
+					
+						<div class="row col-centered p-3 m-3 search">
+							<div class="col-sm-2 text-center pr-0">
+								<i class="fas fa-search" aria-hidden="true"></i>
+							</div>
+							<div class="col-sm-10 p-0">
+								<input type="text" class="form-control" placeholder="Search by Location or Stop id" id="timetable-search">
+							</div>
 						</div>
-					</div>
+						<div class="row col-centered p-3 m-3" id="timetable-holder">
+							<div class="col-xs-12 col-centered px-5 text-center display-5 mp-5" style="color: #fff;">
+								Routes Serviced
+							</div>
+							<div class="col-sm-12 col-xs-12 mobile-col-centered" id="timetable-content">
+								<ul class="nav nav-pills" id="tt-pills">
+								
+								</ul>
+							</div>
+							
+						</div>
+					
 				</div>
 			</div>
 		</div>
-		<!-- <div class="row p-3 mp-5">
-			<div class="col-sm-6">
-				<input type="text" class="form-control" placeholder="Location or Stop id">
-			</div>
-			<div class="col-sm-3">
-				<input type="text" class="form-control" placeholder="Route">
-			</div>
-		</div> -->
-		<!-- <div class="collapse" id- "navbarToggleExternalContent">
-			<ul class="nav nav-tabs px-3 collapse" id="myTab" role="tablist">
-				<li class="nav-item">
-					<a class="nav-link active" id="homeTab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" id="newsTab" data-toggle="tab" href="#latestNews" role="tab" aria-controls="news" aria-selected="false">News</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" id="contactTab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
-				</li>
-			</ul>
-		</div> -->
 		<nav class="navbar navbar-dark bg-dark" role="navigation">
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-parent="#form" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
 			 aria-expanded="false" aria-label="Toggle navigation" id="toggle-button">
 				<span class="navbar-toggler-icon"></span>
 			</button>
