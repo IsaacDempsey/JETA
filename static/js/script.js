@@ -168,34 +168,34 @@ function loadMap() {
             styles: mapstyle
         });
 
-        // $.getJSON('/static/json/routes.json', function(data) {
-        //     var coordinates_arr = [];
+        $.getJSON('/static/json/routes.json', function(data) {
+            var coordinates_arr = [];
      
-        //     //iterates through each key in json
-        //     $.each(data, function(index, data) {
-        //     var coordinates = [];
-        //     for (var i = 0; i < data.length; i++) {
-        //     var iarr = data[i];
-        //     coordinates.push({lat: iarr[1], lng: iarr[0]});
-        //     if (i == data.length - 1) {
-        //         coordinates_arr.push(coordinates);
-        //         coordinates = [];
-        //     }
-        //     }
-        //     })
-        //  for (var i = 0; i < coordinates_arr.length; i++) {
-        //  var line = coordinates_arr[i];
-        //  var busroute = new google.maps.Polyline({
-        //     path: line,
-        //     geodesic: true,
-        //     strokeColor: '#b3ccff',
-        //     strokeOpacity: 1.0,
-        //     strokeWeight: 2
-        //   });
+            //iterates through each key in json
+            $.each(data, function(index, data) {
+            var coordinates = [];
+            for (var i = 0; i < data.length; i++) {
+            var iarr = data[i];
+            coordinates.push({lat: iarr[1], lng: iarr[0]});
+            if (i == data.length - 1) {
+                coordinates_arr.push(coordinates);
+                coordinates = [];
+            }
+            }
+            })
+         for (var i = 0; i < coordinates_arr.length; i++) {
+         var line = coordinates_arr[i];
+         var busroute = new google.maps.Polyline({
+            path: line,
+            geodesic: true,
+            strokeColor: '#b3ccff',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
      
-        //   busroute.setMap(map);
-        //       };
-        //     });
+          busroute.setMap(map);
+              };
+            });
 
         // Auto complete of generic search to plot bus stops near a paricular location
         // Create the search box and link it to the UI element.
@@ -980,8 +980,33 @@ function getLines(startStop, endStop){
       success: function (data) {
           $("#lineholder").show();
           $("#line-pills").html('');
-          for (var i = 0; i < data.length; i ++){
-              $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this)>' + data[i] + "</a></li>").appendTo("#line-pills");
+          var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
+        var url2 = __startStop
+        var url3 = '&format=json';
+        var res = url1.concat(url2, url3);
+        sorted_lines = data;
+        // If more than one bus route, sort by arriving first
+        if (sorted_lines.length > 1) {
+        $.getJSON(res, function(bus) {
+        var nextbus = [];
+        for (var i = 0; i < bus.results.length; i++) {
+            var iarr = bus.results[i];
+                nextbus.push(bus.results[i].route);           
+        }            
+            function intersect(nextbus, theroutes) {
+                return nextbus.filter(Set.prototype.has, new Set(theroutes));
+                }
+            intersect_arr = intersect(nextbus, data);
+            
+            function removeDuplicates(long_arr){
+                short_arr = Array.from(new Set(long_arr))
+                return short_arr
+                }
+            sorted_lines = removeDuplicates(intersect_arr)
+        });
+        }
+          for (var i = 0; i < sorted_lines.length; i ++){
+              $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this)>' + sorted_lines[i] + "</a></li>").appendTo("#line-pills");
           }
       }
     });
