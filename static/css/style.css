@@ -619,13 +619,40 @@ a#timetableline.nav-link.active{
   /* right: 50% !important; */
   transform: translate(-20%, -50%); 
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-  background-color: rgba(233, 233, 233, 0.85) !important;
+  background-color: rgba(33,37,41,0.9) !important;
   border: 1px solid black;
   border-radius: 10px;
   width: max-content;
   width: -webkit-max-content;
   width: -moz-max-content;
+  max-width: 100%;
   z-index:99;
+  color: white;
+}
+/* @media screen and (min-width: 650px){
+  .schedule{
+  border: 1px solid;
+  border-color: #4CAF50;
+} */
+#schedule-change-destination-holder{
+  display: none;
+
+}
+.new_destination:hover{
+  text-decoration: underline;
+  cursor: pointer;
+  color: #007bff;
+}
+#schedule-destination-holder{
+  width: max-content !important;
+  width: -webkit-max-content !important;
+  width: -moz-max-content !important;
+}
+#schedule-line-destination{
+  padding-left: 0.5rem !important;
+}
+#schedule-change-destination:hover{
+  color: white !important;
 }
 .bac-info-holder{
   color: white;

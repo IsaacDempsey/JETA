@@ -410,98 +410,6 @@ $j(function () {
         }
     });      
 });
-var __timeTableStop;
-// Get the timetable values here
-$j(function(){
-    $j("#timetable-search").autocomplete({
-        source: localAddress + "/main/get_address",
-        minLength: 1,
-        autoFocus: true,
-        classes: {
-            "ui-autocomplete": "highlight"
-        },
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        select: function (e, ui) {
-            var start = ui.item.label;
-            var pieces = start.split(",");
-            var stopid = pieces[pieces.length - 1];
-            __timeTableStop = stopid;
-            // ..--> Send an ajax query to the api at the below URL
-            // getStops(stopid.trim());
-            getTimeTable(stopid);
-        }
-    });
-});
-function getTimeTable(stopid){
-    $.ajax({
-        url: localAddress + "/main/get_timetable",
-        data:{
-            stopid: stopid,
-        }, 
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        error: function (jqXHR, textStatus, errorThrown) {
-            //console.log(jqXHR);
-            $("#form").hide();
-            $(".overlay").show();
-            $(".loadingcontent").hide();
-            $(".switch_note_content").hide();
-            $j("#error").show("slide", { direction: "down" }, "fast");
-            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
-        },
-        success: function (data) {
-            // Here we will receive all the lines as per their schedule data
-            // Loop over the array
-            $("#timetable-holder").show();
-            var routes = [];
-            for (var i =0; i<data.length;i++){
-                routes.push(data[i].lineid);
-            }
-            var uniqueRoutes = [];
-            $.each(routes, function (i, el) {
-                if ($.inArray(el, uniqueRoutes) === -1) uniqueRoutes.push(el);
-            });
-            $(uniqueRoutes[0]).appendTo("#timetable-content");
-            for (var i = 0; i< uniqueRoutes.length; i++){
-                var line_num = uniqueRoutes[i];
-                var collapse_id = 'dayofservice'+line_num;
-                $('<div class="col-sm-12 col-centered mobile-col-centered pt-1"><div class="row p-2" id="tt"><div class="col-sm-6" id="tt-line">' + line_num + '</div><div class="col-sm text-right" id="tt-caret"><a data-toggle="collapse" href="#' + collapse_id + '" role="button" aria-expanded="false" aria-controls="' + collapse_id + '" style="color: white" id="open-tt"><i class="fas fa-caret-down"></i></a></div></div><div class="collapse dayofservice" id="' + collapse_id + '"><div class="row p-2"><div class="col-sm">Weekdays</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(3)"><i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Sunday </div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(1)"> <i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Saturday</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(2)"><i class="fas fa-eye"></i></a></div></div></div></div>').appendTo("#timetable-content");
-                // routes_served = '<div class="mb-2 display-5 col-centerd"><button type="button" class="btn btn-success" >' + uniqueRoutes[i] + "</button></div>";
-                // $(routes_served).appendTo("#timetable-content");
-            }
-        }
-
-    })
-}
-
-function getSchedule(line){
-    var stopid;
-    if (__timeTableStop){
-        stopid=__timeTableStop;
-    }
-    $.ajax({
-        url: localAddress + "/main/get_timetable",
-        data:{
-            stopid: stopid,
-            line: line
-        },
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        error: function (jqXHR, textStatus, errorThrown) {
-            //console.log(jqXHR);
-            $("#form").hide();
-            $(".overlay").show();
-            $(".loadingcontent").hide();
-            $(".switch_note_content").hide();
-            $j("#error").show("slide", { direction: "down" }, "fast");
-            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
-        },
-        success: function (data) {
-            console.log(data);
-        }
-    });
-}
 function getswitch(selected_dest){
     $.ajax({
         url: localAddress + "/main/get_route",
@@ -681,6 +589,7 @@ $(function () {
        deactivateDestination(val);
        if (val.length==0){
            __startStop = "";
+           __endStop = "";
            deleteRoute();
        }
        
@@ -835,7 +744,9 @@ function addMarkers(data, stopid="None", endstop="None"){
                 marker.addListener("click", function () {
                     $j(".mobile-markerwindow").show("slide", { direction: "down" }, "fast");
                     $("#markerwindow-content").html("");
-                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-default disabled tooltip" id="setDest" >Set Destination</button></div></div></div></div>';
+                    var marker_name = this.get("name");
+                    marker_name = marker_name.replace(/(['"])/g, "\\$1");
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning disabled" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '"' + marker_name + '",' + this.get("stopid") + ')" >Open Schedule</button></div></div>';
                     $(content_string).appendTo("#markerwindow-content");
                     this.setOptions({ icon: stop_icon_h });
                 }); 
@@ -846,7 +757,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                         $("#markerwindow-content").html("");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ');setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div>";
+                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '\"' + marker_name + '\",' + this.get("stopid") + ')\" >Open Schedule</button></div></div>';
                         $(content_string).appendTo("#markerwindow-content");
                         this.setOptions({ icon: stop_icon_h });
                     }); 
@@ -856,7 +767,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                         $("#markerwindow-content").html("");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="#">Set Destination</button></div></div></div>';
+                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '"' + marker_name + '",' + this.get("stopid") + ')" >Open Schedule</button></div></div>';
                         $(content_string).appendTo("#markerwindow-content");
                         this.setOptions({ icon: stop_icon_h });
                     }); 
@@ -867,8 +778,10 @@ function addMarkers(data, stopid="None", endstop="None"){
             if (flag) {
                 marker.addListener('mouseover', function () {
                     lasthover = this.getIcon();
+                    var marker_name = this.get("name");
+                    marker_name = marker_name.replace(/(['"])/g, "\\$1");
                     // alert("Hover Out");
-                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-default disabled" id="setSource" >Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-default disabled" id="setDest" >Set Destination</button></div></div>';
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning disabled" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + "'" + marker_name + "'," + this.get("stopid") + ')" >Open Schedule</button></div></div>';
                     infowindow.setContent(content_string);
                     this.setOptions({ icon: stop_icon_h });
                     infowindow.open(map, this);
@@ -885,7 +798,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                         // alert("Hover Out");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick=\"setValueOnForm(\'' + marker_name + "\','" + this.get("stopid") + '\',\'source\')\">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ');setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div>";
+                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '\'' + marker_name + '\',' + this.get("stopid") + ')\" >Open Schedule</button></div></div>';
 
                         infowindow.setContent(content_string);
                         this.setOptions({ icon: stop_icon_h });
@@ -902,7 +815,7 @@ function addMarkers(data, stopid="None", endstop="None"){
                         // alert("Hover Out");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="#">Set Destination</button></div></div>';
+                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + "'" + marker_name + "'," + this.get("stopid") + ')" >Open Schedule</button></div></div>';
 
                         infowindow.setContent(content_string);
                         this.setOptions({ icon: stop_icon_h });
@@ -997,6 +910,10 @@ function deleteRoute(){
 }
 // });
 function setValueOnForm(address, stopid, flag) {
+    $("#homeTab").addClass("active show");
+    $("#ttTab").removeClass("active show");
+    $("#homeMain").addClass("active show");
+    $("#timetable").removeClass("active show");
     deleteRoute();
     $("#pac-input").val("");
     current_flag = false;
@@ -1372,6 +1289,9 @@ function sendErrorReport(){
     
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+// This function executes after the error display is closed for the user
+// It simply hides all the error display shows up the form and reloads the page
 $(function () {
     $("#closeError").click(function () {
       $("#error").hide();
@@ -1379,7 +1299,134 @@ $(function () {
       $("form").show();
       location.reload();
     });
-})
+});
+////////////////////////////////////////////////////////////////////////////////////////
+
+
+// ----------------------------------------------------------------------------------------------------------------------------
+// ----------- The following section contains all the code used to retrieve and manipulate the timetable display on the UI --------
+// ----------------------------------------------------------------------------------------------------------------
+var __timeTableStop; // A global variable 
+// Get the timetable values here
+$j(function () {
+    $j("#timetable-search").autocomplete({
+        source: localAddress + "/main/get_address",
+        minLength: 1,
+        autoFocus: true,
+        classes: {
+            "ui-autocomplete": "highlight"
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        select: function (e, ui) {
+            var start = ui.item.label;
+            var pieces = start.split(",");
+            var stopid = pieces[pieces.length - 1];
+            __timeTableStop = stopid;
+            // ..--> Send an ajax query to the api at the below URL
+            // getStops(stopid.trim());
+            getTimeTable(stopid);
+        }
+    });
+});
+function getTimeTable(stopid) {
+    $.ajax({
+        url: localAddress + "/main/get_timetable",
+        data: {
+            stopid: stopid,
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function (jqXHR, textStatus, errorThrown) {
+            //console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $(".switch_note_content").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+        success: function (data) {
+            // Here we will receive all the lines as per their schedule data
+            // Loop over the array
+            $("#timetable-holder").show();
+            $(".schedule").hide();
+            var routes = [];
+            for (var i = 0; i < data.length; i++) {
+                routes.push(data[i].lineid);
+            }
+            var uniqueRoutes = [];
+            $.each(routes, function (i, el) {
+                if ($.inArray(el, uniqueRoutes) === -1) uniqueRoutes.push(el);
+            });
+            $("#timetable-content").html("");
+            for (var i = 0; i < uniqueRoutes.length; i++) {
+                var line_num = uniqueRoutes[i];
+                var collapse_id = 'dayofservice' + line_num;
+                $('<div class="col-sm-12 col-centered mobile-col-centered pt-1"><div class="row p-2" id="tt"><div class="col-sm-6" id="tt-line">' + line_num + '</div><div class="col-sm text-right" id="tt-caret"><a data-toggle="collapse" href="#' + collapse_id + '" role="button" aria-expanded="false" aria-controls="' + collapse_id + '" style="color: white" id="open-tt" onclick="getSchedule(\''+line_num+'\')"><i class="fas fa-caret-down"></i></a></div></div><div class="collapse dayofservice" id="' + collapse_id + '"><div class="row p-2"><div class="col-sm">Weekdays</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(3)"><i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Sunday </div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(1)"> <i class="fas fa-eye"></i></a></div></div><div class="row p-2"><div class="col-sm">Saturday</div><div class="col-sm text-right"><a class="show-tt" onclick="currentTimeTable(2)"><i class="fas fa-eye"></i></a></div></div></div></div>').appendTo("#timetable-content");
+                // routes_served = '<div class="mb-2 display-5 col-centerd"><button type="button" class="btn btn-success" >' + uniqueRoutes[i] + "</button></div>";
+                // $(routes_served).appendTo("#timetable-content");
+            }
+        }
+
+    })
+}
+
+function getSchedule(line) {
+    var stopid;
+    if (__timeTableStop) {
+        stopid = __timeTableStop;
+    }
+    $.ajax({
+        url: localAddress + "/main/get_timetable",
+        data: {
+            stopid: stopid,
+            line: line
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function (jqXHR, textStatus, errorThrown) {
+            //console.log(jqXHR);
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $(".switch_note_content").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+        success: function (data) {
+            var stopid = data[0].stopid;
+            var lineid = data[0].lineid;
+            var destination1 = data[0].destination;
+            var destinations = [];
+            $("#schedule-stop-number").html(stopid);
+            $("#schedule-line-num").html(lineid);
+            $("#schedule-line-destination").html(destination1);
+            if (data.length > 3){  
+                $("#schedule-change-destination-holder").show();
+                $("#schedule-change-destination-content").html("Set Destination: ");
+                $.each(data, function(i,el){
+                    if ($.inArray(el.destination, destinations) === -1) destinations.push(el.destination);
+                });   
+                console.log("Here",destinations);
+                var new_destinations = destinations.slice(1, destinations.length);
+                var content;
+                for (var i = 0; i < new_destinations.length;i++){
+                    content = '<span class="pr-2 new_destination" id="new_destination' + i.toString() + "\" onclick='changeDestination(this.id)'>" + new_destinations[i] + "</span>";
+                    $(content).appendTo("#schedule-change-destination-content");
+                }
+            } else { $j("#schedule-change-destination-holder").hide();}
+            
+        }
+    });
+}
+function changeDestination(new_value_id){
+    var old_value = $("#schedule-line-destination").html();
+    
+    var new_value = document.getElementById(new_value_id).innerHTML;
+    $("#schedule-line-destination").html(new_value);
+    document.getElementById(new_value_id).innerHTML = old_value ;
+}
 var dayIndex = 1;
 function plusTimeTable(n){
     openTimeTable(dayIndex += n);
@@ -1392,6 +1439,8 @@ var count=0;
 function openTimeTable(n) {
     count++;
     $(".schedule").fadeIn("fast");
+    $j(".schedule").draggable();
+    
     if (count==1){
         $('#schedule-container').css('position', 'absolute');
         $('#schedule-container').css("left", ($(window).width() / 2 - $('#schedule-container').width() / 2) + "px");
@@ -1418,3 +1467,15 @@ $(function () {
         $(".schedule").fadeOut("fast");
     })
 })
+
+function openScheduleforStop(stopname,stopid) {
+    __timeTableStop = stopid;
+    $("#timetable-content").html("");
+    $("#homeTab").removeClass("active show");
+    $("#ttTab").addClass("active show");
+    $("#homeMain").removeClass('active show');
+    $("#timetable").addClass('active show');
+  getTimeTable(stopid);
+  var stop_val = stopname + ' ,' + stopid.toString(); 
+    $("#timetable-search").val(stop_val);
+}
