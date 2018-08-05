@@ -783,7 +783,7 @@ a#timetableline.nav-link.active{
   overflow-y: scroll;
   height: 35vh !important;
 }
-.schedule-holder::-webkit-scrollbar{
+.schedule-holder::-webkit-scrollbar, #timetable-content::-webkit-scrollbar{
   display: none;
 }
 .show-tt{

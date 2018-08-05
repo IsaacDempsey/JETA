@@ -143,31 +143,7 @@ $(document).ready(function () {
     
 });
 
-// This function loads all the stops either searched in the generic search bar or from current location
-function loadGenericStops(latitude, longitude,rad){
-    $.ajax({
-      url: localAddress + "/main/locations",
-      data:{
-          lat: latitude,
-          lng: longitude,
-          radius: rad
-      },
-      contentType: "application/json;charset=utf-8",
-      dataType: "json",
-      error: function(jqXHR, textStatus, errorThrown) {
-        //console.log(jqXHR);
-        $("#form").hide();
-        $(".overlay").show();
-        $(".loadingcontent").hide();
-          $(".switch_note_content").hide();
-        $j("#error").show("slide", { direction: "down" }, "fast");
-          $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
-      },
-      success: function(data) {
-        addMarkers(data);
-      }
-    });
-}
+
 // Autocomplete feature for the UI Source inputs
 $j(function () {
     
@@ -200,52 +176,59 @@ $j(function () {
                 __oldStartStop = startStop;
             }
             $("#destination").val("");
+            $("#setDest").removeClass("disabled");
             // ..--> Send an ajax query to the api at the below URL
             getStops(startStop.trim());
         }
     });      
 });
 function getswitch(selected_dest){
-    $.ajax({
-        url: localAddress + "/main/get_route",
-        // Set the start text as the label value
-        data: { 
-            source: __startStop,
-            destination: selected_dest,
+    var source_val = $("#source").val();
+    if (source_val != ""){
+        $.ajax({
+            url: localAddress + "/main/get_route",
+            // Set the start text as the label value
+            data: {
+                source: __startStop,
+                destination: selected_dest,
             },
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
-            $("#form").hide();
-            $(".overlay").show();
-            $(".loadingcontent").hide();
-            $(".switch_note_content").hide();
-            $j("#error").show("slide", { direction: "down" }, "fast");
-            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
-        },
-        // On success send this data to the receive data function
-        success: function (data) {
-            new_source = data.toString();
-            data_str = data.toString();
-            // Tell the user we are switching their source stop
-            if (data != __startStop) {
-                var newSource_address = $("#source").val();
-                var pieces = newSource_address.split(',');
-                pieces.splice(-1,1);
-                document.getElementById('SwitchText').innerHTML = "Your bus will leave from bus stop number: " + data;
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
                 $("#form").hide();
                 $(".overlay").show();
                 $(".loadingcontent").hide();
-                $(".errorreport").hide();
+                $(".switch_note_content").hide();
+                $j("#error").show("slide", { direction: "down" }, "fast");
+                $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+            },
+            // On success send this data to the receive data function
+            success: function (data) {
+                new_source = data.toString();
+                data_str = data.toString();
+                // Tell the user we are switching their source stop
+                if (data != __startStop) {
+                    var newSource_address = $("#source").val();
+                    var pieces = newSource_address.split(',');
+                    pieces.splice(-1, 1);
+                    document.getElementById('SwitchText').innerHTML = "Your bus will leave from bus stop number: " + data;
+                    $("#form").hide();
+                    $(".overlay").show();
+                    $(".loadingcontent").hide();
+                    $(".errorreport").hide();
+                }
+                // Change the source
+                __oldStartStop = __startStop
+                var source_new_value = pieces.toString() + ', ' + new_source;
+                $("#source").val(source_new_value);
+                __startStop = new_source;
             }
-            // Change the source
-            __oldStartStop = __startStop
-            var source_new_value = pieces.toString() + ', ' + new_source;
-            $("#source").val(source_new_value);
-            __startStop = new_source;
-            }
-    });
+        });
+    } else {
+        alert('Please set source first');
+    }
+    
 }
 function closeSwitchNote() {
     $(".overlay").hide();
@@ -292,6 +275,32 @@ function getStops(startstop) {
                 __oldEndStop = $("#destination").val();
             }
             addMarkers(data, __startStop);
+            // This function loads all the stops either searched in the generic search bar or from current location
+function loadGenericStops(latitude, longitude,rad){
+    $.ajax({
+      url: localAddress + "/main/locations",
+      data:{
+          lat: latitude,
+          lng: longitude,
+          radius: rad
+      },
+      contentType: "application/json;charset=utf-8",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        //console.log(jqXHR);
+        $("#form").hide();
+        $(".overlay").show();
+        $(".loadingcontent").hide();
+          $(".switch_note_content").hide();
+        $j("#error").show("slide", { direction: "down" }, "fast");
+          $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+      },
+      success: function(data) {
+        addMarkers(data);
+          $("#setDest").addClass("disabled");
+      }
+    });
+}
             // refresh autocomplete for destination
             $j("#destination").autocomplete({
 
@@ -387,6 +396,7 @@ function setValueOnForm(address, stopid, flag) {
     $("#ttTab").removeClass("active show");
     $("#homeMain").addClass("active show");
     $("#timetable").removeClass("active show");
+    $("#setDest").removeClass("disabled");
     deleteRoute();
     $("#pac-input").val("");
     current_flag = false;
@@ -405,7 +415,7 @@ function setValueOnForm(address, stopid, flag) {
         }
         
         $("#source").val(source_new_value);
-        $("#setDest").removeClass('disabled');
+        
         $("#destination").val("");
         __endStop == "";
         getStops(stopid); // Get the data and the markers now with this stop as the source
@@ -414,15 +424,19 @@ function setValueOnForm(address, stopid, flag) {
             $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
             $("#toggle-button").click();
         }
-        var destination_new_value = address + ', ' + stopid;
-        if ($("#source").val() != "") {
-            __oldStartStop = $("#source").val();
+        var source_val = $("#source").val();
+        if (source_val!=""){
+            var destination_new_value = address + ', ' + stopid;
+            if ($("#source").val() != "") {
+                __oldStartStop = $("#source").val();
+            }
+            if ($("#destination").val() != "") {
+                __oldEndStop = $("#destination").val();
+            }
+            $("#destination").val(destination_new_value);
+            addMarkers(startStopAutocompleteData, __startStop, stopid);
         }
-        if ($("#destination").val() != "") {
-            __oldEndStop = $("#destination").val();
-        }
-        $("#destination").val(destination_new_value);
-        addMarkers(startStopAutocompleteData, __startStop, stopid);
+        
         
     }
     var visibility = $("#home").is(":visible");
