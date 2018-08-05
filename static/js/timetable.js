@@ -226,8 +226,6 @@ function openTimeTable(n) {
 
     if (count == 1) {
         $('#schedule-container').css('position', 'absolute');
-        $('#schedule-container').css("left", ($(window).width() / 2 - $('#schedule-container').width() / 2) + "px");
-        $('#schedule-container').css("top", ($(window).height() / 2 - $('#schedule-container').height() / 2) + "px");
     }
 
     // $j("#schedule-container").position({
