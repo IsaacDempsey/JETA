@@ -1,6 +1,9 @@
 {% extends "layout.html" %} {% block content %}
 
+
+<!-- DOM for Error and Switch Data Reporting -->
 <div class="overlay text-center">
+	<!-- DOM -> ERROR REPORTING -->
 	<div class="errorreport mobile-col-centered mobile-overlay" id="error">
 		<div class="mobile-col-centered" id="errorcontent"></div>
 		<div id="errorsent">
@@ -10,22 +13,26 @@
 			</div>
 		</div>
 	</div>
-	<div class="loadingcontent">
-		<div class="row">
-			<div class="col-xs-6 loader mobile-col-centered" id="loading"></div>
-			<div class="col-xs-6 text-center display-4 mobile-col-centered mp-5 p-3">Getting all stops</div>
-		</div>
-	</div>
+	<!-- ********************* -->
+
+	<!-- DOM -> SWITCHED BUS STOP REPORTING -->
 	<div class="switch_note_content mobile-overlay">
 		<p id="SwitchText"></p>
 		<p>Please note: this is different from the stop you selected.</p>
 		<button type="button" class="btn btn-primary mx-3 px-3 mp-5" onclick="closeSwitchNote()">OK</button>
 	</div>
+	<!-- ********************* -->
 </div>
+<!-- *************************************** -->
 
+<!-- DOM for entire Body -->
+<!-- WRAPPER IS THE MAIN PARENT ELEMENT -->
 <div class="wrapper" id="targetElement">
+	<!-- MAP -->
 	<div id="map"></div>
+	<!-- Mobile Form Container is the container to place the form while active and not on the smaller screens (<650px) -->
 	<div class="mobile-form-container" id="mobile-container">
+		<!-- Search form for generic search -->
 		<div class="form" id="search-form">
 			<div class="row">
 				<input id="pac-input" class="controls form-control inputRow mt-3 p-3 " type="text" placeholder="Search around Dublin">
@@ -39,9 +46,6 @@
 				</div>
 			</div>
 		</div>	
-		
-		
-		
 		<div class="col-xs-6 mobile-form form-main" id="form">
 			<div class="col-xs-12 col-centered py-3 text-center" id="brand-img">
 				<a class="mx-auto" href="#">
@@ -200,6 +204,9 @@
 						</div>
 					</div>
 					<div class="tab-pane fade" id="latestNews" role="tabpanel" aria-labelledby="newsTab">
+						<div class="row p-3 m-3 news">
+							Test News
+						</div>
 					</div>
 					<div class="tab-pane fade" id="timetable" role="tabpanel" aria-labelledby="ttTab">
 						
@@ -233,6 +240,9 @@
 		</div>
 	</div>
 </div>
+<!-- *************************************** -->
+
+<!-- DOM for bottom Mobile Marker Window -->
 <div class="mobile-markerwindow">
 	<button type="button" class="close mr-3 mt-3" aria-label="Close">
 		<span aria-hidden="true"><i class="fas fa-times"></i></span>
@@ -243,6 +253,9 @@
 		</div>
 	</div>	
 </div>
+<!-- *************************************** -->
+
+<!-- DOM for Showing the Time Table -->
 <div class="schedule" id="schedule-container">
 	<a class="prev" onclick="plusTimeTable(-1)">&#10094;</a>
 	<a class="next" onclick="plusTimeTable(1)">&#10095;</a>
@@ -333,5 +346,7 @@
 		</div>
 	</div>
 </div>
+<!-- *************************************** -->
+
 
 {% endblock %}

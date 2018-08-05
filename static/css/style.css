@@ -708,6 +708,10 @@ a#timetableline.nav-link.active{
     font-size: 1.2em;
   }
 }
+.news{
+  border-bottom: 1px solid;
+  border-bottom-color: #007bff;
+}
 @media screen and (max-width: 650px){
   #tt{
   border: 1px solid;
