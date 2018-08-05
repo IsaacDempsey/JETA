@@ -105,9 +105,7 @@ $(document).ready(function () {
     new_option2.value = mins_slice;
     new_mins.add(new_option2);
     document.getElementById('hour').value = hour_slice;
-    document.getElementById('mins').value = mins_slice;
-    // deactivate the destination field which will only be activated when the user enters a source
-    deactivateDestination(autocomplete_data); 
+    document.getElementById('mins').value = mins_slice; 
     // Hide the various elements which will only be visible as and when required
     // Line holder holds the bus numbers which only be displayed when the user has entered the start and dest stops
     $("#lineholder").hide();
@@ -327,27 +325,7 @@ function loadGenericStops(latitude, longitude,rad){
 
 
 
-$(function () {
-   $("#source").keyup(function () {
-       
-       var val = $.trim($('#source').val());
-       deactivateDestination(val);
-       if (val.length==0){
-           __startStop = "";
-           __endStop = "";
-           deleteRoute();
-       }
-       
-   }); 
-    $("#source").change(function () {
-        var val = $.trim($('#source').val());
-        deactivateDestination(val);
-        if (val.length == 0) {
-            __startStop = "";
-            deleteRoute();
-        };
-    });     
-});
+
 
 
 
@@ -444,23 +422,7 @@ function setValueOnForm(address, stopid, flag) {
         $("#goBackSearch").click();
     }
 }
-function deactivateDestination(val) {
-  if (val.length == 0) {
-    $("#destination")
-      .val("")
-      .attr("placeholder", "Please select source first")
-      .css("background-color", "#CFD8DC");
-    $("#destination").prop("disabled", true);
-    $("#setDest").addClass("disabled");
-    if (markers.length > 0) {
-      deleteMarkers(markers);
-      markers = [];
-      if (map) {
-        map.setZoom(12);
-      }
-    }
-  }
-}
+
 $(function(){
     $("#undo").click(function () {
         deleteRoute();

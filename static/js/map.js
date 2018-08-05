@@ -4,6 +4,8 @@ var $j = jQuery.noConflict(); // No conflict with the major jquery for autocompl
 // Creating a Global Map Object
 var map;
 $(document).ready(function () {
+    // deactivate the destination field which will only be activated when the user enters a source
+    deactivateDestination();
     loadMap();
 });
 // Separate Function to render the map
@@ -316,9 +318,8 @@ function addMarkers(data, stopid = "None", endstop = "None") {
                     $("#markerwindow-content").html("");
                     var marker_name = this.get("name");
                     marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning disabled" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '"' + marker_name + '",' + this.get("stopid") + ')" >Open Schedule</button></div></div>';
+                    content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning disabled" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p-3 mp-5 mt-2'><div class='col-xs mobile-col-centered col-centered'><button type='button' class='btn btn-outline-info' onClick='openScheduleforStop(\"" +  marker_name + "\"," + this.get("stopid") + ")' >Open Schedule</button></div></div>";
                     $(content_string).appendTo("#markerwindow-content");
-                    this.setOptions({ icon: stop_icon_h });
                 });
             } else {
                 if (__startStop != "") {
@@ -327,9 +328,8 @@ function addMarkers(data, stopid = "None", endstop = "None") {
                         $("#markerwindow-content").html("");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '\"' + marker_name + '\",' + this.get("stopid") + ')\" >Open Schedule</button></div></div>';
+                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p-3 mp-5 mt-2'><div class='col-xs mobile-col-centered col-centered'><button type='button' class='btn btn-outline-info' onClick='openScheduleforStop(\"" + marker_name + '",' + this.get("stopid") + ")' >Open Schedule</button></div></div>";
                         $(content_string).appendTo("#markerwindow-content");
-                        this.setOptions({ icon: stop_icon_h });
                     });
                 } else {
                     marker.addListener("click", function () {
@@ -337,9 +337,8 @@ function addMarkers(data, stopid = "None", endstop = "None") {
                         $("#markerwindow-content").html("");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '"' + marker_name + '",' + this.get("stopid") + ')" >Open Schedule</button></div></div>';
+                        content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p-3 mp-5 mt-2'><div class='col-xs mobile-col-centered col-centered'><button type='button' class='btn btn-outline-info' onClick='openScheduleforStop(\"" + marker_name + '",' + this.get("stopid") + ")' >Open Schedule</button></div></div>";
                         $(content_string).appendTo("#markerwindow-content");
-                        this.setOptions({ icon: stop_icon_h });
                     });
                 }
 
@@ -351,7 +350,7 @@ function addMarkers(data, stopid = "None", endstop = "None") {
                     var marker_name = this.get("name");
                     marker_name = marker_name.replace(/(['"])/g, "\\$1");
                     // alert("Hover Out");
-                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" >Set Destination</button></div></div><div class="row p-3 mp-5"><div class="col-xs mobile-col-centered col-centered"><button type="button" class="btn btn-outline-info" onClick=\"openScheduleforStop(' + "\'" + marker_name + "\'," + this.get("stopid") + ')" >Open Schedule</button></div></div>';
+                    content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row px-3 pt-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning disabled" id="setSource">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" >Set Destination</button></div></div><div class="row p-3 mp-5"><div class="col-xs mobile-col-centered col-centered"><button type="button" class="btn btn-outline-info" onClick=\"openScheduleforStop(' + "\'" + marker_name + "\'," + this.get("stopid") + ')" >Open Schedule</button></div></div>';
                     infowindow.setContent(content_string);
                     this.setOptions({ icon: stop_icon_h });
                     infowindow.open(map, this);
@@ -368,7 +367,7 @@ function addMarkers(data, stopid = "None", endstop = "None") {
                         // alert("Hover Out");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '\'' + marker_name + '\',' + this.get("stopid") + ')\" >Open Schedule</button></div></div>';
+                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row px-3 pt-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div><div class='row p-3 mp-5'><div class='col-xs mobile-col-centered col-centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + '\'' + marker_name + '\',' + this.get("stopid") + ')\" >Open Schedule</button></div></div>';
 
                         infowindow.setContent(content_string);
                         this.setOptions({ icon: stop_icon_h });
@@ -385,7 +384,7 @@ function addMarkers(data, stopid = "None", endstop = "None") {
                         // alert("Hover Out");
                         var marker_name = this.get("name");
                         marker_name = marker_name.replace(/(['"])/g, "\\$1");
-                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row p-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div><div class='row p - 3 mp - 5'><div class='col - xs mobile - col - centered col - centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + "'" + marker_name + "'," + this.get("stopid") + ')" >Open Schedule</button></div></div>';
+                        content_string = '<div class="iWindow display-5 p-3 mp-5"><div class="row pb-3 mp-5 text-center"><div class="col-xs-12 mobile-col-centered col-centered" id="stopName">' + this.get("name") + '</div></div><div class="row mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><b>Stop Number: </b>' + this.get("stopid") + '</div></div><div class="row px-3 pt-3 mp-5"><div class="col-xs-6 mobile-col-centered col-centered"><button type="button" class="btn btn-outline-warning" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered col-centered pl-3"><button type="button" class="btn btn-outline-warning" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div><div class='row p-3 mp-5'><div class='col-xs mobile-col-centered col-centered'><button type='button' class='btn btn-outline-info' onClick=\"openScheduleforStop(" + "'" + marker_name + "'," + this.get("stopid") + ')" >Open Schedule</button></div></div>';
 
                         infowindow.setContent(content_string);
                         this.setOptions({ icon: stop_icon_h });
@@ -482,3 +481,34 @@ function deleteRoute() {
 
 
 // The below script deactivates all the destination features on the UI if source is not yet provided
+function deactivateDestination(val=[]) {
+    if (val.length == 0) {
+        $("#destination")
+            .val("")
+            .attr("placeholder", "Please select source first")
+            .css("background-color", "#CFD8DC");
+        $("#destination").prop("disabled", true);
+        $("#setDest").addClass("disabled");
+        if (markers.length > 0) {
+            deleteMarkers(markers);
+            markers = [];
+            if (map) {
+                map.setZoom(12);
+            }
+        }
+    }
+}
+
+$(function () {
+    $("#source").keyup(function () {
+
+        var val = $.trim($('#source').val());
+        deactivateDestination(val);
+        if (val.length == 0) {
+            __startStop = "";
+            __endStop = "";
+            deleteRoute();
+        }
+
+    });
+});

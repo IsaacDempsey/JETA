@@ -250,6 +250,10 @@ $(function () {
 })
 
 function openScheduleforStop(stopname, stopid) {
+    if ($(window).width() < 650) {
+        $j(".mobile-markerwindow").hide("slide", { direction: "down" }, "fast");
+        $("#toggle-button").click();
+    }
     __timeTableStop = stopid;
     $("#timetable-content").html("");
     $("#homeTab").removeClass("active show");
