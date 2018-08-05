@@ -106,13 +106,11 @@ function loadMap() {
             if (places.length == 0) {
                 is_places_entered = false;
             } else {
-                // console.log(places);
                 is_places_entered = true;
                 lat = places[0].geometry.location.lat();
                 lng = places[0].geometry.location.lng();
                 var myLatLng = { lat: places[0].geometry.location.lat(), lng: places[0].geometry.location.lng() };
                 if (marker != "") {
-                    // console.log(map.contains(marker.getPosition()));
                     if (marker.getMap() != "") {
                         marker.setMap(null);
                     }
@@ -128,8 +126,6 @@ function loadMap() {
                     map: map
                 });
                 map.setCenter(marker);
-                // //console.log(places[0].geometry.location.lat());
-                // //console.log(places[0].geometry.location.lng());
                 runGenericStopLoader(lat, lng, radius);
             }
 
@@ -201,7 +197,6 @@ function loadGenericStops(latitude, longitude, rad) {
       contentType: "application/json;charset=utf-8",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        //console.log(jqXHR);
         $("#form").hide();
         $(".overlay").show();
         $(".loadingcontent").hide();
@@ -224,7 +219,6 @@ function loadGenericStops(latitude, longitude, rad) {
 var markers = [];
 var content_string;
 function addMarkers(data, stopid = "None", endstop = "None") {
-    //console.log(data);
     deleteMarkers(markers);
     markers = [];
     var infowindow = new google.maps.InfoWindow();
@@ -428,7 +422,6 @@ function setMapBounds(start) {
     for (var i = 0; i < markers.length; i++) {
         bounds.extend(markers[i].getPosition());
         var icon = markers[i].getIcon();
-        //console.log(icon);
         if (icon == "/static/img/markers/StartStop.png") {
             center_point = markers[i];
         }
@@ -464,7 +457,6 @@ function clearMarkers() {
 
 // Function to delete markers from the map
 function deleteMarkers(markers) {
-    //console.log("Deleting all stops");
     clearMarkers();
     markers = [];
 }

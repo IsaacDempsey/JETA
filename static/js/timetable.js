@@ -83,7 +83,6 @@ function getSchedule(line) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            //console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -92,7 +91,6 @@ function getSchedule(line) {
             $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
         },
         success: function (data) {
-            console.log(data);
             var stopid = data[0].stopid;
             var lineid = data[0].lineid;
             $("#schedule-stop-number").html(stopid);
@@ -107,7 +105,6 @@ function showScheduleTimes(schedule_data) {
     var Saturday = false;
     var Sunday = false;
     var Weekday = false;
-    console.log(schedule_data);
     
     
     $("#card-saturday").html("");

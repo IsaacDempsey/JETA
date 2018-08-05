@@ -4,7 +4,7 @@
  // [NOTE :] When "**" appears please refer documentation for more information
 
 
- // This Script renders all the UI animations and interactions for the user.
+ // This Script is the core script responsible to render the major functionilities in the UI.
  // All the data is accessed by a API
 
 
@@ -116,8 +116,6 @@ $(document).ready(function () {
     $("#noSource").hide();
     // No Destination is same as No Source only for destination
     $("#noDestination").hide();
-    // Home 1 is the slider that slides in when the busses has to be displayed
-    // $("#home1").hide();
     // Error Tab or 404 tab that will be displayed when there is any major server side fault **
     $("#error").hide();
     // Error Sent tab that is shown when the user selects to send the error report **
@@ -193,7 +191,6 @@ function getswitch(selected_dest){
             contentType: "application/json;charset=utf-8",
             dataType: "json",
             error: function (jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
                 $("#form").hide();
                 $(".overlay").show();
                 $(".loadingcontent").hide();
@@ -243,7 +240,6 @@ function getStops(startstop) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            //console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -285,7 +281,6 @@ function loadGenericStops(latitude, longitude,rad){
       contentType: "application/json;charset=utf-8",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
-        //console.log(jqXHR);
         $("#form").hide();
         $(".overlay").show();
         $(".loadingcontent").hide();
@@ -312,7 +307,6 @@ function loadGenericStops(latitude, longitude,rad){
                     var end = ui.item.label;
                     var stopId = end.split(",");
                     var endStop = stopId[stopId.length - 1];
-                    // console.log(endStop);
                     __endStop = endStop.trim();
                     getswitch(__endStop);
                     addMarkers(startStopAutocompleteData, __startStop, __endStop);
@@ -452,7 +446,6 @@ function getLines(startStop, endStop){
         destination: endStop,
       },
         error: function (jqXHR, textStatus, errorThrown) {
-            //console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
@@ -503,13 +496,11 @@ function getTravelTime(content) {
             else {
                 for (var i = 0; i < weather.hourly.data.length; i++) {
                     var iarr = weather.hourly.data[i];
-                    //console.log(iarr.precipIntensity);
                     if (datetime <= iarr.time + 3600 && datetime >= iarr.time - 3600) {
                     rain = iarr.precipIntensity;
                 }
             }
         }
-           // console.log(rain);
     });
     var lin = content;
     startStopAutocompleteData.sort(function (a, b) {
@@ -567,7 +558,6 @@ function getTravelTime(content) {
         $(journeytime + " mins").appendTo("#totaltraveltime-id");
         $("#totaltraveltime-id").text(journeytime + " mins");
         var length = getRTPI(lin);
-        console.log("TESTING 2: ",length);
         function getRTPI() {
           $.getJSON(live_db, function(bus) {
             var nextbuses = [];
@@ -578,7 +568,6 @@ function getTravelTime(content) {
               }
             }
             setTime(nextbuses);
-            // console.log(nextbuses.length);
           });
         }
         rtpi_interval = setInterval(getRTPI, 5000);
@@ -627,10 +616,8 @@ function getTravelTime(content) {
 
           return D(((mins % (24 * 60)) / 60) | 0) + ":" + D(mins % 60);
         }
-        //console.log(nextbus);
       }
     });
-    // console.log(nextbustime);
 
     
 }
@@ -648,7 +635,6 @@ function getRoute(line) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
             $("#form").hide();
             $(".overlay").show();
             $(".loadingcontent").hide();
