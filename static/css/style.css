@@ -617,7 +617,7 @@ a#timetableline.nav-link.active{
   top: 50% !important;  
   left: 50%;
   /* right: 50% !important; */
-  transform: translate(-20%, -50%); 
+  transform: translate(-50%, -50%); 
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
   background-color: rgba(33,37,41,0.9) !important;
   border: 1px solid black;
@@ -651,9 +651,9 @@ a#timetableline.nav-link.active{
 .schedule-time-sunday::-webkit-scrollbar, .schedule-time-saturday::-webkit-scrollbar, .schedule-time-weekdays::-webkit-scrollbar{
   display: none;
 }
-.schdule-rows, .accordion{
+/* .schdule-rows, .accordion{
  width: 36vw !important;
-}
+} */
 
 .card-header{
   color: white;
@@ -698,12 +698,19 @@ a#timetableline.nav-link.active{
   border: 1px solid;
   border-color: #4CAF50;
 }
-
+@media screen and (min-width: 650px){
+  .schdule-rows, .accordion{
+    width: 36vw !important;
+  }
+}
 @media screen and (max-width: 650px){
   #tt{
   border: 1px solid;
   border-color: #4CAF50;
-}
+  }
+  .schdule-rows, .accordion{
+    width: auto !important;
+  }
   #tt-line{
   /* padding: 0px !important; */
   width: max-content !important;
