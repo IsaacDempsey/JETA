@@ -173,34 +173,34 @@ function loadMap() {
             styles: mapstyle
         });
 
-        // $.getJSON('/static/json/routes.json', function(data) {
-        //     var coordinates_arr = [];
+        $.getJSON('/static/json/routes.json', function(data) {
+            var coordinates_arr = [];
      
-        //     //iterates through each key in json
-        //     $.each(data, function(index, data) {
-        //     var coordinates = [];
-        //     for (var i = 0; i < data.length; i++) {
-        //     var iarr = data[i];
-        //     coordinates.push({lat: iarr[1], lng: iarr[0]});
-        //     if (i == data.length - 1) {
-        //         coordinates_arr.push(coordinates);
-        //         coordinates = [];
-        //     }
-        //     }
-        //     })
-        //  for (var i = 0; i < coordinates_arr.length; i++) {
-        //  var line = coordinates_arr[i];
-        //  var busroute = new google.maps.Polyline({
-        //     path: line,
-        //     geodesic: true,
-        //     strokeColor: '#b3ccff',
-        //     strokeOpacity: 1.0,
-        //     strokeWeight: 2
-        //   });
+            //iterates through each key in json
+            $.each(data, function(index, data) {
+            var coordinates = [];
+            for (var i = 0; i < data.length; i++) {
+            var iarr = data[i];
+            coordinates.push({lat: iarr[1], lng: iarr[0]});
+            if (i == data.length - 1) {
+                coordinates_arr.push(coordinates);
+                coordinates = [];
+            }
+            }
+            })
+         for (var i = 0; i < coordinates_arr.length; i++) {
+         var line = coordinates_arr[i];
+         var busroute = new google.maps.Polyline({
+            path: line,
+            geodesic: true,
+            strokeColor: '#b3ccff',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
      
-        //   busroute.setMap(map);
-        //       };
-        //     });
+          busroute.setMap(map);
+              };
+            });
 
         // Auto complete of generic search to plot bus stops near a paricular location
         // Create the search box and link it to the UI element.
