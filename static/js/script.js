@@ -458,50 +458,6 @@ function closeSwitchNote() {
     
 }
 
-// This function draws final user route of their selected bus journey
-// function getFinalStops() {
-//     $.ajax({
-//         url: localAddress + "/main/get_route",
-//         // Set the start text as the label value
-//         data: { 
-//             source: __startStop,
-//             destination: __endStop,
-//             },
-//         contentType: "application/json;charset=utf-8",
-//         dataType: "json",
-//         error: function (jqXHR, textStatus, errorThrown) {
-//             console.log(jqXHR);
-//             $("#form").hide();
-//             $(".overlay").show();
-//             $(".loadingcontent").hide();
-//             $j("#error").show("slide", { direction: "down" }, "fast");
-//             $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.responseJSON.error + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
-//         },
-//         // On success send this data to the receive data function
-//         success: function (data) {
-//             finalData = data;
-//             var coordinates_arr = [];
-//             var coordinates = [];
-//             for (var i = 0; i < finalData.length; i++) {
-//             var iarr = finalData[i];
-//             coordinates.push({lat: iarr.coord[1], lng: iarr.coord[0]});
-//             }
-//             coordinates_arr.push(coordinates);
-//                 var line = coordinates_arr[0];
-//                 var route = new google.maps.Polyline({
-//                    path: line,
-//                    geodesic: true,
-//                    strokeColor: '#000099',
-//                    strokeOpacity: 1.0,
-//                    strokeWeight: 5,
-//                    zIndex: 1
-//                  });
-                 
-//                  route.setMap(map);
-//                  addMarkers(finalData, __startStop, __endStop);
-//         }
-//     });
-// }
 function getStops(startstop) {
     __startStop = startstop
     $.ajax({
