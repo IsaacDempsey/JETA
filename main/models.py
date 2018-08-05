@@ -143,7 +143,6 @@ class Timetable(models.Model):
     stopid = models.IntegerField(null=True)
     lineid = models.CharField(max_length=10)
     dayofservice = models.CharField(max_length=10)
-    program_num = models.IntegerField(null=True)
     destination = models.CharField(max_length=50, null=True)
     schedule = ArrayField(models.CharField(max_length=5))
 
@@ -156,5 +155,5 @@ class Timetable(models.Model):
             models.Index(fields=['stopid']),
             models.Index(fields=['lineid']),
             models.Index(fields=['dayofservice']),
-            models.Index(fields=['stopid', 'lineid', 'dayofservice','program_num','destination']),
+            models.Index(fields=['stopid', 'lineid', 'dayofservice','destination']),
         ]

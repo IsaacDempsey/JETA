@@ -643,6 +643,31 @@ a#timetableline.nav-link.active{
   cursor: pointer;
   color: #007bff;
 }
+.schedule-time-saturday, .schedule-time-sunday, .schedule-time-weekdays{
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: 250px;
+}
+.schedule-time-sunday::-webkit-scrollbar, .schedule-time-saturday::-webkit-scrollbar, .schedule-time-weekdays::-webkit-scrollbar{
+  display: none;
+}
+.schdule-rows, .accordion{
+ width: 36vw !important;
+}
+
+.card-header{
+  color: white;
+  border-bottom: 1px solid;
+  border-bottom-color: #007bff;
+}
+.card-header>h5>button{
+  color: white !important;
+}
+.accordion, .card{
+  background: transparent;
+  overflow: hidden;
+}
+
 #schedule-destination-holder{
   width: max-content !important;
   width: -webkit-max-content !important;
@@ -747,6 +772,11 @@ a#timetableline.nav-link.active{
   -moz-animation-name: bounce2;
 }
 .schedule-holder{
+  display: none;
+  overflow-y: scroll;
+  height: 35vh !important;
+}
+.schedule-holder::-webkit-scrollbar{
   display: none;
 }
 .show-tt{
