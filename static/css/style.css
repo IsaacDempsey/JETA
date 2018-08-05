@@ -559,6 +559,15 @@ a#timetableline.nav-link.active{
     z-index: 500;
 }
 
+#latestNews{
+  
+  max-width: 400px;
+}
+.news-feed{
+  max-height: 70vh !important;
+  color: white;
+  overflow-y: scroll;
+}
 @import url("//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css");
 .search { 
   margin-top: 1em;
@@ -649,7 +658,7 @@ a#timetableline.nav-link.active{
   overflow-y: scroll;
   max-height: 250px;
 }
-.schedule-time-sunday::-webkit-scrollbar, .schedule-time-saturday::-webkit-scrollbar, .schedule-time-weekdays::-webkit-scrollbar{
+.news-feed::-webkit-scrollbar, .schedule-time-sunday::-webkit-scrollbar, .schedule-time-saturday::-webkit-scrollbar, .schedule-time-weekdays::-webkit-scrollbar{
   display: none;
 }
 /* .schdule-rows, .accordion{
@@ -708,11 +717,23 @@ a#timetableline.nav-link.active{
     font-size: 1.2em;
   }
 }
+.knowmore_link{
+  font-size: 1rem;
+  color: #3498db;
+}
+.knowmore_link:hover{
+  color: white;
+  text-decoration: underline;
+}
 .news{
   border-bottom: 1px solid;
   border-bottom-color: #007bff;
 }
 @media screen and (max-width: 650px){
+  #latestNews{
+  
+  max-width: 400px;
+}
   #tt{
   border: 1px solid;
   border-color: #4CAF50;

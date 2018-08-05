@@ -117,7 +117,7 @@ $(document).ready(function () {
     // No Destination is same as No Source only for destination
     $("#noDestination").hide();
     // Home 1 is the slider that slides in when the busses has to be displayed
-    $("#home1").hide();
+    // $("#home1").hide();
     // Error Tab or 404 tab that will be displayed when there is any major server side fault **
     $("#error").hide();
     // Error Sent tab that is shown when the user selects to send the error report **
