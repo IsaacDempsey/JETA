@@ -182,7 +182,7 @@ function getswitch(selected_dest){
     var source_val = $("#source").val();
     if (source_val != ""){
         $.ajax({
-            url: localAddress + "/main/get_route",
+            url: localAddress + "/main/get_switch",
             // Set the start text as the label value
             data: {
                 source: __startStop,
@@ -458,9 +458,38 @@ function getLines(startStop, endStop){
       success: function (data) {
           $("#lineholder").show();
           $("#line-pills").html('');
-          for (var i = 0; i < data.length; i ++){
-              $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' + data[i] + "</a></li>").appendTo("#line-pills");
-          }
+            var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
+            var url2 = __startStop
+            var url3 = '&format=json';
+            var res = url1.concat(url2, url3);
+            // If more than one bus route, sort by arriving first
+            if (data.length > 1) {
+            $.getJSON(res, function(bus) {
+            var nextbus = [];
+            for (var i = 0; i < bus.results.length; i++) {
+                var iarr = bus.results[i];
+                    nextbus.push(bus.results[i].route);           
+            }            
+                function intersect(nextbus, theroutes) {
+                    return nextbus.filter(Set.prototype.has, new Set(theroutes));
+                    }
+                intersect_arr = intersect(nextbus, data);
+                
+                function removeDuplicates(long_arr){
+                    short_arr = Array.from(new Set(long_arr))
+                    return short_arr
+                    }
+                sorted_lines = removeDuplicates(intersect_arr)
+            for (var i = 0; i < sorted_lines.length; i ++){
+                $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' + sorted_lines[i] + "</a></li>").appendTo("#line-pills");
+            }
+            });
+            }
+        else {
+            for (var i = 0; i < data.length; i ++){
+                $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' + data[i] + "</a></li>").appendTo("#line-pills");
+            }
+        }
       }
     });
 }

@@ -366,7 +366,7 @@ def stops(request):
 
 
 
-def get_route(request):
+def get_switch(request):
     source = request.GET.get("source")
     destination = request.GET.get("destination")
     source = int(source)

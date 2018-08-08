@@ -11,7 +11,7 @@ urlpatterns = [
     path('locations', views.locations, name='locations'),
     #path('routes', views.routes, name='routes'),
     path('stops', views.stops, name='stops'),
-    path('get_route', views.get_route, name='get_route'),
+    path('get_switch', views.get_switch, name='get_switch'),
     path('get_timetable',views.get_timetable,name='get_timetable')
 
 ]
