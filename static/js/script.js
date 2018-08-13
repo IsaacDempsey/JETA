@@ -158,98 +158,88 @@ $(document).ready(function() {
 });
 
 // Autocomplete feature for the UI Source inputs
-$j(function() {
-  // Check for the HTML DOM element who has #source as the id
-  $j("#source").autocomplete({
-    // Send a ajax request to the below address
-    source: localAddress + "/main/get_address",
-    // Start autocompleting when the user enter's atleast 2 characters
-    minLength: 1,
-    autoFocus: true,
-    classes: {
-      "ui-autocomplete": "highlight"
-    },
-    contentType: "application/json;charset=utf-8",
-    dataType: "json",
-    // When the user selects the required input ...-->
-    select: function(e, ui) {
-      deleteRoute();
-      current_flag = false;
-      if (__oldStartStop != "") {
-        $("#undo").removeClass("disabled");
-      }
-      $("#pac-input").val("");
-      // Get the stop id for the start
-      $("#noSource").hide();
-      var start = ui.item.label;
-      var stopId = start.split(",");
-      var startStop = stopId[stopId.length - 1];
-      if (__oldStartStop == "") {
-        __oldStartStop = startStop;
-      }
-      $("#destination").val("");
-      $("#setDest").removeClass("disabled");
-      // ..--> Send an ajax query to the api at the below URL
-      getStops(startStop.trim());
-    }
-  });
-});
-function getswitch(selected_dest) {
-  var source_val = $("#source").val();
-  if (source_val != "") {
-    $.ajax({
-      url: localAddress + "/main/get_route",
-      // Set the start text as the label value
-      data: {
-        source: __startStop,
-        destination: selected_dest
-      },
-      contentType: "application/json;charset=utf-8",
-      dataType: "json",
-      error: function(jqXHR, textStatus, errorThrown) {
-        $("#form").hide();
-        $(".overlay").show();
-        $(".loadingcontent").hide();
-        $(".switch_note_content").hide();
-        $j("#error").show("slide", { direction: "down" }, "fast");
-        $("#errorcontent").html(
-          '<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' +
-            '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' +
-            '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' +
-            jqXHR.status +
-            " Status Code</b></div>" +
-            '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' +
-            jqXHR.statusText +
-            " </b></div>" +
-            '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>'
-        );
-      },
-      // On success send this data to the receive data function
-      success: function(data) {
-        new_source = data.toString();
-        data_str = data.toString();
-        // Tell the user we are switching their source stop
-        if (data != __startStop) {
-          var newSource_address = $("#source").val();
-          var pieces = newSource_address.split(",");
-          pieces.splice(-1, 1);
-          document.getElementById("SwitchText").innerHTML =
-            "Your bus will leave from bus stop number: " + data;
-          $("#form").hide();
-          $(".overlay").show();
-          $(".loadingcontent").hide();
-          $(".errorreport").hide();
+$j(function () {
+    
+        // Check for the HTML DOM element who has #source as the id
+    $j("#source").autocomplete({
+        // Send a ajax request to the below address
+        source: localAddress + '/main/get_address',
+        // Start autocompleting when the user enter's atleast 2 characters
+        minLength: 1,
+        autoFocus: true,
+        classes: {
+            "ui-autocomplete": "highlight"
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        // When the user selects the required input ...-->
+        select: function (e, ui) {
+            deleteRoute();
+            current_flag = false;
+            if (__oldStartStop != "") {
+                $("#undo").removeClass("disabled");
+            }
+            $("#pac-input").val("");
+            // Get the stop id for the start
+            $("#noSource").hide();
+            var start = ui.item.label;
+            var stopId = start.split(",");
+            var startStop = stopId[stopId.length - 1]; 
+            if (__oldStartStop == "") {
+                __oldStartStop = startStop;
+            }
+            $("#destination").val("");
+            $("#setDest").removeClass("disabled");
+            // ..--> Send an ajax query to the api at the below URL
+            getStops(startStop.trim());
         }
-        // Change the source
-        __oldStartStop = __startStop;
-        var source_new_value = pieces.toString() + ", " + new_source;
-        $("#source").val(source_new_value);
-        __startStop = new_source;
-      }
-    });
-  } else {
-    alert("Please set source first");
-  }
+    });      
+});
+function getswitch(selected_dest){
+    var source_val = $("#source").val();
+    if (source_val != ""){
+        $.ajax({
+            url: localAddress + "/main/get_switch",
+            // Set the start text as the label value
+            data: {
+                source: __startStop,
+                destination: selected_dest,
+            },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            error: function (jqXHR, textStatus, errorThrown) {
+                $("#form").hide();
+                $(".overlay").show();
+                $(".loadingcontent").hide();
+                $(".switch_note_content").hide();
+                $j("#error").show("slide", { direction: "down" }, "fast");
+                $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+            },
+            // On success send this data to the receive data function
+            success: function (data) {
+                new_source = data.toString();
+                data_str = data.toString();
+                // Tell the user we are switching their source stop
+                if (data != __startStop) {
+                    var newSource_address = $("#source").val();
+                    var pieces = newSource_address.split(',');
+                    pieces.splice(-1, 1);
+                    document.getElementById('SwitchText').innerHTML = "Your bus will leave from bus stop number: " + data;
+                    $("#form").hide();
+                    $(".overlay").show();
+                    $(".loadingcontent").hide();
+                    $(".errorreport").hide();
+                }
+                // Change the source
+                __oldStartStop = __startStop
+                var source_new_value = pieces.toString() + ', ' + new_source;
+                $("#source").val(source_new_value);
+                __startStop = new_source;
+            }
+        });
+    } else {
+        alert('Please set source first');
+    }
 }
 function closeSwitchNote() {
   $(".overlay").hide();
@@ -472,46 +462,61 @@ $(function() {
 /* ----------------------------------------------------------------------- */
 /*************************** MANIPULATION OF MARKERS ***********************/
 /* ----------------------------------------------------------------------- */
-function getLines(startStop, endStop) {
-  __startStop = startStop;
-  __endStop = endStop;
-  $.ajax({
-    url: localAddress + "/main/lines",
-    data: {
-      source: startStop,
-      destination: endStop
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      $("#form").hide();
-      $(".overlay").show();
-      $(".loadingcontent").hide();
-      $(".switch_note_content").hide();
-      $j("#error").show("slide", { direction: "down" }, "fast");
-      $("#errorcontent").html(
-        '<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' +
-          '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' +
-          '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' +
-          jqXHR.status +
-          " Status Code</b></div>" +
-          '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' +
-          jqXHR.statusText +
-          " </b></div>" +
-          '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>'
-      );
-    },
-    contentType: "application/json;charset=utf-8",
-    dataType: "json",
-    success: function(data) {
-      $("#lineholder").show();
-      $("#line-pills").html("");
-      for (var i = 0; i < data.length; i++) {
-        $(
-          '<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' +
-            data[i] +
-            "</a></li>"
-        ).appendTo("#line-pills");
+function getLines(startStop, endStop){
+    __startStop = startStop;
+    __endStop = endStop;
+    $.ajax({
+      url: localAddress + "/main/lines",
+      data: {
+        source: startStop,
+        destination: endStop,
+      },
+        error: function (jqXHR, textStatus, errorThrown) {
+            $("#form").hide();
+            $(".overlay").show();
+            $(".loadingcontent").hide();
+            $(".switch_note_content").hide();
+            $j("#error").show("slide", { direction: "down" }, "fast");
+            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
+        },
+      contentType: "application/json;charset=utf-8",
+      dataType: "json",
+      success: function (data) {
+          $("#lineholder").show();
+          $("#line-pills").html('');
+            var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
+            var url2 = __startStop
+            var url3 = '&format=json';
+            var res = url1.concat(url2, url3);
+            // If more than one bus route, sort by arriving first
+            if (data.length > 1) {
+            $.getJSON(res, function(bus) {
+            var nextbus = [];
+            for (var i = 0; i < bus.results.length; i++) {
+                var iarr = bus.results[i];
+                    nextbus.push(bus.results[i].route);           
+            }            
+                function intersect(nextbus, theroutes) {
+                    return nextbus.filter(Set.prototype.has, new Set(theroutes));
+                    }
+                intersect_arr = intersect(nextbus, data);
+                
+                function removeDuplicates(long_arr){
+                    short_arr = Array.from(new Set(long_arr))
+                    return short_arr
+                    }
+                sorted_lines = removeDuplicates(intersect_arr)
+            for (var i = 0; i < sorted_lines.length; i ++){
+                $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' + sorted_lines[i] + "</a></li>").appendTo("#line-pills");
+            }
+            });
+            }
+        else {
+            for (var i = 0; i < data.length; i ++){
+                $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' + data[i] + "</a></li>").appendTo("#line-pills");
+            }
+        }
       }
-    }
   });
 }
 var old_nextbus = 0;
