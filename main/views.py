@@ -78,9 +78,10 @@ def journeytime(request):
 
     # Get Irish timezone (utc + daylight saving time (DST))
     irish_time = timezone('Europe/Dublin')
-
+    print("Start time",int(start_time))
     # Get start_time (unixtime) as datetime object
     dt_time = datetime.fromtimestamp(int(start_time), irish_time)
+    print("The time",dt_time)
 
     # Create list with desired weekday filled.
     weekday = dt_time.weekday() # Mon: 0, Sun: 6
@@ -95,6 +96,7 @@ def journeytime(request):
     
     # Group model inputs into single list
     model_inputs = [seconds_since_midnight, rain] + week_dummies
+    print("model inputs",model_inputs)
 
     # Get stop lists associated with query lineid, start stop and end stop
     routes = Routes.objects.filter(lineid=lineid, stopids__contains=[source, destination]).values()
