@@ -512,30 +512,37 @@ function getTravelTime(content) {
     var datetime = (moment(datetime_future_str, "YYYY-MM-DDTHH:mm").valueOf())/1000;
 
     // var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
-    var rain = "0.5";
     var proxy = 'https://cors-anywhere.herokuapp.com/';
     var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
     var weather_url = proxy.concat(darksky);
-        $.getJSON(weather_url, function(weather) {
-            var current_time = Math.round((new Date()).getTime() / 1000);
-            // if time with hour of current time, use current rainfall
-            if (datetime <= current_time + 3600 && datetime >= current_time - 3600) {
-                rain = weather.currently.precipIntensity;
-            }
-            else {
-                for (var i = 0; i < weather.hourly.data.length; i++) {
-                    var iarr = weather.hourly.data[i];
-                    if (datetime <= iarr.time + 3600 && datetime >= iarr.time - 3600) {
+
+    $.getJSON(weather_url, function(weather) {
+        var current_time = Math.round((new Date()).getTime() / 1000);
+        var rain;
+        // if time with hour of current time, use current rainfall
+        if (datetime <= current_time + 3600 && datetime >= current_time - 3600) {
+            rain = weather.currently.precipIntensity;
+        }
+        else {
+            for (var i = 0; i < weather.hourly.data.length; i++) {
+                var iarr = weather.hourly.data[i];
+                if (datetime <= iarr.time + 3600 && datetime >= iarr.time - 3600) {
                     rain = iarr.precipIntensity;
                 }
             }
         }
+        if (typeof rain == "undefined") {
+            rain = "0.5";
+        }
+        getFromModel(rain);
     });
     var lin = content;
     startStopAutocompleteData.sort(function (a, b) {
         return Number(a.lineid[lin]) - Number(b.lineid[lin]);
     });
     getRoute(lin);
+    function getFromModel(rain) {
+    rain = rain.toString();
     $.ajax({
       url: localAddress + "/main/journeytime",
       data: {
@@ -649,6 +656,7 @@ function getTravelTime(content) {
     });
 
     
+}
 }
 var route = "";
 function getRoute(line) {
