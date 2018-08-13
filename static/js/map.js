@@ -90,7 +90,12 @@ function loadMap() {
         var lng = null;
         var places = [];
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(runCurrentStopLoader);
+            try {
+                navigator.geolocation.getCurrentPosition(runCurrentStopLoadertrue);
+            } catch (error) {
+                console.log("Cannot get current location");                
+            }
+            
         } else {
             console.log("Geolocation is not supported by this browser.");
         }
@@ -297,14 +302,17 @@ function addMarkers(data, stopid = "None", endstop = "None") {
         // the infowindow disappears even after the user has clicked on the marker
         // We want the infowindow to stay when clicked and disappear when not
         var hover_status;
-        marker.addListener('mouseout', function () {
-            // alert("Hover In");            
-            this.setOptions({ icon: lasthover });
-            if (hover_status) {
-                infowindow.close(map, this);
-            }
+        if ($(window).width() >= 650) {
+            marker.addListener('mouseout', function () {
+                // alert("Hover In");            
+                this.setOptions({ icon: lasthover });
+                if (hover_status) {
+                    infowindow.close(map, this);
+                }
 
-        });
+            });
+        }
+        
         if ($(window).width() < 650) {
             if (flag) {
                 marker.addListener("click", function () {
@@ -314,7 +322,9 @@ function addMarkers(data, stopid = "None", endstop = "None") {
                     marker_name = marker_name.replace(/(['"])/g, "\\$1");
                     content_string = '<div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopName" style="color: #fff">' + this.get("name") + ' </div></div> <div class="row pb-3"><div class="col-xs-12 mobile-col-centered" id="stopNumber" style="color: #fff"><b>Stop Number: </b>' + this.get("stopid") + ' </div></div> <div class="row"><div class="col-xs-6 mobile-col-centered"><button type="button" class="btn btn-outline-warning disabled" id="setSource" onclick="setValueOnForm(\'' + marker_name + "','" + this.get("stopid") + '\',\'source\')">Set Source</button></div><div class="col-xs-6 mobile-col-centered pl-3"><button type="button" class="btn btn-outline-warning disabled" id="setDest" onclick="getswitch(' + this.get("stopid") + ");setValueOnForm('" + marker_name + "','" + this.get("stopid") + "','destination')\">Set Destination</button></div></div></div><div class='row p-3 mp-5 mt-2'><div class='col-xs mobile-col-centered col-centered'><button type='button' class='btn btn-outline-info' onClick='openScheduleforStop(\"" +  marker_name + "\"," + this.get("stopid") + ")' >Open Schedule</button></div></div>";
                     $(content_string).appendTo("#markerwindow-content");
+                    // this.setOptions({ icon: stop_icon_h });
                 });
+                
             } else {
                 if (__startStop != "") {
                     marker.addListener("click", function () {
