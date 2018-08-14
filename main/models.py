@@ -19,6 +19,7 @@ class Coefficients(models.Model):
     intercept = models.FloatField(null=True)
     arrivaltime = models.FloatField(null=True)
     rain = models.FloatField(null=True)
+    holiday = models.FloatField(null=True)
     fri = models.FloatField(null=True)
     mon = models.FloatField(null=True)
     sat = models.FloatField(null=True)
