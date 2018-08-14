@@ -127,36 +127,25 @@ $(document).ready(function() {
   });
   // Listening to changes of values on date and time
   $("#hour").change(function() {
-      if ($("#hour").val() > hour_slice) {
-        $("#ETA").hide();
-        $("#next-bus").hide();
-      } else {
-        $("#ETA").show();
-        $("#next-bus").show();
-      }
-    
+    toggleETA(hour_slice, today, mins_slice);
   });
   $("#date").change(function() {
-    // alert(today);
-    if($("#date").val()>today){
-        $("#ETA").hide();
-        $("#next-bus").hide();
-    } else{
-        $("#ETA").show();
-        $("#next-bus").show();
-    }
+    toggleETA(hour_slice,today,mins_slice);
   });
   $("#mins").change(function() {
-      if ($("#mins").val() > mins_slice) {
-          $("#ETA").hide();
-          $("#next-bus").hide();
-      } else {
-          $("#ETA").show();
-          $("#next-bus").show();
-      }
+    toggleETA(hour_slice, today, mins_slice);
   });
 });
 
+function toggleETA(hour_slice, today, mins_slice){
+  if (($("#hour").val() != hour_slice) || ($("#date").val() > today) || ($("#mins").val() != mins_slice)) {
+    $("#ETA").hide();
+    $("#next-bus").hide();
+  } else {
+    $("#ETA").show();
+    $("#next-bus").show();
+  }
+}
 // Autocomplete feature for the UI Source inputs
 $j(function () {
     
