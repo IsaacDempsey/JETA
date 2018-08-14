@@ -78,15 +78,33 @@ def journeytime(request):
 
     # Get Irish timezone (utc + daylight saving time (DST))
     irish_time = timezone('Europe/Dublin')
-    print("Start time",int(start_time))
     # Get start_time (unixtime) as datetime object
     dt_time = datetime.fromtimestamp(int(start_time), irish_time)
-    print("The time",dt_time)
+
+    # Create list with school holiday bool filled
+    check_date = dt_time.date()
+    school_hols = [("2018-08-14","2018-09-02"),("2018-10-29","2018-11-02"),("2018-12-24","2019-01-04"),("2019-02-18","2019-02-22"),("2019-04-15","2019-04-26")]   
+    school_hol_input = [0]
+    for i in school_hols:
+        begin = datetime.strptime(i[0],'%Y-%m-%d')
+        end = datetime.strptime(i[1],'%Y-%m-%d')
+        if begin.date() <= check_date <= end.date():
+            school_hol_input[0] = 1
 
     # Create list with desired weekday filled.
-    weekday = dt_time.weekday() # Mon: 0, Sun: 6
     week_dummies = [0] * 7
-    week_dummies[weekday] = 1
+    holiday_bool = False
+    # If bank holiday, make it a Sunday.
+    bank_hols = ["2018-10-29","2018-12-25","2018-12-26","2019-01-01","2019-03-17","2019-04-22","2019-05-06","2019-06-03","2019-08-05",]
+    for i in bank_hols:
+        holiday = datetime.strptime(i,'%Y-%m-%d')
+        if check_date == holiday.date():
+            week_dummies[6] = 1
+            holiday_bool = True
+
+    if holiday_bool == False:
+        weekday = check_date.weekday() # Mon: 0, Sun: 6
+        week_dummies[weekday] = 1
     del week_dummies[2] # Delete wednesday - not included in model due to dummy var trap
 
     # Get arrivaltime in seconds
@@ -95,7 +113,7 @@ def journeytime(request):
     seconds_since_midnight = int(time.mktime((dt_time - timedelta(seconds = date_unixtime)).timetuple()))
     
     # Group model inputs into single list
-    model_inputs = [seconds_since_midnight, rain] + week_dummies
+    model_inputs = [seconds_since_midnight, rain] + week_dummies # + school_hol_input
     print("model inputs",model_inputs)
 
     # Get stop lists associated with query lineid, start stop and end stop
