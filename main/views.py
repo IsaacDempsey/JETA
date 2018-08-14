@@ -78,43 +78,50 @@ def journeytime(request):
 
     # Get Irish timezone (utc + daylight saving time (DST))
     irish_time = timezone('Europe/Dublin')
+
     # Get start_time (unixtime) as datetime object
     dt_time = datetime.fromtimestamp(int(start_time), irish_time)
-
-    # Create list with school holiday bool filled
-    check_date = dt_time.date()
-    school_hols = [("2018-08-14","2018-09-02"),("2018-10-29","2018-11-02"),("2018-12-24","2019-01-04"),("2019-02-18","2019-02-22"),("2019-04-15","2019-04-26")]   
-    school_hol_input = [0]
-    for i in school_hols:
-        begin = datetime.strptime(i[0],'%Y-%m-%d')
-        end = datetime.strptime(i[1],'%Y-%m-%d')
-        if begin.date() <= check_date <= end.date():
-            school_hol_input[0] = 1
-
-    # Create list with desired weekday filled.
-    week_dummies = [0] * 7
-    holiday_bool = False
-    # If bank holiday, make it a Sunday.
-    bank_hols = ["2018-10-29","2018-12-25","2018-12-26","2019-01-01","2019-03-17","2019-04-22","2019-05-06","2019-06-03","2019-08-05",]
-    for i in bank_hols:
-        holiday = datetime.strptime(i,'%Y-%m-%d')
-        if check_date == holiday.date():
-            week_dummies[6] = 1
-            holiday_bool = True
-
-    if holiday_bool == False:
-        weekday = check_date.weekday() # Mon: 0, Sun: 6
-        week_dummies[weekday] = 1
-    del week_dummies[2] # Delete wednesday - not included in model due to dummy var trap
 
     # Get arrivaltime in seconds
     date = dt_time.date()
     date_unixtime = time.mktime(date.timetuple())
     seconds_since_midnight = int(time.mktime((dt_time - timedelta(seconds = date_unixtime)).timetuple()))
+
+    # List of school holidays
+    school_hols = [("2018-08-14","2018-09-02"),("2018-10-29","2018-11-02"),("2018-12-24","2019-01-04"),
+    ("2019-02-18","2019-02-22"),("2019-04-15","2019-04-26")]
+
+    # Create flag for school holiday
+    school_holiday = 0
+    for i in school_hols:
+        begin = datetime.strptime(i[0],'%Y-%m-%d')
+        end = datetime.strptime(i[1],'%Y-%m-%d')
+        if begin.date() <= date <= end.date():
+            school_holiday = 1
+
+    # Create list with desired weekday filled.
+    week_dummies = [0] * 7
+    bank_holiday = False
+
+    # List of bank holidays
+    bank_hols = ["2018-10-29","2018-12-25","2018-12-26","2019-01-01","2019-03-17","2019-04-22",
+    "2019-05-06","2019-06-03","2019-08-05",]
+
+    # If bank holiday, change day of week to Sunday.
+    for i in bank_hols:
+        holiday = datetime.strptime(i,'%Y-%m-%d')
+        if date == holiday.date():
+            week_dummies[6] = 1 # Mon: 0, Sun: 6
+            bank_holiday = True
+
+    if bank_holiday == False:
+        weekday = date.weekday() # Mon: 0, Sun: 6
+        week_dummies[weekday] = 1
+
+    del week_dummies[2] # Delete wednesday - not included in model due to dummy var trap
     
     # Group model inputs into single list
-    model_inputs = [seconds_since_midnight, rain] + week_dummies # + school_hol_input
-    print("model inputs",model_inputs)
+    model_inputs = [seconds_since_midnight, rain, school_holiday] + week_dummies
 
     # Get stop lists associated with query lineid, start stop and end stop
     routes = Routes.objects.filter(lineid=lineid, stopids__contains=[source, destination]).values()
@@ -155,7 +162,7 @@ def journeytime(request):
     coefficients = coefficients.sort_values(["segment"])
 
     # Rearrange columns and set segment id as index
-    coefficients = coefficients[["segment", "intercept", "arrivaltime", "rain", 
+    coefficients = coefficients[["segment", "intercept", "arrivaltime", "rain", "holiday",
     "mon", "tue", "thu", "fri", "sat", "sun"]]    
     coefficients = coefficients.set_index('segment')
 
@@ -168,12 +175,13 @@ def journeytime(request):
         traveltime = (rows['intercept']
                     +(rows['arrivaltime']*arrivaltime)
                     +(rows['rain']*model_inputs[1])
-                    +(rows['mon']*model_inputs[2])
-                    +(rows['tue']*model_inputs[3])
-                    +(rows['thu']*model_inputs[4])
-                    +(rows['fri']*model_inputs[5])
-                    +(rows['sat']*model_inputs[6])
-                    +(rows['sun']*model_inputs[7]))
+                    +(rows['holiday']*model_inputs[2])
+                    +(rows['mon']*model_inputs[3])
+                    +(rows['tue']*model_inputs[4])
+                    +(rows['thu']*model_inputs[5])
+                    +(rows['fri']*model_inputs[6])
+                    +(rows['sat']*model_inputs[7])
+                    +(rows['sun']*model_inputs[8]))
         segment_times.append((i, round(traveltime)))
         totaltraveltime += traveltime
 
