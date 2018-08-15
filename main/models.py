@@ -158,3 +158,30 @@ class Timetable(models.Model):
             models.Index(fields=['dayofservice']),
             models.Index(fields=['stopid', 'lineid', 'dayofservice','destination']),
         ]
+
+class Fares(models.Model):
+    index = models.IntegerField(null=True)
+    stop = models.CharField(max_length=10)
+    route = models.CharField(max_length=20)
+    direction = models.CharField(max_length=10)
+    stage = models.FloatField(null=True)
+    pattern_id = models.CharField(max_length=10)
+    seq = models.IntegerField(null=True)
+
+    def __str__(self):
+        return self.stop
+    
+    class Meta:
+        verbose_name_plural = "Linked Stops"
+        indexes = [
+            models.Index(fields=['index']),
+            models.Index(fields=['stop']),
+            models.Index(fields=['route']),
+            models.Index(fields=['direction']),
+            models.Index(fields=['stage']),
+            models.Index(fields=['pattern_id']),
+            models.Index(fields=['seq']),
+        ]
+
+
+ 
