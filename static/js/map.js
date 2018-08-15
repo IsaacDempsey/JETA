@@ -91,10 +91,11 @@ function loadMap() {
         var places = [];
         if (navigator.geolocation) {
             try {
-                navigator.geolocation.getCurrentPosition(runCurrentStopLoadertrue);
+                navigator.geolocation.getCurrentPosition(runCurrentStopLoader);
             } catch (error) {
                 console.log("Cannot get current location");                
             }
+            // navigator.geolocation.getCurrentPosition(runCurrentStopLoader);
             
         } else {
             console.log("Geolocation is not supported by this browser.");
