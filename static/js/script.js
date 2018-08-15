@@ -480,6 +480,7 @@ function getLines(startStop, endStop){
             var res = url1.concat(url2, url3);
             // If more than one bus route, sort by arriving first
             if (data.length > 1) {
+            $("#inorder").text("(in order of first arriving)");
             $.getJSON(res, function(bus) {
             var nextbus = [];
             for (var i = 0; i < bus.results.length; i++) {
@@ -511,6 +512,7 @@ function getLines(startStop, endStop){
 }
 function getFares(line_id) {
     if (line_id != ""){
+    $("#fares").hide();
     $.ajax({
         url: localAddress + "/main/get_fares",
         // Set the start text as the label value
@@ -526,7 +528,26 @@ function getFares(line_id) {
         },
         // On success send this data to the receive data function
         success: function(data) {
-          console.log(data);
+         console.log(data);
+          var adult1 = "€1.50 (Leap), €2.10 (Cash)"
+          var adult2 = "€2.15 (Leap), €2.85 (Cash)"
+          var adult3 = "€2.60 (Leap), €3.30 (Cash)"
+          
+          if (data <= 3) {
+            $("#fares").show();
+            $("#adultfare").text(adult1);
+            }
+          else if (data > 3 && data <= 13) {
+            $("#fares").show();
+            $("#adultfare").text(adult2);
+            }
+        else if (data > 13) {
+            $("#fares").show();
+            $("#adultfare").text(adult3);
+            }
+        else {
+            $("#fares").hide();
+        }
         }
       });
     }
@@ -696,7 +717,6 @@ function getTravelTime(content) {
         return D(((mins % (24 * 60)) / 60) | 0) + ":" + D(mins % 60);
       }
     }
-    // Fare
   });
 
 }

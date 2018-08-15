@@ -8,7 +8,7 @@ from .models import Coefficients, Lines, Linked, Routes, Stops, Timetable, Fares
 from .destinations import Destinations
 from .route_result import Route_result
 from .switch import Switch_start
-from .fares import Fares
+from .fares import Faresfinder
 
 from datetime import datetime, timedelta
 import json
@@ -409,15 +409,13 @@ def get_switch(request):
         return HttpResponse(switch)
 
 def get_fares(request):
-    print("in fares")
     source = request.GET.get("source")
     destination = request.GET.get("destination")
     line_id = request.GET.get("line_id")
-    print(source)
     source = int(source)
     destination = int(destination)
     
-    stages = Fares(source, destination, line_id).stages_finder()
+    stages = Faresfinder(source, destination, line_id).stages_finder()
     print("STAGES",stages)
     return HttpResponse(stages)
 

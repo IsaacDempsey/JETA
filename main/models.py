@@ -160,7 +160,6 @@ class Timetable(models.Model):
         ]
 
 class Fares(models.Model):
-    index = models.IntegerField(null=True)
     stop = models.CharField(max_length=10)
     route = models.CharField(max_length=10)
     direction = models.CharField(max_length=10)

@@ -1,26 +1,22 @@
-from .models import Fares as Faresdata
+from .models import Fares
 import pandas as pd
+import numpy as np
 
 # Checks how many stages travelled by user
-class Fares():
+class Faresfinder():
     def __init__(self, start_id, destination_id, line_id):
         self.start_id = start_id
         self.destination_id = destination_id
         self.line_id = line_id
-        self.fare_data = Faresdata.objects.all().values()
+        self.fare_data1 = Fares.objects.filter(route = self.line_id, direction = "I").values()
+        self.fare_data2 = Fares.objects.filter(route = self.line_id, direction = "O").values()
 
-    # Returns 0 if start and destination are linked.
-    # Else, returns stopid of station with same name which IS linked and should be switched.
+    # Returns number of stages traversed
     def stages_finder(self):
-        df = pd.DataFrame.from_records(self.fare_data)
-        route = self.line_id
+        inbound = pd.DataFrame.from_records(self.fare_data1)
+        outbound = pd.DataFrame.from_records(self.fare_data2)
         source = self.start_id
         destination = self.destination_id
-
-        going_in = df['direction'] == "I"
-        going_out = df['direction'] == "O"
-        inbound = df[route & going_in]
-        outbound = df[route & going_out]
 
         journeys_out = outbound.pattern_id.unique()
         journeys_out.tolist()
@@ -60,7 +56,6 @@ class Fares():
                 stage_out1 = df_out_filtered.loc[df_out_filtered['stop'] == source, 'stage'].iloc[0]
                 stage_out2 = df_out_filtered.loc[df_out_filtered['stop'] == destination, 'stage'].iloc[0]
                 stages_travelled = stage_out2 - stage_out1
-                print("out",stage_out2 - stage_out1)
         
         if route_id_in != None:
             in_filtered = inbound['pattern_id'] == route_id_in
@@ -71,6 +66,4 @@ class Fares():
                 stage_in1 = df_in_filtered.loc[df_in_filtered['stop'] == source, 'stage'].iloc[0]
                 stage_in2 = df_in_filtered.loc[df_in_filtered['stop'] == destination, 'stage'].iloc[0]
                 stages_travelled = stage_in2 - stage_in1
-                print("in",stage_in2 - stage_in1)
-                
-        return int(stages_travelled)
+        return stages_travelled
