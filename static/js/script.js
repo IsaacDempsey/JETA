@@ -17,6 +17,7 @@ var __startStop = ""; // Global Variable for Start Stop selected by the user on 
 var __endStop = ""; // End Stop selected by the user on the form
 var __oldStartStop = ""; // Old start stop to make the undo feature
 var __oldEndStop = ""; // Old End Stop to make the undo feature
+var __line_id = "";
 var autocomplete_data = []; // This a global variable for the data that will be used to select for the destination field in the form
 var startStopAutocompleteData; // A separate variable after the destination is entered by the user in order to plot markers
 var current_flag = false; // This flag is set when the user allows to use the current location
@@ -508,12 +509,34 @@ function getLines(startStop, endStop){
       }
   });
 }
+function getFares(line_id) {
+    if (line_id != ""){
+    $.ajax({
+        url: localAddress + "/main/get_fares",
+        // Set the start text as the label value
+        data: {
+          source: __startStop,
+          destination: __endStop,
+          line_id: line_id
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function(jqXHR, textStatus, errorThrown) {
+          
+        },
+        // On success send this data to the receive data function
+        success: function(data) {
+          console.log(data);
+        }
+      });
+    }
+}
 var old_nextbus = 0;
 var count;
 var rtpi_interval;
 function getTravelTime(content) {
     clearInterval(rtpi_interval);
-
+    var __line_id = content;
     var nextbustime;
     count=0;
     deleteRoute();
@@ -604,7 +627,6 @@ function getTravelTime(content) {
           journeytime_toDisplay = totaltraveltime[1] + " mins";
         }
 
-      console.log(journeytime);
       $("#journeyholder").show();
       $("#journeycontent").show();
       var url1 =
@@ -674,8 +696,11 @@ function getTravelTime(content) {
         return D(((mins % (24 * 60)) / 60) | 0) + ":" + D(mins % 60);
       }
     }
+    // Fare
   });
+
 }
+getFares(__line_id);
 }
 var route = "";
 function getRoute(line) {

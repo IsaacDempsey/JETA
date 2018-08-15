@@ -12,6 +12,7 @@ urlpatterns = [
     #path('routes', views.routes, name='routes'),
     path('stops', views.stops, name='stops'),
     path('get_switch', views.get_switch, name='get_switch'),
-    path('get_timetable',views.get_timetable,name='get_timetable')
+    path('get_timetable',views.get_timetable,name='get_timetable'),
+    path('get_fares', views.get_fares, name='get_fares')
 
 ]

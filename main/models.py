@@ -162,7 +162,7 @@ class Timetable(models.Model):
 class Fares(models.Model):
     index = models.IntegerField(null=True)
     stop = models.CharField(max_length=10)
-    route = models.CharField(max_length=20)
+    route = models.CharField(max_length=10)
     direction = models.CharField(max_length=10)
     stage = models.FloatField(null=True)
     pattern_id = models.CharField(max_length=10)
@@ -172,15 +172,13 @@ class Fares(models.Model):
         return self.stop
     
     class Meta:
-        verbose_name_plural = "Linked Stops"
+        verbose_name_plural = "Fares"
         indexes = [
-            models.Index(fields=['index']),
             models.Index(fields=['stop']),
             models.Index(fields=['route']),
             models.Index(fields=['direction']),
             models.Index(fields=['stage']),
             models.Index(fields=['pattern_id']),
-            models.Index(fields=['seq']),
         ]
 
 

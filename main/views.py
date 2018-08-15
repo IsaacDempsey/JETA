@@ -8,6 +8,7 @@ from .models import Coefficients, Lines, Linked, Routes, Stops, Timetable, Fares
 from .destinations import Destinations
 from .route_result import Route_result
 from .switch import Switch_start
+from .fares import Fares
 
 from datetime import datetime, timedelta
 import json
@@ -393,6 +394,7 @@ def stops(request):
     return HttpResponse(combined_df.to_json(orient='records'), content_type='application/json')
 
 def get_switch(request):
+    print("in switch")
     source = request.GET.get("source")
     destination = request.GET.get("destination")
     source = int(source)
@@ -405,6 +407,19 @@ def get_switch(request):
         return HttpResponse(source)
     else:
         return HttpResponse(switch)
+
+def get_fares(request):
+    print("in fares")
+    source = request.GET.get("source")
+    destination = request.GET.get("destination")
+    line_id = request.GET.get("line_id")
+    print(source)
+    source = int(source)
+    destination = int(destination)
+    
+    stages = Fares(source, destination, line_id).stages_finder()
+    print("STAGES",stages)
+    return HttpResponse(stages)
 
 def get_timetable(request):
     """This function returns the timetable of a selected stop id"""
