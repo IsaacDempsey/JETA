@@ -36,21 +36,6 @@ class Coefficients(models.Model):
             models.Index(fields=['segment'])
         ]
 
-# May remove this table eventually.
-class JourneyLogs(models.Model):
-    routeid = models.CharField(max_length=10, primary_key=True)
-    segments = ArrayField(models.CharField(max_length=15))
-    seg_num = ArrayField(models.IntegerField(null=True))
-
-    def __str__(self):
-        return self.routeid
-
-    class Meta:
-        verbose_name_plural = "Journey Logs"
-        indexes = [
-            models.Index(fields=['routeid'])
-        ]    
-
 
 class Lines(models.Model):
     lineid = models.CharField(max_length=10, primary_key=True)
