@@ -525,7 +525,7 @@ function getTravelTime(content) {
     var mins = mins1[mins1.selectedIndex].value
     var datetime_future_str = $("#date").val().concat("T", hour, mins);
     var datetime = (moment(datetime_future_str, "YYYY-MM-DDTHH:mm").valueOf())/1000;
-
+    console.log(datetime);
     // var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
     var proxy = 'https://cors-anywhere.herokuapp.com/';
     var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
