@@ -381,9 +381,21 @@ def stops(request):
 
 
 def get_switch(request):
-    print("in switch")
-    source = request.GET.get("source")
-    destination = request.GET.get("destination")
+    """
+    Checks if stop needs to be switched or not:
+        - Returns source stop if there are no linked stops.
+        - The stop that is to be switched to if there are switched stops.
+    """
+
+    source = request.GET.get('source', '')
+    destination = request.GET.get('destination', '')
+
+    if not source.isnumeric() or not destination.isnumeric():
+        response = HttpResponse(json.dumps(
+            {"error": "No query terms/query terms given invalid."}), content_type='application/json')
+        response.status_code = 400
+        return response
+
     source = int(source)
     destination = int(destination)
 
