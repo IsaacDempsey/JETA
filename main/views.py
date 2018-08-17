@@ -283,12 +283,6 @@ def stops(request):
     destination = request.GET.get('destination')
     lineid = request.GET.get('lineid')
 
-    # if source and destination:
-    #     print("Inn ere")
-    #     switch = Switch_start(source, destination).switch_check()
-    #     if switch[0] == True:
-    #         destination = switch[1]
-
     if (source and not source.isnumeric()) or (destination and not destination.isnumeric()):
         response = HttpResponse(json.dumps(
             {"error": "Source/Destination query terms not numeric."}), content_type='application/json')
@@ -378,8 +372,7 @@ def stops(request):
 
     # Merge stops and routes to combine lineid info with coordinate and address.
     combined_df = pd.merge(stops, routes, on='stopid',sort=False)
-    combined_df = combined_df[[
-        'stopid', 'address', 'lineid', 'direction','coord']]
+    combined_df = combined_df[['stopid', 'address', 'lineid', 'direction','coord']]
 
     # Rename to suit front end conventions
     combined_df = combined_df.rename(columns={'stopid': 'stop_id', 'address': 'stop_name'})
@@ -396,6 +389,7 @@ def get_switch(request):
 
     switch = Switch_start(source, destination).switch_check()
     switch = int(switch)
+
     # If switch is 0, the means theres no linked stops, so no switching will happen
     if switch == 0:
         return HttpResponse(source)
@@ -404,14 +398,21 @@ def get_switch(request):
 
 
 def get_fares(request):
-    source = request.GET.get("source")
-    destination = request.GET.get("destination")
-    line_id = request.GET.get("line_id")
+    source = request.GET.get('source', '')
+    destination = request.GET.get('destination', '')
+    line_id = request.GET.get('line_id', '')
+
+    if not source.isnumeric() or not destination.isnumeric() or not line_id:
+        response = HttpResponse(json.dumps(
+            {"error": "No query terms/query terms given invalid."}), content_type='application/json')
+        response.status_code = 400
+        return response    
+
     source = int(source)
     destination = int(destination)
     
     stages = Faresfinder(source, destination, line_id).stages_finder()
-    print("STAGES",stages)
+
     return HttpResponse(stages)
 
 

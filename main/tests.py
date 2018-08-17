@@ -306,6 +306,48 @@ class TestStops(TestCase):
 
 class TestGet_fares(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.fares = Fares()
+        Fares.objects.bulk_create([
+            Fares(stop=1, route='39A', direction=1, stage=1, pattern_id='00000001', seq=0),
+            Fares(stop=2, route='39A', direction=1, stage=2, pattern_id='00000001', seq=1),
+            Fares(stop=1, route='39A', direction=0, stage=1, pattern_id='00000011', seq=0),
+            Fares(stop=1, route='39A', direction=0, stage=2, pattern_id='00000011', seq=0)
+            ])
+
+    def test_fares_no_terms_status_code(self):
+        response = self.client.get('/main/get_fares')
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_only_source_status_code(self):
+        response = self.client.get('/main/get_fares', {'source': 1})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_only_destination_status_code(self):
+        response = self.client.get('/main/get_fares', {'destination': 2})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_only_lineid_status_code(self):
+        response = self.client.get('/main/get_fares', {'line_id': '39A'})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_source_and_destination_status_code(self):
+        response = self.client.get('/main/get_fares', {'source': 1, 'destination': 2})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_source_and_lineid_status_code(self):
+        response = self.client.get('/main/get_fares', {'source': 1, 'line_id': '39A'})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_destination_and_lineid_status_code(self):
+        response = self.client.get('/main/get_fares', {'destination': 2, 'line_id': '39A'})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_all_terms_status_code(self):
+        response = self.client.get('/main/get_fares', {'source': 1, 'destination': 2, 'line_id': '39A'})
+        self.assertEqual(response.status_code, 200)
+
 
 # class TestGet_timetable(TestCase):
 
