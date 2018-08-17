@@ -306,8 +306,83 @@ class TestStops(TestCase):
 
 class TestGet_fares(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.fares = Fares()
+        Fares.objects.bulk_create([
+            Fares(stop=1, route='39A', direction=1, stage=1, pattern_id='00000001', seq=0),
+            Fares(stop=2, route='39A', direction=1, stage=2, pattern_id='00000001', seq=1),
+            Fares(stop=1, route='39A', direction=0, stage=1, pattern_id='00000011', seq=0),
+            Fares(stop=1, route='39A', direction=0, stage=2, pattern_id='00000011', seq=0)
+            ])
 
-# class TestGet_timetable(TestCase):
+    def test_fares_no_terms_status_code(self):
+        response = self.client.get('/main/get_fares')
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_only_source_status_code(self):
+        response = self.client.get('/main/get_fares', {'source': 1})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_only_destination_status_code(self):
+        response = self.client.get('/main/get_fares', {'destination': 2})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_only_lineid_status_code(self):
+        response = self.client.get('/main/get_fares', {'line_id': '39A'})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_source_and_destination_status_code(self):
+        response = self.client.get('/main/get_fares', {'source': 1, 'destination': 2})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_source_and_lineid_status_code(self):
+        response = self.client.get('/main/get_fares', {'source': 1, 'line_id': '39A'})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_destination_and_lineid_status_code(self):
+        response = self.client.get('/main/get_fares', {'destination': 2, 'line_id': '39A'})
+        self.assertEqual(response.status_code, 400)
+
+    def test_fares_all_terms_status_code(self):
+        response = self.client.get('/main/get_fares', {'source': 1, 'destination': 2, 'line_id': '39A'})
+        self.assertEqual(response.status_code, 200)
+
+
+class TestGet_timetable(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.timetable = Timetable.objects.create(stopid=2, lineid='39A', dayofservice='Saturday', destination='Damastown', 
+            schedule=['09:47','10:51','11:56','12:57','13:57','14:57','16:00','17:00',
+            '17:50','18:40','19:37','20:37','21:34','22:34','23:29'])
+
+    def test_timetable_no_terms_status_code(self):
+        response = self.client.get('/main/get_timetable')
+        self.assertEqual(response.status_code, 200) # returns all timetables.
+
+    def test_timetable_only_stop_status_code(self):
+        response = self.client.get('/main/get_timetable', {'stopid': 2})
+        self.assertEqual(response.status_code, 200)
+
+    def test_timetable_only_line_status_code(self):
+        response = self.client.get('/main/get_timetable', {'line': '39A'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_timetable_stop_and_line_status_code(self):
+        response = self.client.get('/main/get_timetable', {'stopid': 2, 'line': '39A'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_timetable_invalid_terms_code(self):
+        response = self.client.get('/main/get_timetable', {'stopid': 10, 'line': '39X'})
+        self.assertEqual(response.status_code, 400)    
+
+    def test_timetable_json_results(self):
+        response = self.client.get('/main/get_timetable', {'stopid': 2, 'line': '39A'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]['destination'], 'Damastown')
+        self.assertEqual(len(response.json()[0]), 6)
+
 
 # class TestGet_switch(TestCase):
 
