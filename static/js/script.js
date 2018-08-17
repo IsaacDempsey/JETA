@@ -131,15 +131,19 @@ $(document).ready(function() {
     toggleETA(hour_slice, today, mins_slice);
   });
   $("#date").change(function() {
-    toggleETA(hour_slice,today,mins_slice);
+    toggleETA(hour_slice, today, mins_slice);
   });
   $("#mins").change(function() {
     toggleETA(hour_slice, today, mins_slice);
   });
 });
 
-function toggleETA(hour_slice, today, mins_slice){
-  if (($("#hour").val() != hour_slice) || ($("#date").val() > today) || ($("#mins").val() != mins_slice)) {
+function toggleETA(hour_slice, today, mins_slice) {
+  if (
+    $("#hour").val() != hour_slice ||
+    $("#date").val() > today ||
+    $("#mins").val() != mins_slice
+  ) {
     $("#ETA").hide();
     $("#next-bus").hide();
   } else {
@@ -148,88 +152,98 @@ function toggleETA(hour_slice, today, mins_slice){
   }
 }
 // Autocomplete feature for the UI Source inputs
-$j(function () {
-    
-        // Check for the HTML DOM element who has #source as the id
-    $j("#source").autocomplete({
-        // Send a ajax request to the below address
-        source: localAddress + '/main/get_address',
-        // Start autocompleting when the user enter's atleast 2 characters
-        minLength: 1,
-        autoFocus: true,
-        classes: {
-            "ui-autocomplete": "highlight"
-        },
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        // When the user selects the required input ...-->
-        select: function (e, ui) {
-            deleteRoute();
-            current_flag = false;
-            if (__oldStartStop != "") {
-                $("#undo").removeClass("disabled");
-            }
-            $("#pac-input").val("");
-            // Get the stop id for the start
-            $("#noSource").hide();
-            var start = ui.item.label;
-            var stopId = start.split(",");
-            var startStop = stopId[stopId.length - 1]; 
-            if (__oldStartStop == "") {
-                __oldStartStop = startStop;
-            }
-            $("#destination").val("");
-            $("#setDest").removeClass("disabled");
-            // ..--> Send an ajax query to the api at the below URL
-            getStops(startStop.trim());
-        }
-    });      
-});
-function getswitch(selected_dest){
-    var source_val = $("#source").val();
-    if (source_val != ""){
-        $.ajax({
-            url: localAddress + "/main/get_switch",
-            // Set the start text as the label value
-            data: {
-                source: __startStop,
-                destination: selected_dest,
-            },
-            contentType: "application/json;charset=utf-8",
-            dataType: "json",
-            error: function (jqXHR, textStatus, errorThrown) {
-                $("#form").hide();
-                $(".overlay").show();
-                $(".loadingcontent").hide();
-                $(".switch_note_content").hide();
-                $j("#error").show("slide", { direction: "down" }, "fast");
-                $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
-            },
-            // On success send this data to the receive data function
-            success: function (data) {
-                new_source = data.toString();
-                data_str = data.toString();
-                // Tell the user we are switching their source stop
-                if (data != __startStop) {
-                    var newSource_address = $("#source").val();
-                    var pieces = newSource_address.split(',');
-                    pieces.splice(-1, 1);
-                    document.getElementById('SwitchText').innerHTML = "Your bus will leave from bus stop number: " + data;
-                    $("#form").hide();
-                    $(".overlay").show();
-                    $(".loadingcontent").hide();
-                    $(".errorreport").hide();
-                }
-                // Change the source
-                __oldStartStop = __startStop
-                var source_new_value = pieces.toString() + ', ' + new_source;
-                $("#source").val(source_new_value);
-                __startStop = new_source;
-            }
-        });
-    } else {
-        alert('Please set source first');
+$j(function() {
+  // Check for the HTML DOM element who has #source as the id
+  $j("#source").autocomplete({
+    // Send a ajax request to the below address
+    source: localAddress + "/main/get_address",
+    // Start autocompleting when the user enter's atleast 2 characters
+    minLength: 1,
+    autoFocus: true,
+    classes: {
+      "ui-autocomplete": "highlight"
+    },
+    contentType: "application/json;charset=utf-8",
+    dataType: "json",
+    // When the user selects the required input ...-->
+    select: function(e, ui) {
+      deleteRoute();
+      current_flag = false;
+      if (__oldStartStop != "") {
+        $("#undo").removeClass("disabled");
+      }
+      $("#pac-input").val("");
+      // Get the stop id for the start
+      $("#noSource").hide();
+      var start = ui.item.label;
+      var stopId = start.split(",");
+      var startStop = stopId[stopId.length - 1];
+      if (__oldStartStop == "") {
+        __oldStartStop = startStop;
+      }
+      $("#destination").val("");
+      $("#setDest").removeClass("disabled");
+      // ..--> Send an ajax query to the api at the below URL
+      getStops(startStop.trim());
     }
+  });
+});
+function getswitch(selected_dest) {
+  var source_val = $("#source").val();
+  if (source_val != "") {
+    $.ajax({
+      url: localAddress + "/main/get_switch",
+      // Set the start text as the label value
+      data: {
+        source: __startStop,
+        destination: selected_dest
+      },
+      contentType: "application/json;charset=utf-8",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        $("#form").hide();
+        $(".overlay").show();
+        $(".loadingcontent").hide();
+        $(".switch_note_content").hide();
+        $j("#error").show("slide", { direction: "down" }, "fast");
+        $("#errorcontent").html(
+          '<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' +
+            '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' +
+            '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' +
+            jqXHR.status +
+            " Status Code</b></div>" +
+            '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' +
+            jqXHR.statusText +
+            " </b></div>" +
+            '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>'
+        );
+      },
+      // On success send this data to the receive data function
+      success: function(data) {
+        new_source = data.toString();
+        data_str = data.toString();
+        // Tell the user we are switching their source stop
+        if (data != __startStop) {
+          var newSource_address = $("#source").val();
+          var pieces = newSource_address.split(",");
+          pieces.splice(-1, 1);
+          document.getElementById("SwitchText").innerHTML =
+            "Your bus will leave from bus stop number: " + data;
+          $("#form").hide();
+          $(".overlay").show();
+          $(".loadingcontent").hide();
+          $(".errorreport").hide();
+        }
+        // Change the source
+        __oldStartStop = __startStop;
+        var source_new_value = pieces.toString() + ", " + new_source;
+        $("#source").val(source_new_value);
+        __startStop = new_source;
+      }
+    });
+  } else {
+    alert("Please set source first");
+  }
 }
 function closeSwitchNote() {
   $(".overlay").hide();
@@ -452,155 +466,177 @@ $(function() {
 /* ----------------------------------------------------------------------- */
 /*************************** MANIPULATION OF MARKERS ***********************/
 /* ----------------------------------------------------------------------- */
-function getLines(startStop, endStop){
-    __startStop = startStop;
-    __endStop = endStop;
-    $.ajax({
-      url: localAddress + "/main/lines",
-      data: {
-        source: startStop,
-        destination: endStop,
-      },
-        error: function (jqXHR, textStatus, errorThrown) {
-            $("#form").hide();
-            $(".overlay").show();
-            $(".loadingcontent").hide();
-            $(".switch_note_content").hide();
-            $j("#error").show("slide", { direction: "down" }, "fast");
-            $("#errorcontent").html('<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' + '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' + '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' + jqXHR.status + " Status Code</b></div>" + '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' + jqXHR.statusText + " </b></div>" + '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>');
-        },
-      contentType: "application/json;charset=utf-8",
-      dataType: "json",
-      success: function (data) {
-          $("#lineholder").show();
-          $("#line-pills").html('');
-            var url1 = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=';
-            var url2 = __startStop
-            var url3 = '&format=json';
-            var res = url1.concat(url2, url3);
-            // If more than one bus route, sort by arriving first
-            if (data.length > 1) {
-            $("#inorder").text("(in order of first arriving)");
-            $.getJSON(res, function(bus) {
-            var nextbus = [];
-            for (var i = 0; i < bus.results.length; i++) {
-                var iarr = bus.results[i];
-                    nextbus.push(bus.results[i].route);           
-            }            
-                function intersect(nextbus, theroutes) {
-                    return nextbus.filter(Set.prototype.has, new Set(theroutes));
-                    }
-                intersect_arr = intersect(nextbus, data);
-                
-                function removeDuplicates(long_arr){
-                    short_arr = Array.from(new Set(long_arr))
-                    return short_arr
-                    }
-                sorted_lines = removeDuplicates(intersect_arr)
-            for (var i = 0; i < sorted_lines.length; i ++){
-                $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' + sorted_lines[i] + "</a></li>").appendTo("#line-pills");
-            }
-            });
-            }
-        else {
-            for (var i = 0; i < data.length; i ++){
-                $('<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' + data[i] + "</a></li>").appendTo("#line-pills");
-            }
+function getLines(startStop, endStop) {
+  __startStop = startStop;
+  __endStop = endStop;
+  $.ajax({
+    url: localAddress + "/main/lines",
+    data: {
+      source: startStop,
+      destination: endStop
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      $("#form").hide();
+      $(".overlay").show();
+      $(".loadingcontent").hide();
+      $(".switch_note_content").hide();
+      $j("#error").show("slide", { direction: "down" }, "fast");
+      $("#errorcontent").html(
+        '<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' +
+          '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' +
+          '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' +
+          jqXHR.status +
+          " Status Code</b></div>" +
+          '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' +
+          jqXHR.statusText +
+          " </b></div>" +
+          '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>'
+      );
+    },
+    contentType: "application/json;charset=utf-8",
+    dataType: "json",
+    success: function(data) {
+      $("#lineholder").show();
+      $("#line-pills").html("");
+      console.log(data);
+      var url1 =
+        "https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=";
+      var url2 = __startStop;
+      var url3 = "&format=json";
+      var res = url1.concat(url2, url3);
+      // If more than one bus route, sort by arriving first
+      if (data.length > 1) {
+        $("#inorder").text("(in order of first arriving)");
+        $.getJSON(res, function(bus) {
+          var nextbus = [];
+          for (var i = 0; i < bus.results.length; i++) {
+            nextbus.push(bus.results[i].route);
+          }
+          function intersect(nextbus, theroutes) {
+            return nextbus.filter(Set.prototype.has, new Set(theroutes));
+          }
+          intersect_arr = intersect(nextbus, data);
+
+          function removeDuplicates(long_arr) {
+            short_arr = Array.from(new Set(long_arr));
+            return short_arr;
+          }
+          sorted_lines = removeDuplicates(intersect_arr);
+          console.log(sorted_lines);
+          Array.prototype.diff = function (a) {
+            return this.filter(function (i) { return a.indexOf(i) < 0; });
+          };
+          var busNotDue = data.diff(sorted_lines); 
+          console.log(busNotDue);
+          for (var i = 0; i < sorted_lines.length; i++) {
+            $(
+              '<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' +
+                sorted_lines[i] +
+                "</a></li>"
+            ).appendTo("#line-pills");
+          }
+        });
+      } else {
+        for (var i = 0; i < data.length; i++) {
+          $(
+            '<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' +
+              data[i] +
+              "</a></li>"
+          ).appendTo("#line-pills");
         }
       }
+    }
   });
 }
 function getFares(line_id) {
-    if (line_id != ""){
+  if (line_id != "") {
     $("#fares").hide();
     $.ajax({
-        url: localAddress + "/main/get_fares",
-        // Set the start text as the label value
-        data: {
-          source: __startStop,
-          destination: __endStop,
-          line_id: line_id
-        },
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        error: function(jqXHR, textStatus, errorThrown) {
-          
-        },
-        // On success send this data to the receive data function
-        success: function(data) {
-         console.log(data);
-          var adult1 = "€1.50 (Leap), €2.10 (Cash)"
-          var adult2 = "€2.15 (Leap), €2.85 (Cash)"
-          var adult3 = "€2.60 (Leap), €3.30 (Cash)"
-          
-          if (data <= 3) {
-            $("#fares").show();
-            $("#adultfare").text(adult1);
-            }
-          else if (data > 3 && data <= 13) {
-            $("#fares").show();
-            $("#adultfare").text(adult2);
-            }
-        else if (data > 13) {
-            $("#fares").show();
-            $("#adultfare").text(adult3);
-            }
-        else {
-            $("#fares").hide();
+      url: localAddress + "/main/get_fares",
+      // Set the start text as the label value
+      data: {
+        source: __startStop,
+        destination: __endStop,
+        line_id: line_id
+      },
+      contentType: "application/json;charset=utf-8",
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {},
+      // On success send this data to the receive data function
+      success: function(data) {
+        console.log(data);
+        var adult1 = "€1.50 (Leap), €2.10 (Cash)";
+        var adult2 = "€2.15 (Leap), €2.85 (Cash)";
+        var adult3 = "€2.60 (Leap), €3.30 (Cash)";
+
+        if (data <= 3) {
+          $("#fares").show();
+          $("#adultfare").text(adult1);
+        } else if (data > 3 && data <= 13) {
+          $("#fares").show();
+          $("#adultfare").text(adult2);
+        } else if (data > 13) {
+          $("#fares").show();
+          $("#adultfare").text(adult3);
+        } else {
+          $("#fares").hide();
         }
-        }
-      });
-    }
+      }
+    });
+  }
 }
 var old_nextbus = 0;
 var count;
 var rtpi_interval;
 function getTravelTime(content) {
-    clearInterval(rtpi_interval);
-    var __line_id = content;
-    var nextbustime;
-    count=0;
-    deleteRoute();
-    $("#journeyholder").show();
+  clearInterval(rtpi_interval);
+  var __line_id = content;
+  var nextbustime;
+  count = 0;
+  deleteRoute();
+  $("#journeyholder").show();
 
-    var hour1 = document.getElementById("hour");
-    var hour = hour1[hour1.selectedIndex].value
-    var mins1 = document.getElementById("mins");
-    var mins = mins1[mins1.selectedIndex].value
-    var datetime_future_str = $("#date").val().concat("T", hour, mins);
-    var datetime = (moment(datetime_future_str, "YYYY-MM-DDTHH:mm").valueOf())/1000;
-    console.log(datetime);
-    // var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
-    var proxy = 'https://cors-anywhere.herokuapp.com/';
-    var darksky = "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
-    var weather_url = proxy.concat(darksky);
+  var hour1 = document.getElementById("hour");
+  var hour = hour1[hour1.selectedIndex].value;
+  var mins1 = document.getElementById("mins");
+  var mins = mins1[mins1.selectedIndex].value;
+  var datetime_future_str = $("#date")
+    .val()
+    .concat("T", hour, mins);
+  var datetime =
+    moment(datetime_future_str, "YYYY-MM-DDTHH:mm").valueOf() / 1000;
+  console.log(datetime);
+  // var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
+  var proxy = "https://cors-anywhere.herokuapp.com/";
+  var darksky =
+    "https://api.darksky.net/forecast/49d7bd97c9c756cb539c7bf0befee061/53.3551,-6.2493";
+  var weather_url = proxy.concat(darksky);
 
-    $.getJSON(weather_url, function(weather) {
-        var current_time = Math.round((new Date()).getTime() / 1000);
-        var rain;
-        // if time with hour of current time, use current rainfall
-        if (datetime <= current_time + 3600 && datetime >= current_time - 3600) {
-            rain = weather.currently.precipIntensity;
+  $.getJSON(weather_url, function(weather) {
+    var current_time = Math.round(new Date().getTime() / 1000);
+    var rain;
+    // if time with hour of current time, use current rainfall
+    if (datetime <= current_time + 3600 && datetime >= current_time - 3600) {
+      rain = weather.currently.precipIntensity;
+    } else {
+      for (var i = 0; i < weather.hourly.data.length; i++) {
+        var iarr = weather.hourly.data[i];
+        if (datetime <= iarr.time + 3600 && datetime >= iarr.time - 3600) {
+          rain = iarr.precipIntensity;
         }
-        else {
-            for (var i = 0; i < weather.hourly.data.length; i++) {
-                var iarr = weather.hourly.data[i];
-                if (datetime <= iarr.time + 3600 && datetime >= iarr.time - 3600) {
-                    rain = iarr.precipIntensity;
-                }
-            }
-        }
-        if (typeof rain == "undefined") {
-            rain = "0.5";
-        }
-        getFromModel(rain);
-    });
-    var lin = content;
-    startStopAutocompleteData.sort(function (a, b) {
-        return Number(a.lineid[lin]) - Number(b.lineid[lin]);
-    });
-    getRoute(lin);
-    function getFromModel(rain) {
+      }
+    }
+    if (typeof rain == "undefined") {
+      rain = "0.5";
+    }
+    getFromModel(rain);
+  });
+  var lin = content;
+  startStopAutocompleteData.sort(function(a, b) {
+    return Number(a.lineid[lin]) - Number(b.lineid[lin]);
+  });
+  getRoute(lin);
+  function getFromModel(rain) {
     rain = rain.toString();
     $.ajax({
       url: localAddress + "/main/journeytime",
@@ -648,79 +684,78 @@ function getTravelTime(content) {
           journeytime_toDisplay = totaltraveltime[1] + " mins";
         }
 
-      $("#journeyholder").show();
-      $("#journeycontent").show();
-      var url1 =
-        "https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=";
-      var url3 = "&format=json";
-      var live_db = url1.concat(__startStop, url3);
-      $("#route-id").text(lin);
-      $(journeytime + " mins").appendTo("#totaltraveltime-id");
-      $("#totaltraveltime-id").text(journeytime_toDisplay);
-      var length = getRTPI(lin);
-      function getRTPI() {
-        $.getJSON(live_db, function(bus) {
-          var nextbuses = [];
-          for (var i = 0; i < bus.results.length; i++) {
-            var iarr = bus.results[i];
-            if (iarr.route == lin) {
-              nextbuses.push(bus.results[i].duetime);
+        $("#journeyholder").show();
+        $("#journeycontent").show();
+        var url1 =
+          "https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=";
+        var url3 = "&format=json";
+        var live_db = url1.concat(__startStop, url3);
+        $("#route-id").text(lin);
+        $(journeytime + " mins").appendTo("#totaltraveltime-id");
+        $("#totaltraveltime-id").text(journeytime_toDisplay);
+        var length = getRTPI(lin);
+        function getRTPI() {
+          $.getJSON(live_db, function(bus) {
+            var nextbuses = [];
+            for (var i = 0; i < bus.results.length; i++) {
+              var iarr = bus.results[i];
+              if (iarr.route == lin) {
+                nextbuses.push(bus.results[i].duetime);
+              }
             }
-          }
-          setTime(nextbuses);
-        });
-      }
-      rtpi_interval = setInterval(getRTPI, 5000);
+            setTime(nextbuses);
+          });
+        }
+        rtpi_interval = setInterval(getRTPI, 5000);
 
-      function setTime(nextbuses) {
-        count++;
-        if (nextbuses.length == 0) {
-          arrivaltime = "--:--";
-          nextbustime = "No Information";
-          clearInterval(rtpi_interval);
-          line = lin;
-        } else {
-          var rtpiArrivalTime = nextbuses[0];
-
-          if (rtpiArrivalTime == "Due") {
-            if (count == 1) {
-              arrivaltime = addMinutes(currentTime, journeytime);
-            }
-            nextbustime = rtpiArrivalTime;
-            count = 0;
+        function setTime(nextbuses) {
+          count++;
+          if (nextbuses.length == 0) {
+            arrivaltime = "--:--";
+            nextbustime = "No Information";
+            clearInterval(rtpi_interval);
+            line = lin;
           } else {
-            nextbus = Math.min(...nextbuses);
-            if (count == 1) {
-              arrivaltime = addMinutes(currentTime, journeytime);
-              arrivaltime = addMinutes(arrivaltime, nextbus);
-            }
-            if (nextbus == 1) {
-              nextbustime = String(nextbus) + " min";
+            var rtpiArrivalTime = nextbuses[0];
+
+            if (rtpiArrivalTime == "Due") {
+              if (count == 1) {
+                arrivaltime = addMinutes(currentTime, journeytime);
+              }
+              nextbustime = rtpiArrivalTime;
+              count = 0;
             } else {
-              nextbustime = String(nextbus) + " mins";
+              nextbus = Math.min(...nextbuses);
+              if (count == 1) {
+                arrivaltime = addMinutes(currentTime, journeytime);
+                arrivaltime = addMinutes(arrivaltime, nextbus);
+              }
+              if (nextbus == 1) {
+                nextbustime = String(nextbus) + " min";
+              } else {
+                nextbustime = String(nextbus) + " mins";
+              }
             }
           }
+
+          $("#eta-id").text(arrivaltime);
+          $("#nextbus-id").text(nextbustime);
+          return nextbustime;
         }
 
-        $("#eta-id").text(arrivaltime);
-        $("#nextbus-id").text(nextbustime);
-        return nextbustime;
-      }
+        function addMinutes(time, minsToAdd) {
+          function D(J) {
+            return (J < 10 ? "0" : "") + J;
+          }
+          var piece = time.split(":");
+          var mins = piece[0] * 60 + +piece[1] + +minsToAdd;
 
-      function addMinutes(time, minsToAdd) {
-        function D(J) {
-          return (J < 10 ? "0" : "") + J;
+          return D(((mins % (24 * 60)) / 60) | 0) + ":" + D(mins % 60);
         }
-        var piece = time.split(":");
-        var mins = piece[0] * 60 + +piece[1] + +minsToAdd;
-
-        return D(((mins % (24 * 60)) / 60) | 0) + ":" + D(mins % 60);
       }
-    }
-  });
-
-}
-getFares(__line_id);
+    });
+  }
+  getFares(__line_id);
 }
 var route = "";
 function getRoute(line) {
