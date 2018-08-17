@@ -24,6 +24,7 @@ def isfloat(x):
     except:
         return False
 
+
 def index(request):
     return render(request, 'index.html')
 
@@ -218,13 +219,6 @@ def get_address(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-# def routes(request):
-#     routes = Routes.objects.all().values()
-#     routesJson = [dict(i) for i in routes]
-# 
-#     return JsonResponse(routesJson, safe=False)
-
-
 def locations(request):
     """
     Query Terms: latitude, longitude and the radius of the distance from the point/line given.
@@ -267,7 +261,6 @@ def locations(request):
     stops = stops.rename(columns={'stopid': 'stop_id', 'address': 'stop_name', 0: 'coord'})
 
     return HttpResponse(stops.to_json(orient='records'), content_type='application/json')    
-
 
 
 def stops(request):
@@ -393,6 +386,7 @@ def stops(request):
 
     return HttpResponse(combined_df.to_json(orient='records'), content_type='application/json')
 
+
 def get_switch(request):
     print("in switch")
     source = request.GET.get("source")
@@ -408,6 +402,7 @@ def get_switch(request):
     else:
         return HttpResponse(switch)
 
+
 def get_fares(request):
     source = request.GET.get("source")
     destination = request.GET.get("destination")
@@ -418,6 +413,7 @@ def get_fares(request):
     stages = Faresfinder(source, destination, line_id).stages_finder()
     print("STAGES",stages)
     return HttpResponse(stages)
+
 
 def get_timetable(request):
     """This function returns the timetable of a selected stop id"""
