@@ -219,9 +219,9 @@ var count = 0;
 function openTimeTable(n) {
     count++;
     $(".schedule").fadeIn("fast");
-    $j(".schedule").draggable({
-        containment: "window"
-    });
+    // $j(".schedule").draggable({
+    //     containment: "window"
+    // });
 
     if (count == 1) {
         $('#schedule-container').css('position', 'absolute');

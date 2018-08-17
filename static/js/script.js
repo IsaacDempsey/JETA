@@ -18,6 +18,7 @@ var __endStop = ""; // End Stop selected by the user on the form
 var __oldStartStop = ""; // Old start stop to make the undo feature
 var __oldEndStop = ""; // Old End Stop to make the undo feature
 var __line_id = "";
+var __flag_toady = true; // This flag will tell the system whether the user is looking for today or in future
 var autocomplete_data = []; // This a global variable for the data that will be used to select for the destination field in the form
 var startStopAutocompleteData; // A separate variable after the destination is entered by the user in order to plot markers
 var current_flag = false; // This flag is set when the user allows to use the current location
@@ -52,7 +53,6 @@ $(function() {
     if (old_left == "") {
       old_left = $j("#form").position().left;
     }
-    var measure = $(window).width() - $j("#form").position().left;
     if ($("#navbarToggleExternalContent").hasClass("show")) {
       $j("#form").position({
         my: "center",
@@ -146,6 +146,7 @@ function toggleETA(hour_slice, today, mins_slice) {
   ) {
     $("#ETA").hide();
     $("#next-bus").hide();
+    __flag_toady = false;
   } else {
     $("#ETA").show();
     $("#next-bus").show();
@@ -498,6 +499,7 @@ function getLines(startStop, endStop) {
     success: function(data) {
       $("#lineholder").show();
       $("#line-pills").html("");
+      var line_class = "active";
       // console.log(data);
       var url1 =
         "https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=";
@@ -523,10 +525,12 @@ function getLines(startStop, endStop) {
           }
           sorted_lines = removeDuplicates(intersect_arr);
           // console.log(sorted_lines);
-          Array.prototype.diff = function (a) {
-            return this.filter(function (i) { return a.indexOf(i) < 0; });
+          Array.prototype.diff = function(a) {
+            return this.filter(function(i) {
+              return a.indexOf(i) < 0;
+            });
           };
-          var busNotDue = data.diff(sorted_lines); 
+          var busNotDue = data.diff(sorted_lines);
           // console.log(busNotDue);
           for (var i = 0; i < sorted_lines.length; i++) {
             $(
@@ -534,13 +538,24 @@ function getLines(startStop, endStop) {
                 sorted_lines[i] +
                 "</a></li>"
             ).appendTo("#line-pills");
-            
           }
-          if (busNotDue.length>0){
-            for (var i = 0; i < busNotDue.length; i++) {
-              $('<li class="nav-item"><a class="nav-link inactive" href="#" id="lineid" onclick=getTravelTime(this.innerHTML,"inactive")>' + busNotDue[i] + "</a></li>").appendTo("#line-pills");
+          if (busNotDue.length > 0) {
+            if (__flag_toady) {
+              line_class = "inactive";
+            } else {
+              line_class = "active";
             }
-          }          
+            // alert(line_class);
+            for (var i = 0; i < busNotDue.length; i++) {
+              $(
+                '<li class="nav-item"><a class="nav-link ' +
+                  line_class +
+                  '" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' +
+                  busNotDue[i] +
+                  "</a></li>"
+              ).appendTo("#line-pills");
+            }
+          }
         });
       } else {
         for (var i = 0; i < data.length; i++) {
@@ -594,7 +609,7 @@ function getFares(line_id) {
 var old_nextbus = 0;
 var count;
 var rtpi_interval;
-function getTravelTime(content,flag="active") {
+function getTravelTime(content) {
   clearInterval(rtpi_interval);
   var __line_id = content;
   var nextbustime;
