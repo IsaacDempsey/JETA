@@ -532,6 +532,10 @@ li.nav-item{
 a#lineid.nav-link.active{
   background-color: red !important;
 }
+
+a#lineid.nav-link.inactive{
+  background-color: gray !important;
+}
 a#timetableline.nav-link.active{
   background-color: #4CAF50 !important;
 }
@@ -617,7 +621,7 @@ a#timetableline.nav-link.active{
   overflow-y: auto;
 }
 #timetable-content{
-  max-height: 15rem;
+  max-height: 50vh;
   overflow-y: auto;
 }
 
@@ -707,6 +711,10 @@ a#timetableline.nav-link.active{
 #tt{
   border: 1px solid;
   border-color: #4CAF50;
+}
+
+#tt:hover{
+  cursor: pointer;
 }
 @media screen and (min-width: 650px){
   .schdule-rows, .accordion{
