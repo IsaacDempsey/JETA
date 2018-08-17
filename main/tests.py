@@ -384,7 +384,43 @@ class TestGet_timetable(TestCase):
         self.assertEqual(len(response.json()[0]), 6)
 
 
-# class TestGet_switch(TestCase):
+class TestGet_switch(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.routes = Routes.objects.create(routeid='39A_40', lineid='39A', direction=1, stopids=[767, 768, 769, 770, 771])
+        cls.linked = Linked.objects.create(stop_name='RandomStop', linked=[767, 888, 999])        
+
+    def test_switch_no_terms_status_code(self):
+        response = self.client.get('/main/get_switch')
+        self.assertEqual(response.status_code, 400)
+
+    def test_switch_only_source_status_code(self):
+        response = self.client.get('/main/get_switch', {'source': 767})
+        self.assertEqual(response.status_code, 400)
+
+    def test_switch_only_destination_status_code(self):
+        response = self.client.get('/main/get_switch', {'destination': 771})
+        self.assertEqual(response.status_code, 400)
+
+    def test_switch_source_and_destination_status_code(self):
+        response = self.client.get('/main/get_switch', {'source': 767, 'destination': 771})
+        self.assertEqual(response.status_code, 200)
+
+    # def test_switch_invalid_terms_code(self):
+    #     response = self.client.get('/main/get_switch', {'source': 3, 'destination': 4})
+    #     self.assertEqual(response.status_code, 400)    
+
+    def test_switch_switch_required_results(self):
+        response = self.client.get('/main/get_switch', {'source': 888, 'destination': 771})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '767')
+        self.assertNotContains(response, "888")
+
+    def test_switch_switch_not_required_results(self):
+        response = self.client.get('/main/get_switch', {'source': 767, 'destination': 771})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '767')
 
 
 # Test Front End

@@ -399,8 +399,10 @@ $(function onSearchAgain() {
 function setValueOnForm(address, stopid, flag) {
   $("#homeTab").addClass("active show");
   $("#ttTab").removeClass("active show");
+  $("#newsTab").removeClass("active show");
   $("#homeMain").addClass("active show");
   $("#timetable").removeClass("active show");
+  $("#latestNews").removeClass("active show");
   $("#setDest").removeClass("disabled");
   deleteRoute();
   $("#pac-input").val("");
