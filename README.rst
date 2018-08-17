@@ -34,6 +34,15 @@ Application Installation Instructions
 5. Navigate in a web browser to the following address:
 
     localhost:8000
+    
+Testing
+-------
+
+To run tests, use the command:
+
+    python manage.py test -k
+
+(Note: -k flage prevents Django from destroying the test database between runs - improving testing speed).
 
 
 :License: GPLv3
