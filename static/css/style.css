@@ -532,6 +532,10 @@ li.nav-item{
 a#lineid.nav-link.active{
   background-color: red !important;
 }
+
+a#lineid.nav-link.inactive{
+  background-color: gray !important;
+}
 a#timetableline.nav-link.active{
   background-color: #4CAF50 !important;
 }

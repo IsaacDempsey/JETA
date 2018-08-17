@@ -498,7 +498,7 @@ function getLines(startStop, endStop) {
     success: function(data) {
       $("#lineholder").show();
       $("#line-pills").html("");
-      console.log(data);
+      // console.log(data);
       var url1 =
         "https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=";
       var url2 = __startStop;
@@ -522,19 +522,25 @@ function getLines(startStop, endStop) {
             return short_arr;
           }
           sorted_lines = removeDuplicates(intersect_arr);
-          console.log(sorted_lines);
+          // console.log(sorted_lines);
           Array.prototype.diff = function (a) {
             return this.filter(function (i) { return a.indexOf(i) < 0; });
           };
           var busNotDue = data.diff(sorted_lines); 
-          console.log(busNotDue);
+          // console.log(busNotDue);
           for (var i = 0; i < sorted_lines.length; i++) {
             $(
               '<li class="nav-item"><a class="nav-link active" href="#" id="lineid" onclick=getTravelTime(this.innerHTML)>' +
                 sorted_lines[i] +
                 "</a></li>"
             ).appendTo("#line-pills");
+            
           }
+          if (busNotDue.length>0){
+            for (var i = 0; i < busNotDue.length; i++) {
+              $('<li class="nav-item"><a class="nav-link inactive" href="#" id="lineid" onclick=getTravelTime(this.innerHTML,"inactive")>' + busNotDue[i] + "</a></li>").appendTo("#line-pills");
+            }
+          }          
         });
       } else {
         for (var i = 0; i < data.length; i++) {
@@ -564,7 +570,7 @@ function getFares(line_id) {
       error: function(jqXHR, textStatus, errorThrown) {},
       // On success send this data to the receive data function
       success: function(data) {
-        console.log(data);
+        // console.log(data);
         var adult1 = "€1.50 (Leap), €2.10 (Cash)";
         var adult2 = "€2.15 (Leap), €2.85 (Cash)";
         var adult3 = "€2.60 (Leap), €3.30 (Cash)";
@@ -588,7 +594,7 @@ function getFares(line_id) {
 var old_nextbus = 0;
 var count;
 var rtpi_interval;
-function getTravelTime(content) {
+function getTravelTime(content,flag="active") {
   clearInterval(rtpi_interval);
   var __line_id = content;
   var nextbustime;
@@ -605,7 +611,7 @@ function getTravelTime(content) {
     .concat("T", hour, mins);
   var datetime =
     moment(datetime_future_str, "YYYY-MM-DDTHH:mm").valueOf() / 1000;
-  console.log(datetime);
+  // console.log(datetime);
   // var datetime = (moment($("#datetime").val(), "YYYY-MM-DDTHH:mm").valueOf())/1000;
   var proxy = "https://cors-anywhere.herokuapp.com/";
   var darksky =
