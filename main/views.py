@@ -381,7 +381,6 @@ def stops(request):
 
 
 def get_switch(request):
-    print("in switch")
     source = request.GET.get("source")
     destination = request.GET.get("destination")
     source = int(source)

@@ -224,12 +224,11 @@ function getswitch(selected_dest) {
         new_source = data.toString();
         data_str = data.toString();
         // Tell the user we are switching their source stop
-        if (data != __startStop) {
+        if (data_str != __startStop) {
           var newSource_address = $("#source").val();
           var pieces = newSource_address.split(",");
           pieces.splice(-1, 1);
-          document.getElementById("SwitchText").innerHTML =
-            "Your bus will leave from bus stop number: " + data;
+          document.getElementById("SwitchText").innerHTML = "Your bus will leave from bus stop number: " + data;
           $("#form").hide();
           $(".overlay").show();
           $(".loadingcontent").hide();
@@ -582,7 +581,24 @@ function getFares(line_id) {
       },
       contentType: "application/json;charset=utf-8",
       dataType: "json",
-      error: function(jqXHR, textStatus, errorThrown) {},
+      error: function(jqXHR, textStatus, errorThrown) {
+        $("#form").hide();
+        $(".overlay").show();
+        $(".loadingcontent").hide();
+        $(".switch_note_content").hide();
+        $j("#error").show("slide", { direction: "down" }, "fast");
+        $("#errorcontent").html(
+          '<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' +
+          '<div class="col-xs-12 p-3 display-5"> Error Occurred</div>' +
+          '<div class="col-xs-12 p-3 mp-5">The server responded with: <b>' +
+          jqXHR.status +
+          " Status Code</b></div>" +
+          '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' +
+          jqXHR.statusText +
+          " </b></div>" +
+          '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>'
+        );
+      },
       // On success send this data to the receive data function
       success: function(data) {
         // console.log(data);
@@ -794,6 +810,7 @@ function getRoute(line) {
       $("#form").hide();
       $(".overlay").show();
       $(".loadingcontent").hide();
+      $(".switch_note_content").hide();
       $j("#error").show("slide", { direction: "down" }, "fast");
       $("#errorcontent").html(
         '<div class="col-xs-12 px-3 pt-3 mp-5 mobile-col-centered text-center display-4"> :( Oops !</div>' +
@@ -802,7 +819,7 @@ function getRoute(line) {
           jqXHR.status +
           " Status Code</b></div>" +
           '<div class="col-xs-12 p-3 mp-5">Error Reason: <b>' +
-          jqXHR.responseJSON.error +
+          jqXHR.statusText +
           " </b></div>" +
           '<div class="col-xs-12 p-3 mp-5 mobile-col-centered"><button type="button" class="btn btn-danger form-control inputRow px-3 mp-5" id="sendErrorReport" onclick=sendErrorReport()>Send Error Report Now !</button></div>'
       );
