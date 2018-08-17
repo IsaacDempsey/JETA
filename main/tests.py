@@ -304,28 +304,15 @@ class TestStops(TestCase):
         self.assertEqual(response.json()[2]['lineid'], {"39A":2})
         self.assertEqual(response.json()[3]['stop_id'], 770)
 
+class TestGet_fares(TestCase):
 
-# Test Models
 
-# class TestBankHolidays(TestCase):
+# class TestGet_timetable(TestCase):
 
-# class TestCoefficients(TestCase):
-
-# class TestJourneyLogs(TestCase):
-
-# class TestLines(TestCase):
-
-# class TestLinked(TestCase):
-
-# class TestRoutes(TestCase):
-
-# class TestStops(TestCase):
-
-# class TestWeather(TestCase):
+# class TestGet_switch(TestCase):
 
 
 # Test Front End
-
 
 # Code reference: https://docs.djangoproject.com/en/2.0/topics/testing/tools/
 class SeleniumTests(StaticLiveServerTestCase):
@@ -334,7 +321,7 @@ class SeleniumTests(StaticLiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        # cls.url = "http://localhost:8000"
+        # cls.url = "http://localhost:8000"https://www.reddit.com/r/worldnews/
         cls.url = "http://csi420-02-vm6.ucd.ie"
 
         # Profile setup code:

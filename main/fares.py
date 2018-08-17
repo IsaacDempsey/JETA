@@ -8,8 +8,8 @@ class Faresfinder():
         self.start_id = start_id
         self.destination_id = destination_id
         self.line_id = line_id
-        self.fare_data1 = Fares.objects.filter(route = self.line_id, direction = "I").values()
-        self.fare_data2 = Fares.objects.filter(route = self.line_id, direction = "O").values()
+        self.fare_data1 = Fares.objects.filter(route = self.line_id, direction = 1).values()
+        self.fare_data2 = Fares.objects.filter(route = self.line_id, direction = 0).values()
 
     # Returns number of stages traversed
     def stages_finder(self):
