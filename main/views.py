@@ -279,13 +279,13 @@ def stops(request):
         - coord = list of coordinations [lng, lat].
     """
 
-    source = request.GET.get('source')
-    destination = request.GET.get('destination')
+    source = request.GET.get('source', '')
+    destination = request.GET.get('destination', '')
     lineid = request.GET.get('lineid')
 
     if (source and not source.isnumeric()) or (destination and not destination.isnumeric()):
         response = HttpResponse(json.dumps(
-            {"error": "Source/Destination query terms not numeric."}), content_type='application/json')
+            {"error": "Source or/and Destination query terms not numeric."}), content_type='application/json')
         response.status_code = 400
         return response
     
@@ -334,6 +334,11 @@ def stops(request):
                 
     # Slice stopids by destination if it was given.
     if destination:
+        # Create mask to identify rows which doen't contain destination. Remove those rows.
+        mask = routes['stopids'].apply(lambda x: True if destination in x else False)
+        routes = routes.loc[mask]
+
+        # Slice list of route stopids by destination.
         routes['stopids'] = routes['stopids'].apply(lambda x: x[:(x.index(destination)+1)])
 
     # Remove duplicate stopids within routes, while maintaining stop order.
