@@ -36,21 +36,6 @@ class Coefficients(models.Model):
             models.Index(fields=['segment'])
         ]
 
-# May remove this table eventually.
-class JourneyLogs(models.Model):
-    routeid = models.CharField(max_length=10, primary_key=True)
-    segments = ArrayField(models.CharField(max_length=15))
-    seg_num = ArrayField(models.IntegerField(null=True))
-
-    def __str__(self):
-        return self.routeid
-
-    class Meta:
-        verbose_name_plural = "Journey Logs"
-        indexes = [
-            models.Index(fields=['routeid'])
-        ]    
-
 
 class Lines(models.Model):
     lineid = models.CharField(max_length=10, primary_key=True)
@@ -158,3 +143,27 @@ class Timetable(models.Model):
             models.Index(fields=['dayofservice']),
             models.Index(fields=['stopid', 'lineid', 'dayofservice','destination']),
         ]
+
+class Fares(models.Model):
+    stop = models.CharField(max_length=10)
+    route = models.CharField(max_length=10)
+    direction = models.CharField(max_length=10)
+    stage = models.FloatField(null=True)
+    pattern_id = models.CharField(max_length=10)
+    seq = models.IntegerField(null=True)
+
+    def __str__(self):
+        return self.stop
+    
+    class Meta:
+        verbose_name_plural = "Fares"
+        indexes = [
+            models.Index(fields=['stop']),
+            models.Index(fields=['route']),
+            models.Index(fields=['direction']),
+            models.Index(fields=['stage']),
+            models.Index(fields=['pattern_id']),
+        ]
+
+
+ 

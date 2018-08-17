@@ -4,10 +4,11 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Coefficients, Lines, Linked, Routes, Stops, Timetable
+from .models import Coefficients, Lines, Linked, Routes, Stops, Timetable, Fares
 from .destinations import Destinations
 from .route_result import Route_result
 from .switch import Switch_start
+from .fares import Faresfinder
 
 from datetime import datetime, timedelta
 import json
@@ -392,9 +393,8 @@ def stops(request):
 
     return HttpResponse(combined_df.to_json(orient='records'), content_type='application/json')
 
-
-
 def get_switch(request):
+    print("in switch")
     source = request.GET.get("source")
     destination = request.GET.get("destination")
     source = int(source)
@@ -408,21 +408,38 @@ def get_switch(request):
     else:
         return HttpResponse(switch)
 
+def get_fares(request):
+    source = request.GET.get("source")
+    destination = request.GET.get("destination")
+    line_id = request.GET.get("line_id")
+    source = int(source)
+    destination = int(destination)
+    
+    stages = Faresfinder(source, destination, line_id).stages_finder()
+    print("STAGES",stages)
+    return HttpResponse(stages)
+
 def get_timetable(request):
     """This function returns the timetable of a selected stop id"""
     stop = request.GET.get("stopid")
     line = request.GET.get("line")
+
     timetable_qs = Timetable.objects.all()
+    
     if stop:
         stop = int(stop)
         timetable_qs = timetable_qs.filter(stopid=stop)
+    
     if line:
         timetable_qs = timetable_qs.filter(lineid=line)
+    
     timetable = pd.DataFrame.from_records(timetable_qs.values())
+    
     if timetable.empty:
         response = HttpResponse(json.dumps(
             {"error": "No Data fits the Criteria"}), content_type='application/json')
         response.status_code = 400
         return response
+    
     return HttpResponse(timetable.to_json(orient='records'), content_type='application/json')
 

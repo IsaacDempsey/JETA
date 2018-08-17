@@ -17,6 +17,7 @@ var __startStop = ""; // Global Variable for Start Stop selected by the user on 
 var __endStop = ""; // End Stop selected by the user on the form
 var __oldStartStop = ""; // Old start stop to make the undo feature
 var __oldEndStop = ""; // Old End Stop to make the undo feature
+var __line_id = "";
 var autocomplete_data = []; // This a global variable for the data that will be used to select for the destination field in the form
 var startStopAutocompleteData; // A separate variable after the destination is entered by the user in order to plot markers
 var current_flag = false; // This flag is set when the user allows to use the current location
@@ -479,6 +480,7 @@ function getLines(startStop, endStop){
             var res = url1.concat(url2, url3);
             // If more than one bus route, sort by arriving first
             if (data.length > 1) {
+            $("#inorder").text("(in order of first arriving)");
             $.getJSON(res, function(bus) {
             var nextbus = [];
             for (var i = 0; i < bus.results.length; i++) {
@@ -508,12 +510,54 @@ function getLines(startStop, endStop){
       }
   });
 }
+function getFares(line_id) {
+    if (line_id != ""){
+    $("#fares").hide();
+    $.ajax({
+        url: localAddress + "/main/get_fares",
+        // Set the start text as the label value
+        data: {
+          source: __startStop,
+          destination: __endStop,
+          line_id: line_id
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        error: function(jqXHR, textStatus, errorThrown) {
+          
+        },
+        // On success send this data to the receive data function
+        success: function(data) {
+         console.log(data);
+          var adult1 = "€1.50 (Leap), €2.10 (Cash)"
+          var adult2 = "€2.15 (Leap), €2.85 (Cash)"
+          var adult3 = "€2.60 (Leap), €3.30 (Cash)"
+          
+          if (data <= 3) {
+            $("#fares").show();
+            $("#adultfare").text(adult1);
+            }
+          else if (data > 3 && data <= 13) {
+            $("#fares").show();
+            $("#adultfare").text(adult2);
+            }
+        else if (data > 13) {
+            $("#fares").show();
+            $("#adultfare").text(adult3);
+            }
+        else {
+            $("#fares").hide();
+        }
+        }
+      });
+    }
+}
 var old_nextbus = 0;
 var count;
 var rtpi_interval;
 function getTravelTime(content) {
     clearInterval(rtpi_interval);
-
+    var __line_id = content;
     var nextbustime;
     count=0;
     deleteRoute();
@@ -604,7 +648,6 @@ function getTravelTime(content) {
           journeytime_toDisplay = totaltraveltime[1] + " mins";
         }
 
-      console.log(journeytime);
       $("#journeyholder").show();
       $("#journeycontent").show();
       var url1 =
@@ -675,7 +718,9 @@ function getTravelTime(content) {
       }
     }
   });
+
 }
+getFares(__line_id);
 }
 var route = "";
 function getRoute(line) {

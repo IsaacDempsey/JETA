@@ -87,10 +87,14 @@ class TestJourneytime(TestCase):
         cls.routes = Routes.objects.create(routeid='39A_40', lineid='39A', direction=1, stopids=[767, 768, 769, 770, 771])
         cls.coefficients = Coefficients()
         Coefficients.objects.bulk_create([
-            Coefficients(segment="767_768", intercept=123, arrivaltime=0, rain=1, fri=-2, mon=0, sat=-10, sun=-10, thu=-10, tue=-10),
-            Coefficients(segment="769_770", intercept=70, arrivaltime=0, rain=0, fri=-1, mon=-2, sat=-10, sun=-11, thu=-11, tue=-10),
-            Coefficients(segment="768_769", intercept=70, arrivaltime=0, rain=0, fri=0, mon=-4, sat=-12, sun=-19, thu=-19, tue=-10),
-            Coefficients(segment="770_771", intercept=34, arrivaltime=0, rain=0, fri=0, mon=-1, sat=-2, sun=-3, thu=-3, tue=-10)
+            Coefficients(segment="767_768", intercept=123, arrivaltime=0, rain=1, 
+                fri=-2, mon=0, sat=-10, sun=-10, thu=-10, tue=-10, holiday=1),
+            Coefficients(segment="769_770", intercept=70, arrivaltime=0, rain=0, 
+                fri=-1, mon=-2, sat=-10, sun=-11, thu=-11, tue=-10, holiday=-7),
+            Coefficients(segment="768_769", intercept=70, arrivaltime=0, rain=0, 
+                fri=0, mon=-4, sat=-12, sun=-19, thu=-19, tue=-10, holiday=5),
+            Coefficients(segment="770_771", intercept=34, arrivaltime=0, rain=0, 
+                fri=0, mon=-1, sat=-2, sun=-3, thu=-3, tue=-10, holiday=7)
             ])
 
     def test_creation_of_routes(self):
@@ -330,8 +334,8 @@ class SeleniumTests(StaticLiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.url = "http://localhost:8000"
-        # cls.url = "http://csi420-02-vm6.ucd.ie:8000"
+        # cls.url = "http://localhost:8000"
+        cls.url = "http://csi420-02-vm6.ucd.ie"
 
         # Profile setup code:
         # https://stackoverflow.com/questions/16292634/always-allow-geolocation-in-firefox-using-selenium/32719667
@@ -355,7 +359,7 @@ class SeleniumTests(StaticLiveServerTestCase):
         source_box = self.browser.find_element_by_id("source")
         source_box.send_keys("768")
 
-        drop_down = self.browser.find_element_by_xpath("//ul[@id='ui-id-1']/li[1]/div")
+        drop_down = self.browser.find_element_by_xpath("//div[text()='Dublin (UCD Stillorgan Rd Flyover), 768']")
 
         self.assertEqual(drop_down.text, "Dublin (UCD Stillorgan Rd Flyover), 768")
 
@@ -366,7 +370,7 @@ class SeleniumTests(StaticLiveServerTestCase):
         source_box = self.browser.find_element_by_id("source")
         source_box.send_keys("ucd")
 
-        drop_down = self.browser.find_element_by_xpath("//ul[@id='ui-id-1']/li[1]/div")
+        drop_down = self.browser.find_element_by_xpath("//div[text()='Dublin (UCD Stillorgan Rd Flyover), 768']")
 
         self.assertEqual(drop_down.text, "Dublin (UCD Stillorgan Rd Flyover), 768")
 
