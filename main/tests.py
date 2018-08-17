@@ -32,7 +32,7 @@ class TestIndex(SimpleTestCase):
 
     def test_index_contains_correct_html(self):
         response = self.client.get('/main/')
-        self.assertContains(response, 'Get your Journey Time')
+        self.assertContains(response, 'Get your journey time')
 
     def test_index_does_not_contain_incorrect_html(self):
         response = self.client.get('/main/')
