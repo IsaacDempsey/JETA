@@ -200,6 +200,11 @@ def journeytime(request):
 
 
 def get_address(request):
+    """
+    Returns a bus stop address given the stopid or the start of the address.
+    For example: "ucd" -> "Dublin (UCD Stillorgan Rd Flyover), 768"
+    """
+
     if not request.is_ajax():
         response = HttpResponse(json.dumps(
             {"error": "Not Ajax Request"}), content_type='application/json')
@@ -415,6 +420,10 @@ def get_switch(request):
 
 
 def get_fares(request):
+    """
+    # Returns number of stages traversed.
+    """
+
     source = request.GET.get('source', '')
     destination = request.GET.get('destination', '')
     line_id = request.GET.get('line_id', '')
@@ -434,7 +443,10 @@ def get_fares(request):
 
 
 def get_timetable(request):
-    """This function returns the timetable of a selected stop id"""
+    """
+    This function returns the timetable of a selected stop id
+    """
+    
     stop = request.GET.get("stopid")
     line = request.GET.get("line")
 
